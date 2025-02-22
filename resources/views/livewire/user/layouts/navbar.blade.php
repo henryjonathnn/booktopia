@@ -34,10 +34,7 @@
 
             <!-- Keranjang -->
             <a href="/pesanan" class="relative p-3 rounded-xl hover:bg-purple-500/10 text-gray-400 hover:text-purple-400">
-                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M3 3h2l1 5m0 0h13l1-5H5m1 0h13m-4 12a4 4 0 1 1-8 0" />
-                </svg>
+                <x-icon name="shopping-cart" class="w-5 h-5" />
             </a>
 
             <!-- Profil -->

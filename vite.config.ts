@@ -9,8 +9,20 @@ export default defineConfig({
         }),
     ],
     build: {
-        minify: true,
+        minify: 'esbuild', // Gunakan esbuild untuk minifikasi yang lebih cepat
         manifest: true,
         outDir: 'public/build',
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    vendor: ['alpinejs'], // Pisahkan library besar agar caching lebih efisien
+                },
+            },
+        },
+    },
+    server: {
+        hmr: {
+            host: 'localhost',
+        },
     },
 });

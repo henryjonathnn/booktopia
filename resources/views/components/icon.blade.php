@@ -5,4 +5,4 @@
     $svgContent = file_exists($filePath) ? file_get_contents($filePath) : '<!-- SVG not found -->';
 @endphp
 
-{!! str_replace('<svg', '<svg ' . $attributes->merge(['class' => 'w-6 h-6']), $svgContent) !!}
+{!! str_replace('<svg', '<svg ' . $attributes->merge(['class' => 'w-5 h-5']), $svgContent) !!}

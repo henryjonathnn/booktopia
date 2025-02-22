@@ -16,13 +16,12 @@
             <div class="text-4xl md:text-6xl font-bold mb-6 leading-tight">
                 Jelajahi<br />
                 <span
-                    x-data="{ texts: @entangle('dynamicTexts'), currentIndex: @entangle('currentTextIndex') }"
-                    x-init="setInterval(() => currentIndex = (currentIndex + 1) % texts.length, 3000)"
-                    x-text="texts[currentIndex]"
+                    id="typing-text"
                     class="bg-gradient-to-r from-purple-400 to-indigo-400 bg-clip-text text-transparent"
                 ></span><br />
                 dimana aja!
             </div>
+            
             <p class="text-gray-400 text-base md:text-xl mb-8 leading-relaxed">
                 Akses ribuan buku-buku menarik dari penulis terkenal dan penerbit di seluruh dunia.
             </p>
