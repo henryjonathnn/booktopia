@@ -9,20 +9,27 @@ export default defineConfig({
         }),
     ],
     build: {
-        minify: 'esbuild', // Gunakan esbuild untuk minifikasi yang lebih cepat
         manifest: true,
-        outDir: 'public/build',
+        minify: 'terser',
+        cssMinify: true,
         rollupOptions: {
             output: {
-                manualChunks: {
-                    vendor: ['alpinejs'], // Pisahkan library besar agar caching lebih efisien
+                manualChunks: (id) => {
+                    if (id.includes('node_modules')) {
+                        if (id.includes('alpinejs')) return 'alpine';
+                        return 'vendor';
+                    }
                 },
+                chunkFileNames: 'js/[name]-[hash].js',
+                entryFileNames: 'js/[name]-[hash].js',
+                assetFileNames: 'assets/[ext]/[name]-[hash].[ext]'
             },
         },
     },
-    server: {
-        hmr: {
-            host: 'localhost',
-        },
+    optimizeDeps: {
+        include: ['alpinejs'],
     },
+    server: {
+        hmr: true,
+    }
 });

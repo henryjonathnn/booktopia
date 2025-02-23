@@ -1,6 +1,8 @@
 <?php
+
 namespace App\Livewire;
 
+use Illuminate\Support\Facades\Cache;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Buku;
@@ -48,34 +50,34 @@ class BookSection extends Component
 
     public function render()
     {
-        $query = Buku::query();
+        $cacheKey = "books_{$this->sortType}_page_";
         
-        // Apply sorting based on sortType
-        switch ($this->sortType) {
-            case 'favorite':
-                $query->withCount('sukas')
-                      ->orderBy('sukas_count', 'desc');
-                break;
-            case 'rating':
-                // Using a subquery approach to avoid GROUP BY issues
-                $query->select('bukus.*')
-                      ->selectSub(
-                          function($query) {
-                              $query->from('ratings')
-                                   ->whereColumn('ratings.id_buku', 'bukus.id')
-                                   ->selectRaw('COALESCE(AVG(rating), 0)');
-                          },
-                          'average_rating'
-                      )
-                      ->orderBy('average_rating', 'desc');
-                break;
-            default:
-                $query->latest();
-        }
+        $books = Cache::remember($cacheKey, now()->addMinutes(30), function () {
+            $query = Buku::query();
+            
+            switch ($this->sortType) {
+                case 'favorite':
+                    return $query->withCount('sukas')
+                        ->orderBy('sukas_count', 'desc')
+                        ->paginate(10);
+                case 'rating':
+                    return $query->select('bukus.*')
+                        ->selectSub(
+                            function($query) {
+                                $query->from('ratings')
+                                    ->whereColumn('ratings.id_buku', 'bukus.id')
+                                    ->selectRaw('COALESCE(AVG(rating), 0)');
+                            },
+                            'average_rating'
+                        )
+                        ->orderBy('average_rating', 'desc')
+                        ->paginate(10);
+                default:
+                    return $query->latest()->paginate(10);
+            }
+        });
 
-        return view('livewire.book-section', [
-            'books' => $query->paginate(10)
-        ]);
+        return view('livewire.book-section', compact('books'));
     }
 
     public function toggleFilterModal()

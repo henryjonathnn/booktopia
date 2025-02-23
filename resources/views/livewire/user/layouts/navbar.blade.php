@@ -2,7 +2,7 @@
     <div class="flex items-center justify-between px-4 md:px-8 py-4">
         <!-- Logo -->
         <a href="/" class="text-2xl font-bold bg-gradient-to-r from-purple-400 to-indigo-400 bg-clip-text text-transparent">
-            BooKoo
+            Booktopia
         </a>
 
         <!-- Search (Desktop) -->
