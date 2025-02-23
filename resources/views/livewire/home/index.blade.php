@@ -2,7 +2,7 @@
     <main>
         <livewire:hero />
         
-        {{-- <livewire:book-section 
+        <livewire:book-section 
             title="Buku Terfavorit"
             subtitle="Buku-buku dengan jumlah suka terbanyak"
             badge-text="Favorit"
@@ -18,7 +18,7 @@
             badge-color="red"
             sort-type="rating"
             :show-rating="true"
-            right-label="Rating" /> --}}
+            right-label="Rating" />
             
         <livewire:ranking />
     </main>
