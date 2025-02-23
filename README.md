@@ -22,7 +22,7 @@
 
 ## Tech Stack
 <p>
-  <img src="https://skillicons.dev/icons?i=mysql,express,react,nodejs,vite,tailwind,sequelize&perline=7" />
+  <img src="https://go-skill-icons.vercel.app/api/icons?i=mysql,laravel,livewire,alpinejs,tailwind&perline=7" />
 </p>
 
 
