@@ -2,7 +2,7 @@
 
 **Booktopia** is a modern digital library management system that enables users to search and borrow books both online and offline. The platform is designed to provide an efficient experience for users while simplifying library management.
 
-
+<!--![Booktopia Dashboard](https://via.placeholder.com/800x400)-->
 
 ## User Features
 - Smart book search with filters
