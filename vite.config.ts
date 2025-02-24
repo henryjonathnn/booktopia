@@ -17,19 +17,26 @@ export default defineConfig({
                 manualChunks: (id) => {
                     if (id.includes('node_modules')) {
                         if (id.includes('alpinejs')) return 'alpine';
+                        if (id.includes('@livewire')) return 'livewire';
+                        if (id.includes('tailwindcss')) return 'tailwind';
                         return 'vendor';
                     }
                 },
-                chunkFileNames: 'js/[name]-[hash].js',
-                entryFileNames: 'js/[name]-[hash].js',
-                assetFileNames: 'assets/[ext]/[name]-[hash].[ext]'
+                chunkFileNames: 'js/[name].[hash].js',
+                entryFileNames: 'js/[name].[hash].js',
+                assetFileNames: '[ext]/[name].[hash].[ext]'
             },
         },
+        target: 'esnext',
+        cssCodeSplit: true,
     },
     optimizeDeps: {
-        include: ['alpinejs'],
+        include: ['alpinejs', '@livewire/turbolinks'],
+        exclude: ['@vite/client', '@inertiajs/inertia'],
     },
     server: {
-        hmr: true,
+        hmr: {
+            timeout: 1000,
+        },
     }
 });

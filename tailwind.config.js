@@ -17,4 +17,23 @@ export default {
       },
     },
   },
+  future: {
+    hoverOnlyWhenSupported: true,
+  },
+  safelist: [],
+  purge: {
+    enabled: true,
+    content: [
+      "./resources/**/*.blade.php",
+      "./resources/**/*.js",
+      "./resources/**/*.vue",
+      "./app/View/**/*.php",
+    ],
+    options: {
+      safelist: [],
+      blocklist: [],
+      keyframes: true,
+      fontFace: true,
+    },
+  },
 }
