@@ -52,7 +52,7 @@ class Buku extends Model
     // Custom accessor for average rating
     public function getAverageRatingAttribute()
     {
-        return cache()->remember("buku.{$this->id}.rating", 3600, function () {
+        return cache()->remember("buku.{$this->id}.rating", 500, function () {
             return $this->ratings()->avg('rating') ?? 0;
         });
     }

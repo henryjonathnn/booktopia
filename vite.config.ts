@@ -28,7 +28,8 @@ export default defineConfig({
             },
         },
         target: 'esnext',
-        cssCodeSplit: true,
+        cssCodeSplit: false,
+        assetsInlineLimit: 4096,
     },
     optimizeDeps: {
         include: ['alpinejs', '@livewire/turbolinks'],
