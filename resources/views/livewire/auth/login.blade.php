@@ -14,7 +14,7 @@
                 <label class="text-sm text-gray-400">Email</label>
                 <div class="mt-1">
                     <input wire:model="email" type="email" required 
-                        class="w-full bg-[#1A1A2E] rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500/50 border border-purple-500/10"
+                        class="w-full bg-[#1A1A2E] rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500/50 border border-purple-500/10 text-white"
                         placeholder="Masukkan email Anda">
                     @error('email') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
                 </div>
@@ -24,7 +24,7 @@
                 <label class="text-sm text-gray-400">Password</label>
                 <div class="mt-1">
                     <input wire:model="password" type="password" required
-                        class="w-full bg-[#1A1A2E] rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500/50 border border-purple-500/10"
+                        class="w-full bg-[#1A1A2E] rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500/50 border border-purple-500/10 text-white"
                         placeholder="Masukkan password Anda">
                     @error('password') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
                 </div>
