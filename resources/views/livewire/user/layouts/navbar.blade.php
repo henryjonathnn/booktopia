@@ -89,7 +89,4 @@
             @endif
         </div>
     </div>
-
-    <!-- Auth Modal -->
-    @livewire('auth.auth-modal', ['isOpen' => $isAuthModalOpen])
 </nav>

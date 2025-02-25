@@ -77,7 +77,7 @@
                                     type="email"
                                     wire:model.live="email"
                                     placeholder="Masukkan email kamu"
-                                    :error="$e rrors->first('email')"
+                                    :error="$errors->first('email')"
                                     :is-validating="$isValidating['email'] ?? false"
                                 />
 
