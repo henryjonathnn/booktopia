@@ -11,7 +11,7 @@
     <div class="min-h-screen flex">
         <!-- Left Side - Animated Background -->
         <div class="hidden lg:flex lg:w-1/2 relative overflow-hidden">
-            <div class="absolute inset-0 bg-gradient-to-br from-purple-600/20 to-indigo-600/20 z-10"></div>
+            <div class="absolute inset-0  z-10"></div>
             <div class="absolute inset-0 bg-grid-pattern animate-grid-movement"></div>
             <div class="relative z-20 flex items-center justify-center w-full">
                 <div class="text-center">
