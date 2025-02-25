@@ -36,7 +36,9 @@ class Navbar extends Component
 
     public function toggleAuthModal()
     {
+        $this->dispatch('toggleAuthModal');
         $this->isAuthModalOpen = !$this->isAuthModalOpen;
+
     }
 
     public function fetchNotifikasi()

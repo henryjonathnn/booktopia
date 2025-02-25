@@ -1,12 +1,4 @@
 <div>
-    {{-- Trigger Button --}}
-    <button 
-        wire:click="$set('isOpen', true)"
-        class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:opacity-90 rounded-xl font-medium transition-all duration-300 px-6 py-2"
-    >
-        Masuk
-    </button>
-
     {{-- Modal --}}
     @if($isOpen)
     <div class="fixed inset-0 flex items-center justify-center z-50">
@@ -126,7 +118,7 @@
 
                         <button type="submit"
                             class="flex-1 px-6 py-3 rounded-xl font-medium transition-all duration-200 
-                            {{ $isFormValid ? 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:opacity-90' : 'bg-gray-600 opacity-50 cursor-not-allowed' }}
+                            {{ $this->isFormValid ? 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:opacity-90' : 'bg-gray-600 opacity-50 cursor-not-allowed' }}
                             flex items-center justify-center gap-2">
                             @if($isLoginMode)
                                 Masuk
