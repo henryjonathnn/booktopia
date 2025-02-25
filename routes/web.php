@@ -16,19 +16,23 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// Home route - accessible for both guest and authenticated users
 Route::get('/', Index::class)->name('home');
 
-// Auth Routes
+// Auth Routes - only for guests
 Route::middleware('guest')->group(function () {
     Route::get('/login', Login::class)->name('login');
     Route::get('/register', Register::class)->name('register');
 });
 
-// Protected Routes
+// Protected Routes - authenticated users only
 Route::middleware('auth')->group(function () {
+    // Fitur-fitur lain yang membutuhkan autentikasi
     Route::get('/dashboard', function() {
         return view('dashboard');
     })->name('dashboard');
+    
+    // Tambahkan fitur lain yang membutuhkan autentikasi di sini
 });
 
 // Admin Routes

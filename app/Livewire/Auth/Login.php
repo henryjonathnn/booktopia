@@ -34,7 +34,7 @@ class Login extends Component
             if (in_array($user->role, ['ADMIN', 'STAFF'])) {
                 return redirect()->intended(route('admin.dashboard'));
             }
-            return redirect()->intended(route('dashboard'));
+            return redirect()->intended(route('home'));
         }
 
         $this->addError('password', 'Email atau password salah');
