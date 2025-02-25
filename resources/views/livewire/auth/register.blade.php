@@ -14,7 +14,7 @@
                 <label class="text-sm text-gray-400">Nama Lengkap</label>
                 <div class="mt-1">
                     <input wire:model="name" type="text" required
-                        class="w-full bg-[#1A1A2E] rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500/50 border border-purple-500/10 text-white"
+                        class="w-full bg-[#1A1A2E] rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500/50 border {{ $errors->has('name') ? 'border-red-500' : 'border-purple-500/10' }} text-white"
                         placeholder="Masukkan nama lengkap Anda">
                     @error('name') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
                 </div>
@@ -22,20 +22,40 @@
 
             <div>
                 <label class="text-sm text-gray-400">Email</label>
-                <div class="mt-1">
-                    <input wire:model.live="email" type="email" required
-                        class="w-full bg-[#1A1A2E] rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500/50 border border-purple-500/10 text-white"
+                <div class="relative mt-1">
+                    <input 
+                        wire:model.live.debounce.500ms="email" 
+                        type="email" 
+                        required
+                        class="w-full bg-[#1A1A2E] rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500/50 border {{ $errors->has('email') ? 'border-red-500' : 'border-purple-500/10' }} text-white"
                         placeholder="Masukkan email Anda">
+                    
+                    @if($isCheckingEmail)
+                    <div class="absolute right-4 top-3.5">
+                        <div class="animate-spin rounded-full h-5 w-5 border-2 border-purple-500 border-t-transparent"></div>
+                    </div>
+                    @endif
+                    
                     @error('email') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
                 </div>
             </div>
 
             <div>
                 <label class="text-sm text-gray-400">Username</label>
-                <div class="mt-1">
-                    <input wire:model.live="username" type="text" required
-                        class="w-full bg-[#1A1A2E] rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500/50 border border-purple-500/10 text-white"
+                <div class="relative mt-1">
+                    <input 
+                        wire:model.live.debounce.500ms="username" 
+                        type="text" 
+                        required
+                        class="w-full bg-[#1A1A2E] rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500/50 border {{ $errors->has('username') ? 'border-red-500' : 'border-purple-500/10' }} text-white"
                         placeholder="Masukkan username Anda">
+                    
+                    @if($isCheckingUsername)
+                    <div class="absolute right-4 top-3.5">
+                        <div class="animate-spin rounded-full h-5 w-5 border-2 border-purple-500 border-t-transparent"></div>
+                    </div>
+                    @endif
+                    
                     @error('username') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
                 </div>
             </div>
@@ -44,7 +64,7 @@
                 <label class="text-sm text-gray-400">Password</label>
                 <div class="mt-1">
                     <input wire:model="password" type="password" required
-                        class="w-full bg-[#1A1A2E] rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500/50 border border-purple-500/10 text-white"
+                        class="w-full bg-[#1A1A2E] rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500/50 border {{ $errors->has('password') ? 'border-red-500' : 'border-purple-500/10' }} text-white"
                         placeholder="Masukkan password Anda">
                     @error('password') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
                 </div>
@@ -72,4 +92,4 @@
             </a>
         </p>
     </form>
-</div> 
+</div>
