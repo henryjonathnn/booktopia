@@ -1,6 +1,8 @@
 <?php
 
 use App\Livewire\Home\Index;
+use App\Livewire\Auth\Login;
+use App\Livewire\Auth\Register;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,3 +17,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', Index::class)->name('home');
+
+// Auth Routes
+Route::get('/login', Login::class)->name('login');
+Route::get('/register', Register::class)->name('register');

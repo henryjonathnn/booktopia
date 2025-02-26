@@ -129,3 +129,23 @@ main {
       @apply rounded-xl;
     }
   }
+
+@keyframes gridMovement {
+    0% {
+        background-position: 0 0;
+    }
+    100% {
+        background-position: 50px 50px;
+    }
+}
+
+.bg-grid-pattern {
+    background-image: 
+        linear-gradient(rgba(128, 90, 213, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(128, 90, 213, 0.1) 1px, transparent 1px);
+    background-size: 50px 50px;
+}
+
+.animate-grid-movement {
+    animation: gridMovement 20s linear infinite;
+}

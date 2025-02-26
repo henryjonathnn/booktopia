@@ -80,12 +80,11 @@
                     @endif
                 </div>
             @else
-                <button
-                    wire:click="toggleAuthModal"
+                <a href="{{ route('login') }}"
                     class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:opacity-90 rounded-xl font-medium transition-all duration-300 px-6 py-2"
                 >
                     Masuk
-                </button>
+                </a>
             @endif
         </div>
     </div>

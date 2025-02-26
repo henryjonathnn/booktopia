@@ -10,7 +10,6 @@ class Navbar extends Component
     public $isMobileMenuOpen = false;
     public $isProfileDropdownOpen = false;
     public $isNotifikasiOpen = false;
-    public $isAuthModalOpen = false;
     public $unreadCount = 0;
     public $notifikasi = [];
 
@@ -32,13 +31,6 @@ class Navbar extends Component
     public function toggleNotifikasi()
     {
         $this->isNotifikasiOpen = !$this->isNotifikasiOpen;
-    }
-
-    public function toggleAuthModal()
-    {
-        $this->dispatch('toggleAuthModal');
-        $this->isAuthModalOpen = !$this->isAuthModalOpen;
-
     }
 
     public function fetchNotifikasi()
