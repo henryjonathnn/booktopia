@@ -37,7 +37,7 @@
                 <x-icon name="shopping-cart" class="w-5 h-5" />
             </a>
 
-            <!-- Profil -->
+            <!-- Login/Profile -->
             @if ($user)
                 <div class="relative">
                     <button wire:click="toggleProfileDropdown"
@@ -80,11 +80,16 @@
                     @endif
                 </div>
             @else
-                <a href="/login"
-                    class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:opacity-90 rounded-xl font-medium transition-all duration-300 px-6 py-2">
+                <button
+                    wire:click="toggleAuthModal"
+                    class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:opacity-90 rounded-xl font-medium transition-all duration-300 px-6 py-2"
+                >
                     Masuk
-                </a>
+                </button>
             @endif
         </div>
     </div>
+
+    <!-- Auth Modal -->
+    @livewire('auth.auth-modal', ['isOpen' => $isAuthModalOpen])
 </nav>

@@ -28,6 +28,18 @@ class AuthModal extends Component
     public $isValidating = [];
     public $validationStates = [];
 
+    public function mount($isOpen = false)
+    {
+        $this->isOpen = $isOpen;
+    }
+
+    protected $listeners = ['toggleAuthModal'];
+
+    public function toggleAuthModal()
+    {
+        $this->isOpen = !$this->isOpen;
+    }
+
     protected function rules()
     {
         return [

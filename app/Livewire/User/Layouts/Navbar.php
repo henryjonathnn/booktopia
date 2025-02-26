@@ -7,10 +7,10 @@ use Livewire\Component;
 
 class Navbar extends Component
 {
-
     public $isMobileMenuOpen = false;
     public $isProfileDropdownOpen = false;
     public $isNotifikasiOpen = false;
+    public $isAuthModalOpen = false;
     public $unreadCount = 0;
     public $notifikasi = [];
 
@@ -34,6 +34,11 @@ class Navbar extends Component
         $this->isNotifikasiOpen = !$this->isNotifikasiOpen;
     }
 
+    public function toggleAuthModal()
+    {
+        $this->isAuthModalOpen = !$this->isAuthModalOpen;
+    }
+
     public function fetchNotifikasi()
     {
         // Fetch notifications logic here
@@ -54,11 +59,18 @@ class Navbar extends Component
         }
         $this->unreadCount = collect($this->notifikasi)->where('isRead', false)->count();
     }
-    
+
+    public function logout()
+    {
+        Auth::logout();
+        session()->invalidate();
+        session()->regenerateToken();
+        return redirect('/');
+    }
+
     public function render()
     {
-        return view('livewire.user.layouts.navbar', [
-            'user' => Auth::user(),
-        ]);
+        $user = Auth::user();
+        return view('livewire.user.layouts.navbar', compact('user'));
     }
 }
