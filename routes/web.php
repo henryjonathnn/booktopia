@@ -19,5 +19,21 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', Index::class)->name('home');
 
 // Auth Routes
-Route::get('/login', Login::class)->name('login');
-Route::get('/register', Register::class)->name('register');
+Route::middleware('guest')->group(function () {
+    Route::get('/login', Login::class)->name('login');
+    Route::get('/register', Register::class)->name('register');
+});
+
+// Protected Routes
+Route::middleware('auth')->group(function () {
+    Route::get('/dashboard', function() {
+        return view('dashboard');
+    })->name('dashboard');
+});
+
+// Admin Routes
+Route::middleware(['auth', 'role:ADMIN'])->group(function () {
+    Route::get('/admin/dashboard', function() {
+        return view('admin.dashboard');
+    })->name('admin.dashboard');
+});
