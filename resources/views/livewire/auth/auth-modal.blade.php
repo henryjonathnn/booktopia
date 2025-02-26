@@ -1,13 +1,13 @@
 <div>
     {{-- Modal --}}
     @if($isOpen)
-    <div class="fixed inset-0 flex items-center justify-center z-50 p-4">
-        {{-- Backdrop --}}
-        <div class="fixed inset-0 bg-black/60 backdrop-blur-sm" wire:click="$set('isOpen', false)"></div>
+    <div class="fixed inset-0 flex items-center justify-center z-[60] p-4 overflow-y-auto overflow-x-hidden">
+        {{-- Backdrop dengan z-index lebih rendah --}}
+        <div class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[61]" wire:click="$set('isOpen', false)"></div>
         
-        {{-- Modal Container dengan max-height dan overflow --}}
-        <div class="w-full max-w-md relative z-50">
-            <div class="bg-[#1A1A2E]/90 border border-purple-500/10 rounded-xl shadow-xl max-h-[90vh] overflow-y-auto">
+        {{-- Modal Container --}}
+        <div class="relative w-full max-w-md z-[62] my-8">
+            <div class="bg-[#1A1A2E]/90 border border-purple-500/10 rounded-xl shadow-xl">
                 <div class="p-6">
                     {{-- Header --}}
                     <div class="flex justify-between items-center mb-6">
@@ -77,7 +77,7 @@
                                     type="email"
                                     wire:model.live="email"
                                     placeholder="Masukkan email kamu"
-                                    :error="$errors->first('email')"
+                                    :error="$e rrors->first('email')"
                                     :is-validating="$isValidating['email'] ?? false"
                                 />
 
