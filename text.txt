@@ -1,1 +1,0 @@
-ini kan saya punya project di mern stack, nah ada masalah sehingga saya harus migrasi ke project baru dengan teknologi baru dengan TALL stack laravel 10 tailwind 3, nah untuk landing page dan authnya sudah, sekarang tolong buatkan UI dan sistem admin dashboardnya yang sama persis, untuk kode MERN nya langsung saya taruh di sini

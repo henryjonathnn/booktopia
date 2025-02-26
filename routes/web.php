@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\Admin\Dashboard;
 use App\Livewire\Home\Index;
 use App\Livewire\Auth\Login;
 use App\Livewire\Auth\Register;
@@ -37,7 +38,5 @@ Route::middleware('auth')->group(function () {
 
 // Admin Routes
 Route::middleware(['auth', 'role:ADMIN'])->group(function () {
-    Route::get('/admin/dashboard', function() {
-        return view('admin.dashboard');
-    })->name('admin.dashboard');
+    Route::get('/admin/dashboard', Dashboard::class)->name('admin.dashboard');
 });

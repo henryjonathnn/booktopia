@@ -1,12 +1,15 @@
 <x-app-layout>
-    <div class="flex h-screen">
+    <div class="min-h-screen bg-[#0f0a19] text-white antialiased">
         @livewire('admin.layouts.sidebar')
-        <main class="flex-1 ml-72 flex flex-col">
+
+        <main class="md:ml-64">
             @livewire('admin.layouts.navbar')
-            <div class="flex-1 p-8 overflow-y-auto">
+
+            <div class="p-4 md:p-8 pt-20">
                 {{ $slot }}
             </div>
+
+            @livewire('admin.layouts.footer')
         </main>
-        @livewire('admin.layouts.footer')
     </div>
 </x-app-layout>
