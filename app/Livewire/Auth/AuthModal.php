@@ -24,6 +24,10 @@ class AuthModal extends Component
     public $password = '';
     public $password_confirmation = '';
 
+    // Tambahkan properti untuk validasi real-time
+    public $isValidating = [];
+    public $validationStates = [];
+
     protected function rules()
     {
         return [
@@ -44,48 +48,80 @@ class AuthModal extends Component
         $this->reset(['loginEmail', 'loginPassword', 'name', 'email', 'username', 'password', 'password_confirmation']);
     }
 
+    // Validasi real-time untuk email dan username
+    public function validateField($field)
+    {
+        $this->isValidating[$field] = true;
+
+        if ($field === 'email') {
+            $this->validateOnly('email', [
+                'email' => 'required|email|unique:users'
+            ]);
+        } elseif ($field === 'username') {
+            $this->validateOnly('username', [
+                'username' => 'required|min:3|unique:users'
+            ]);
+        }
+
+        $this->isValidating[$field] = false;
+    }
+
+    public function updated($field)
+    {
+        if (in_array($field, ['email', 'username'])) {
+            $this->validateField($field);
+        }
+    }
+
     public function login()
     {
-        $this->validateOnly('loginEmail', ['loginEmail' => 'required|email']);
-        $this->validateOnly('loginPassword', ['loginPassword' => 'required']);
-
-        $user = User::where('email', $this->loginEmail)->first();
-
-        if (!$user) {
-            $this->addError('loginEmail', 'Email tidak terdaftar');
-            return;
-        }
-
-        if (!$user->is_active) {
-            $this->addError('loginEmail', 'Akun Anda telah dinonaktifkan. Silakan hubungi admin.');
-            return;
-        }
+        $this->validate([
+            'loginEmail' => 'required|email',
+            'loginPassword' => 'required'
+        ]);
 
         if (Auth::attempt(['email' => $this->loginEmail, 'password' => $this->loginPassword], $this->remember)) {
+            $user = Auth::user();
+            
+            if (!$user->is_active) {
+                Auth::logout();
+                $this->addError('loginEmail', 'Akun Anda telah dinonaktifkan. Silakan hubungi admin.');
+                return;
+            }
+
             session()->regenerate();
             $this->isOpen = false;
+
+            // Redirect berdasarkan role
+            if (in_array($user->role, ['ADMIN', 'STAFF'])) {
+                return redirect()->intended(route('admin.dashboard'));
+            }
             return redirect()->intended(route('dashboard'));
         }
 
-        $this->addError('loginPassword', 'Password salah');
+        $this->addError('loginPassword', 'Email atau password salah');
     }
 
     public function register()
     {
         $this->validate();
 
-        $user = User::create([
-            'name' => $this->name,
-            'email' => $this->email,
-            'username' => $this->username,
-            'password' => Hash::make($this->password),
-            'role' => 'USER'
-        ]);
+        try {
+            $user = User::create([
+                'name' => $this->name,
+                'email' => $this->email,
+                'username' => $this->username,
+                'password' => Hash::make($this->password),
+                'role' => 'USER'
+            ]);
 
-        Auth::login($user);
-
-        $this->isOpen = false;
-        return redirect()->route('dashboard');
+            Auth::login($user);
+            $this->isOpen = false;
+            
+            return redirect()->route('dashboard');
+        } catch (\Exception $e) {
+            $this->addError('email', 'Terjadi kesalahan saat registrasi');
+        }
     }
 
     public function render()
