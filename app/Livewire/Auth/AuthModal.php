@@ -11,6 +11,7 @@ class AuthModal extends Component
 {
     public $isOpen = false;
     public $isLoginMode = true;
+    public $registerStep = 1;
 
     // Login properties
     public $loginEmail = '';
@@ -133,6 +134,23 @@ class AuthModal extends Component
             return redirect()->route('dashboard');
         } catch (\Exception $e) {
             $this->addError('email', 'Terjadi kesalahan saat registrasi');
+        }
+    }
+
+    public function getIsFormValidProperty()
+    {
+        if ($this->isLoginMode) {
+            return !empty($this->loginEmail) && !empty($this->loginPassword);
+        } else {
+            if ($this->registerStep === 1) {
+                return !empty($this->name) && 
+                       !empty($this->email) && 
+                       !empty($this->password) && 
+                       !empty($this->password_confirmation) &&
+                       $this->password === $this->password_confirmation;
+            } else {
+                return !empty($this->username);
+            }
         }
     }
 
