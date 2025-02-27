@@ -133,46 +133,71 @@
                             <td class="hidden md:table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-400">
                                 {{ $user->created_at->format('d M Y') }}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right sm:text-left"
-                                onclick="event.stopPropagation();">
-                                <div class="flex justify-end sm:justify-start space-x-2">
-                                    <button wire:click.stop="editUser({{ $user->id }})"
-                                        class="text-blue-400 hover:text-blue-300">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
-                                            fill="currentColor">
-                                            <path
-                                                d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                                        </svg>
-                                    </button>
-                                    <button wire:click.stop="confirmUserDeletion({{ $user->id }})"
-                                        class="text-red-400 hover:text-red-300">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20"
-                                            fill="currentColor">
-                                            <path fill-rule="evenodd"
-                                                d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                                                clip-rule="evenodd" />
-                                        </svg>
-                                    </button>
-                                    <button wire:click.stop="toggleUserStatus({{ $user->id }})"
-                                        class="{{ $user->is_active ? 'text-yellow-400 hover:text-yellow-300' : 'text-green-400 hover:text-green-300' }}">
-                                        @if ($user->is_active)
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
-                                                viewBox="0 0 20 20" fill="currentColor">
-                                                <path fill-rule="evenodd"
-                                                    d="M13.477 14.89A6 6 0 015.11 6.524l8.367 8.368zm1.414-1.414L6.524 5.11a6 6 0 018.367 8.367zM18 10a8 8 0 11-16 0 8 8 0 0116 0z"
-                                                    clip-rule="evenodd" />
+                            <td class="px-6 py-4 whitespace-nowrap" onclick="event.stopPropagation();">
+                                <div class="relative">
+                                    <div class="flex items-center gap-2">
+
+                                        <!-- Edit Button -->
+                                        <button wire:click.stop="editUser({{ $user->id }})"
+                                            class="p-1.5 text-gray-400 hover:bg-gray-800 rounded-lg transition-colors">
+                                            <x-icon name="pen-tool"
+                                                class="w-4.5 h-4.5" />
+                                        </button>
+
+                                        <!-- Delete Button -->
+                                        <button
+                                            wire:click.stop="$set('showDeleteConfirmModal', true); $set('userIdToDelete', {{ $user->id }})"
+                                            class="p-1.5 hover:bg-gray-800 rounded-lg transition-colors">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                class="text-gray-400">
+                                                <polyline points="3 6 5 6 21 6"></polyline>
+                                                <path
+                                                    d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                                                </path>
+                                                <line x1="10" y1="11" x2="10" y2="17">
+                                                </line>
+                                                <line x1="14" y1="11" x2="14" y2="17">
+                                                </line>
                                             </svg>
-                                        @else
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
-                                                viewBox="0 0 20 20" fill="currentColor">
-                                                <path fill-rule="evenodd"
-                                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                                    clip-rule="evenodd" />
+                                        </button>
+
+                                        <!-- More Button -->
+                                        <button class="p-1.5 hover:bg-gray-800 rounded-lg transition-colors">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                                                viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                                class="text-gray-400">
+                                                <circle cx="12" cy="12" r="1"></circle>
+                                                <circle cx="12" cy="5" r="1"></circle>
+                                                <circle cx="12" cy="19" r="1"></circle>
                                             </svg>
-                                        @endif
-                                    </button>
+                                        </button>
+                                    </div>
                                 </div>
                             </td>
+
+                            <!-- Delete Confirmation Modal -->
+                            @if ($confirmingUserDeletion)
+                                <div
+                                    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                                    <div class="bg-gray-800 p-6 rounded-lg shadow-xl">
+                                        <h3 class="text-lg font-semibold mb-4">Konfirmasi Hapus</h3>
+                                        <p class="text-gray-400 mb-6">Apakah Anda yakin ingin menghapus item ini?</p>
+                                        <div class="flex justify-end gap-4">
+                                            <button wire:click="$set('confirmingUserDeletion', false)"
+                                                class="px-4 py-2 bg-gray-700 text-gray-300 rounded hover:bg-gray-600">
+                                                Batal
+                                            </button>
+                                            <button wire:click="deleteUser({{ $userIdToDelete }})"
+                                                class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+                                                Hapus
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
                         </tr>
                     @empty
                         <tr>
