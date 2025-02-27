@@ -1,19 +1,26 @@
 <div>
     <div class="pt-16">
         <!-- Page Header -->
-        <div class="mb-8">
-            <h1 class="text-2xl md:text-3xl font-bold mb-2">Data User</h1>
-            <p class="text-gray-400 mb-6">Pengelolaan data user yang ada di perpustakaan BooKoo</p>
+        <div class="mb-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold">{{ $title ?? 'Data User' }}</h1>
+                    <p class="text-sm text-gray-400 mt-1">
+                        {{ $subtitle ?? 'Pengelolaan data user yang ada di perpustakaan BooKoo' }}</p>
+                </div>
 
-            <button wire:click="createUser"
-                class="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg text-white font-medium flex items-center gap-2 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-                Tambah User
-            </button>
+                <button wire:click="createUser"
+                    class="flex items-center justify-center gap-1 px-2 py-1.5 md:px-4 md:py-2.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-[11px] md:text-sm md:w-auto w-max whitespace-nowrap">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        class="w-2.5 h-2.5 md:w-4 md:h-4">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="16"></line>
+                        <line x1="8" y1="12" x2="16" y2="12"></line>
+                    </svg>
+                    <span>{{ $buttonLabel ?? 'Tambah User' }}</span>
+                </button>
+            </div>
         </div>
 
         <!-- Search & Filter Bar -->
@@ -140,8 +147,7 @@
                                         <!-- Edit Button -->
                                         <button wire:click.stop="editUser({{ $user->id }})"
                                             class="p-1.5 text-gray-400 hover:bg-gray-800 rounded-lg transition-colors">
-                                            <x-icon name="pen-tool"
-                                                class="w-4.5 h-4.5" />
+                                            <x-icon name="pen-tool" class="w-4.5 h-4.5" />
                                         </button>
 
                                         <!-- Delete Button -->
