@@ -18,11 +18,12 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      */
-// In AppServiceProvider.php
-public function boot()
-{
-    if (!app()->isLocal()) {
-        View::cache();
+    public function boot()
+    {
+        // In production, Laravel will automatically cache views.
+        if (!app()->isLocal()) {
+            // You can add any other custom caching logic you need here,
+            // but there is no need to call View::cache()
+        }
     }
-}
 }
