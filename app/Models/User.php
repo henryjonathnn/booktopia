@@ -42,6 +42,42 @@ class User extends Authenticatable
         'is_active' => 'boolean',
     ];
 
+    /**
+     * Scope a query to search for users by name, email, or username.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param string $search
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeSearch($query, $search)
+    {
+        if (!$search) {
+            return $query;
+        }
+        
+        return $query->where(function($q) use ($search) {
+            $q->where('name', 'like', "%{$search}%")
+              ->orWhere('email', 'like', "%{$search}%")
+              ->orWhere('username', 'like', "%{$search}%");
+        });
+    }
+
+    /**
+     * Scope a query to filter users by role.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param string $role
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeRole($query, $role)
+    {
+        if (!$role) {
+            return $query;
+        }
+        
+        return $query->where('role', $role);
+    }
+
     // Relationships
     public function peminjaman()
     {
