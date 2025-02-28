@@ -52,7 +52,7 @@ class BookSection extends Component
     {
         $cacheKey = "books_{$this->sortType}_page_";
         
-        $books = Cache::remember($cacheKey, now()->addMinutes(30), function () {
+        $books = Cache::remember($cacheKey, now()->addMinutes(5), function () {
             $query = Buku::query();
             
             switch ($this->sortType) {

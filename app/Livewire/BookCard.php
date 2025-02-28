@@ -16,8 +16,6 @@ class BookCard extends Component
         $this->book = $book;
         $this->showRating = $showRating;
         $this->rightLabel = $rightLabel;
-        // You might want to check if the book is bookmarked by the current user
-        // $this->isBookmarked = auth()->user()->hasBookmarked($book->id);
     }
 
     public function toggleBookmark()
@@ -28,7 +26,7 @@ class BookCard extends Component
 
     public function showBookDetail()
     {
-        $this->emit('showBookDetail', $this->book->id);
+        $this->dispatch('showBookDetail', $this->book->id);
     }
 
     public function render()

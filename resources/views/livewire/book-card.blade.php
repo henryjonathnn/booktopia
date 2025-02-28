@@ -4,8 +4,12 @@
         class="glass-effect rounded-2xl p-3 md:p-4 card-glow border border-purple-500/10 transition-transform duration-300"
         :class="{ '-translate-y-2': isHovered }">
         {{-- Use lazy loading for images --}}
-        <img src="{{ $book->cover_img }}" alt="{{ $book->judul }}" class="w-full aspect-[2/3] rounded-xl object-cover"
-            loading="lazy" decoding="async" />
+        @if ($book->cover_img)
+            <img src="{{ asset('storage/' . $book->cover_img) }}" alt="{{ $book->judul }}"
+                class="w-full aspect-[2/3] rounded-xl object-cover" loading="lazy" decoding="async" />
+        @else
+            <div class="w-full aspect-[2/3] rounded-xl bg-gray-300"></div>
+        @endif
 
         {{-- Remove unnecessary nested divs and simplify structure --}}
         @if ($showRating || $isBookmarked)
