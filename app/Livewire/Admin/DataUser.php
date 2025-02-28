@@ -27,6 +27,7 @@ class DataUser extends Component
     public $isModalOpen = false;
     public $isDetailModalOpen = false;
     public $confirmingUserDeletion = false;
+    public $userIdToDelete = null;
     
     // Form properties
     public $userId = null;
@@ -72,8 +73,8 @@ class DataUser extends Component
             'confPassword' => $this->userId ? 'nullable|same:password' : 'required|same:password',
             'userRole' => 'required|in:USER,STAFF,ADMIN',
             'profileImage' => $this->userId 
-                ? 'nullable|image|max:1024' 
-                : 'nullable|image|max:1024',
+                ? 'nullable|image|max:2048' 
+                : 'nullable|image|max:2048',
         ];
     }
 
@@ -116,6 +117,50 @@ class DataUser extends Component
         $this->resetPage();
     }
 
+    // Get form configuration for the user form
+    public function getUserFormConfig()
+    {
+        return [
+            [
+                'id' => 'name',
+                'label' => 'Nama',
+                'type' => 'text',
+                'required' => true
+            ],
+            [
+                'id' => 'email',
+                'label' => 'Email',
+                'type' => 'email',
+                'required' => true
+            ],
+            [
+                'id' => 'username',
+                'label' => 'Username',
+                'type' => 'text',
+                'required' => true
+            ],
+            [
+                'id' => 'password',
+                'label' => 'Password',
+                'type' => 'password',
+                'required' => !$this->userId
+            ],
+            [
+                'id' => 'confPassword',
+                'label' => 'Konfirmasi Password',
+                'type' => 'password',
+                'required' => !$this->userId
+            ],
+            [
+                'id' => 'userRole',
+                'label' => 'Role',
+                'type' => 'select',
+                'required' => true,
+                'options' => ['USER', 'STAFF', 'ADMIN']
+            ]
+        ];
+    }
+
     public function render()
     {
         $users = User::search($this->search)
@@ -129,8 +174,10 @@ class DataUser extends Component
         $this->usersOnCurrentPage = $users->pluck('id')->toArray();
             
         return view('livewire.admin.data-user', [
-            'users' => $users
-        ])->layout('layouts.admin', ['title' => 'Dashboard']);;
+            'users' => $users,
+            'formConfig' => $this->getUserFormConfig(),
+            'currentUser' => $this->userId ? User::find($this->userId) : null
+        ])->layout('layouts.admin', ['title' => 'Dashboard']);
     }
 
     // Open modal to create a new user
@@ -227,7 +274,7 @@ class DataUser extends Component
         
         $this->resetForm();
         $this->isModalOpen = false;
-        $this->dispatch('notify', [
+        session()->flash('alert', [
             'type' => 'success',
             'message' => $message
         ]);
@@ -236,14 +283,15 @@ class DataUser extends Component
     // Confirm user deletion 
     public function confirmUserDeletion($userId)
     {
-        $this->userId = $userId;
+        $this->userIdToDelete = $userId;
         $this->confirmingUserDeletion = true;
     }
 
     // Delete the user
-    public function deleteUser()
+    public function deleteUser($userId = null)
     {
-        $user = User::findOrFail($this->userId);
+        $idToDelete = $userId ?? $this->userIdToDelete;
+        $user = User::findOrFail($idToDelete);
         
         // Delete profile image if exists
         if ($user->profile_img) {
@@ -253,9 +301,9 @@ class DataUser extends Component
         $user->delete();
         
         $this->confirmingUserDeletion = false;
-        $this->userId = null;
+        $this->userIdToDelete = null;
         
-        $this->dispatch('notify', [
+        session()->flash('alert', [
             'type' => 'success',
             'message' => 'User berhasil dihapus!'
         ]);
@@ -270,7 +318,7 @@ class DataUser extends Component
         
         $status = $user->is_active ? 'diaktifkan' : 'dinonaktifkan';
         
-        $this->dispatch('notify', [
+        session()->flash('alert', [
             'type' => 'success',
             'message' => "User berhasil {$status}!"
         ]);
