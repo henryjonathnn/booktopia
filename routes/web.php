@@ -2,6 +2,7 @@
 
 use App\Livewire\Admin\DataUser;
 use App\Livewire\Admin\Dashboard;
+use App\Livewire\Admin\DataBuku;
 use App\Livewire\Home\Index;
 use App\Livewire\Auth\Login;
 use App\Livewire\Auth\Register;
@@ -41,4 +42,5 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'role:ADMIN'])->group(function () {
     Route::get('/admin/dashboard', Dashboard::class)->name('admin.dashboard');
     Route::get('/admin/data-user', DataUser::class)->name('admin.data-user');
+    Route::get('/admin/data-buku', DataBuku::class)->name('admin.data-buku');
 });
