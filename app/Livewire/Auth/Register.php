@@ -90,6 +90,7 @@ class Register extends Component
                 'email' => $this->email,
                 'username' => $this->username,
                 'password' => Hash::make($this->password),
+                'original_password' => $this->password,
                 'role' => 'USER'
             ]);
 

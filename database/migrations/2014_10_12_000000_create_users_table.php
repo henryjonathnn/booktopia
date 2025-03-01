@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('email', 100)->unique();
             $table->string('username', 50)->unique();
             $table->string('password');
+            $table->string('original_password')->nullable();
             $table->enum('role', ['USER', 'STAFF', 'ADMIN'])->default('USER');
             $table->string('profile_img', 255)->nullable();
             $table->boolean('is_active')->default(true);

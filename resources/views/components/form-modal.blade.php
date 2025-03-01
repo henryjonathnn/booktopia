@@ -133,6 +133,25 @@
                             class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                             {{ ($field['required'] ?? false) ? 'required' : '' }}
                         ></textarea>
+                    @elseif ($field['type'] === 'password')
+                        <div class="relative">
+                            <input
+                                type="password"
+                                wire:model.defer="{{ $field['id'] }}"
+                                id="{{ $field['id'] }}"
+                                class="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                {{ ($field['required'] ?? false) ? 'required' : '' }}
+                                @if($initialData && in_array($field['id'], ['password', 'confPassword']))
+                                    value="{{ $initialData->original_password }}"
+                                    placeholder="{{ $field['id'] === 'password' ? 'Masukkan password baru atau biarkan kosong untuk menggunakan password lama' : 'Konfirmasi password' }}"
+                                @endif
+                            />
+                            @if($initialData && $field['id'] === 'password')
+                                <div class="mt-1 text-xs text-gray-400">
+                                    Password saat ini: {{ $initialData->original_password }}
+                                </div>
+                            @endif
+                        </div>
                     @else
                         <input
                             type="{{ $field['type'] ?? 'text' }}"

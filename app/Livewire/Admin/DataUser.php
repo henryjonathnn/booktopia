@@ -39,6 +39,7 @@ class DataUser extends Component
     public $userRole = 'USER';
     public $profileImage = null;
     public $existingProfileImage = null;
+    public $originalPassword = '';
     
     // Selected users for batch operations
     public $selectedUsers = [];
@@ -203,6 +204,11 @@ class DataUser extends Component
         $this->userRole = $user->role;
         $this->existingProfileImage = $user->profile_img;
         
+        // Set password dan konfirmasi password dengan password asli
+        $this->originalPassword = $user->original_password ?? '';
+        $this->password = $this->originalPassword;
+        $this->confPassword = $this->originalPassword;
+        
         $this->isModalOpen = true;
     }
 
@@ -245,9 +251,19 @@ class DataUser extends Component
             'role' => $this->userRole,
         ];
         
-        // Only add password if it's provided (for updates) or required (for new users)
-        if ($this->password) {
+        if ($this->userId) {
+            // Update existing user
+            // Hanya hash password jika password diubah dan berbeda dari password asli
+            if ($this->password && $this->password !== $this->originalPassword) {
+                $userData['password'] = Hash::make($this->password);
+                $userData['original_password'] = $this->password;
+            }
+        } else {
+            // Create new user
+            // Selalu hash password untuk user baru dan simpan original password
             $userData['password'] = Hash::make($this->password);
+            $userData['original_password'] = $this->password;
+            $userData['is_active'] = true; // Set user baru sebagai aktif secara default
         }
         
         // Handle profile image upload
@@ -336,6 +352,7 @@ class DataUser extends Component
         $this->userRole = 'USER';
         $this->profileImage = null;
         $this->existingProfileImage = null;
+        $this->originalPassword = '';
     }
 
     // Validate email or username in real-time
