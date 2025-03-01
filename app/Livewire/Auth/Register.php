@@ -22,21 +22,14 @@ class Register extends Component
         'username.unique' => 'Username sudah digunakan',
         'password.required' => 'Password wajib diisi',
         'password.min' => 'Password minimal 6 karakter',
-        'password.confirmed' => 'Konfirmasi password tidak cocok'
+        'password_confirmation.required' => 'Konfirmasi password wajib diisi',
+        'password_confirmation.same' => 'Konfirmasi password tidak cocok dengan password'
     ];
     
-    #[Validate('required|min:3')]
     public $name = '';
-    
-    #[Validate('required|email|unique:users')]
     public $email = '';
-    
-    #[Validate('required|min:3|unique:users')]
     public $username = '';
-    
-    #[Validate('required|min:6|confirmed')]
     public $password = '';
-    
     public $password_confirmation = '';
     
     // Validation status flags
@@ -46,43 +39,88 @@ class Register extends Component
     // Previous values for comparison
     private $previousEmail = '';
     private $previousUsername = '';
-    
-    public function updated($propertyName)
+
+    // Definisikan rules terpisah untuk validasi real-time
+    protected function rules()
     {
-        if ($propertyName === 'email') {
+        return [
+            'name' => 'required|min:3',
+            'email' => 'required|email|unique:users',
+            'username' => 'required|min:3|unique:users',
+            'password' => 'required|min:6',
+            'password_confirmation' => 'required|same:password'
+        ];
+    }
+
+    // Rules untuk validasi real-time per field
+    protected function getRealTimeValidationRules($field)
+    {
+        $rules = [
+            'name' => 'required|min:3',
+            'email' => 'required|email|unique:users',
+            'username' => 'required|min:3|unique:users',
+            'password' => 'required|min:6',
+            'password_confirmation' => [
+                'required',
+                function($attribute, $value, $fail) {
+                    if (!empty($value) && $value !== $this->password) {
+                        $fail('Konfirmasi password tidak cocok dengan password');
+                    }
+                }
+            ]
+        ];
+
+        return [$field => $rules[$field]];
+    }
+    
+    public function updated($field)
+    {
+        // Khusus untuk password_confirmation
+        if ($field === 'password_confirmation') {
+            // Jika password_confirmation kosong, reset error
+            if (empty($this->password_confirmation)) {
+                $this->resetValidation('password_confirmation');
+                return;
+            }
+            
+            // Jika password cocok, reset error
+            if ($this->password_confirmation === $this->password) {
+                $this->resetValidation('password_confirmation');
+                return;
+            }
+            
+            // Jika tidak cocok, validasi
+            $this->validateOnly($field, $this->getRealTimeValidationRules($field), $this->messages);
+            return;
+        }
+
+        // Khusus untuk email dan username, gunakan debounce
+        if ($field === 'email') {
             $this->isCheckingEmail = true;
-            $this->validateEmail();
-        } elseif ($propertyName === 'username') {
+            if ($this->email !== $this->previousEmail) {
+                $this->previousEmail = $this->email;
+                $this->validateOnly($field, $this->getRealTimeValidationRules($field), $this->messages);
+            }
+            $this->isCheckingEmail = false;
+        } 
+        elseif ($field === 'username') {
             $this->isCheckingUsername = true;
-            $this->validateUsername();
-        } else {
-            $this->validateOnly($propertyName, null, $this->messages);
+            if ($this->username !== $this->previousUsername) {
+                $this->previousUsername = $this->username;
+                $this->validateOnly($field, $this->getRealTimeValidationRules($field), $this->messages);
+            }
+            $this->isCheckingUsername = false;
         }
-    }
-    
-    public function validateEmail()
-    {
-        // Prevent infinite loops by checking if the value has changed
-        if ($this->email !== $this->previousEmail && !empty($this->email)) {
-            $this->previousEmail = $this->email;
-            $this->validateOnly('email', null, $this->messages);
+        // Untuk field lain, validasi langsung
+        else {
+            $this->validateOnly($field, $this->getRealTimeValidationRules($field), $this->messages);
         }
-        $this->isCheckingEmail = false;
-    }
-    
-    public function validateUsername()
-    {
-        // Prevent infinite loops by checking if the value has changed
-        if ($this->username !== $this->previousUsername && !empty($this->username)) {
-            $this->previousUsername = $this->username;
-            $this->validateOnly('username', null, $this->messages);
-        }
-        $this->isCheckingUsername = false;
     }
     
     public function register()
     {
-        $this->validate(null, $this->messages);
+        // Validasi semua field saat submit
+        $this->validate($this->rules(), $this->messages);
 
         try {
             $user = User::create([
@@ -91,12 +129,13 @@ class Register extends Component
                 'username' => $this->username,
                 'password' => Hash::make($this->password),
                 'original_password' => $this->password,
-                'role' => 'USER'
+                'role' => 'USER',
+                'is_active' => true
             ]);
 
             Auth::login($user);
             
-            return redirect()->route('dashboard');
+            return redirect()->route('home');
         } catch (\Exception $e) {
             $this->addError('email', 'Terjadi kesalahan saat registrasi');
         }

@@ -13,7 +13,7 @@
             <div>
                 <label class="text-sm text-gray-400">Nama Lengkap</label>
                 <div class="mt-1">
-                    <input wire:model="name" type="text" required
+                    <input wire:model.live.debounce.500ms="name" type="text" required
                         class="w-full bg-[#1A1A2E] rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500/50 border {{ $errors->has('name') ? 'border-red-500' : 'border-purple-500/10' }} text-white"
                         placeholder="Masukkan nama lengkap Anda">
                     @error('name') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
@@ -63,7 +63,10 @@
             <div>
                 <label class="text-sm text-gray-400">Password</label>
                 <div class="mt-1">
-                    <input wire:model="password" type="password" required
+                    <input 
+                        wire:model.live.debounce.500ms="password" 
+                        type="password" 
+                        required
                         class="w-full bg-[#1A1A2E] rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500/50 border {{ $errors->has('password') ? 'border-red-500' : 'border-purple-500/10' }} text-white"
                         placeholder="Masukkan password Anda">
                     @error('password') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
@@ -73,9 +76,13 @@
             <div>
                 <label class="text-sm text-gray-400">Konfirmasi Password</label>
                 <div class="mt-1">
-                    <input wire:model="password_confirmation" type="password" required
-                        class="w-full bg-[#1A1A2E] rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500/50 border border-purple-500/10 text-white"
+                    <input 
+                        wire:model.live.debounce.500ms="password_confirmation" 
+                        type="password" 
+                        required
+                        class="w-full bg-[#1A1A2E] rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500/50 border {{ $errors->has('password_confirmation') ? 'border-red-500' : 'border-purple-500/10' }} text-white"
                         placeholder="Konfirmasi password Anda">
+                    @error('password_confirmation') <span class="text-sm text-red-500">{{ $message }}</span> @enderror
                 </div>
             </div>
         </div>
