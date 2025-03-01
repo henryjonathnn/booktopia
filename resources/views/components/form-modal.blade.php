@@ -1,12 +1,26 @@
 @if($isOpen)
 <div 
     class="fixed inset-0 z-50 flex items-center justify-center"
-    x-data
-    x-init="$nextTick(() => { document.body.classList.add('overflow-hidden'); $el.querySelector('input:not([type=file]):not([type=hidden])').focus() })"
-    x-on:keydown.escape.window="$wire.closeModal()"
+    x-data="{ 
+        init() {
+            document.body.classList.add('overflow-hidden');
+            this.$el.querySelector('input:not([type=file]):not([type=hidden])').focus();
+            
+            this.$watch('$wire.isModalOpen', value => {
+                if (!value) {
+                    document.body.classList.remove('overflow-hidden');
+                }
+            });
+        },
+        cleanup() {
+            document.body.classList.remove('overflow-hidden');
+        }
+    }"
+    x-init="init()"
+    @keydown.escape.window="$wire.closeModal(); cleanup()"
 >
     <!-- Backdrop -->
-    <div class="fixed inset-0 bg-black/50" wire:click="closeModal"></div>
+    <div class="fixed inset-0 bg-black/50" @click="$wire.closeModal(); cleanup()"></div>
     
     <!-- Modal Content -->
     <div class="relative z-50 w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-[#0f0a19] rounded-lg shadow-xl">
@@ -16,7 +30,8 @@
                 {{ isset($initialData) ? "Edit $title" : "Tambah $title Baru" }}
             </h2>
             <button
-                wire:click="closeModal"
+                @click="$wire.closeModal(); cleanup()"
+                type="button"
                 class="p-2 hover:bg-gray-800 rounded-full transition-colors"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -173,7 +188,7 @@
             <div class="flex justify-end gap-3 pt-6 border-t border-gray-700">
                 <button
                     type="button"
-                    wire:click="closeModal"
+                    @click="$wire.closeModal(); cleanup()"
                     class="px-4 py-2 text-sm font-medium text-white bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors"
                 >
                     Batal

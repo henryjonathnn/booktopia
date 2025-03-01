@@ -9,10 +9,8 @@
     <link rel="shortcut icon" href="{{ asset('assets/logo.png') }}" type="image/x-icon">
     @once
         @vite(['resources/css/app.css', 'resources/js/app.js'])
-        <script src="{{ mix('resources/js/app.js') }}" defer></script>
         @livewireStyles
     @endonce
-
 </head>
 
 <body class="min-h-full flex flex-col">

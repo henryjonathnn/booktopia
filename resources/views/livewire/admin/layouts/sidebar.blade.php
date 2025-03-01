@@ -1,4 +1,4 @@
-<div>
+<div x-data="sidebar">
     <!-- Overlay for mobile -->
     <div 
         x-show="sidebarOpen" 
