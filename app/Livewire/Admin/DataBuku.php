@@ -8,6 +8,7 @@ use Livewire\WithPagination;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
 
 class DataBuku extends Component
 {
@@ -51,14 +52,33 @@ class DataBuku extends Component
     // Cache selected book for detail view
     public $selectedBuku = null;
 
+    // Available categories from database
+    public $categories = [];
+
     protected $listeners = ['refreshBooks' => '$refresh'];
 
-    // Available categories
-    public $categories = [
-        'Fiksi', 'Non-Fiksi', 'Sastra', 'Teknologi', 'Sains', 
-        'Sejarah', 'Biografi', 'Pendidikan', 'Anak-anak', 'Remaja',
-        'Bisnis', 'Kesehatan', 'Agama', 'Seni', 'Kuliner'
-    ];
+    // Available categories from database
+    public function getCategories()
+    {
+        // Ambil nilai enum dari skema database
+        $enumValues = DB::select("SHOW COLUMNS FROM bukus WHERE Field = 'kategori'")[0]->Type;
+        preg_match('/^enum\((.*)\)$/', $enumValues, $matches);
+        
+        $values = [];
+        if (isset($matches[1])) {
+            foreach(explode(',', $matches[1]) as $value) {
+                $values[] = trim($value, "'");
+            }
+        }
+        
+        return $values;
+    }
+
+    public function mount()
+    {
+        $this->resetPage();
+        $this->categories = $this->getCategories();
+    }
 
     // Define validation rules
     protected function rules()
@@ -111,11 +131,6 @@ class DataBuku extends Component
         } else {
             $this->selectedBooks = [];
         }
-    }
-
-    public function mount()
-    {
-        $this->resetPage();
     }
 
     // Get form configuration for the book form
