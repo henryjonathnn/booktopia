@@ -1,5 +1,6 @@
 <?php
 
+use App\Livewire\Admin\DataPeminjaman;
 use App\Livewire\Admin\DataUser;
 use App\Livewire\Admin\Dashboard;
 use App\Livewire\Admin\DataBuku;
@@ -43,4 +44,5 @@ Route::middleware(['auth', 'role:ADMIN'])->group(function () {
     Route::get('/admin/dashboard', Dashboard::class)->name('admin.dashboard');
     Route::get('/admin/data-user', DataUser::class)->name('admin.data-user');
     Route::get('/admin/data-buku', DataBuku::class)->name('admin.data-buku');
+    Route::get('/admin/data-peminjaman', DataPeminjaman::class)->name('admin.data-peminjaman');
 });
