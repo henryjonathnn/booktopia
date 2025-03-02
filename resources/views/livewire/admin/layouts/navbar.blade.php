@@ -34,7 +34,7 @@
                             <div
                                 class="relative w-8 h-8 rounded-lg overflow-hidden bg-purple-500/10 border-2 border-purple-500">
                                 @if ($user->profile_img)
-                                    <img src="{{ asset($user->profile_img) }}" alt="Profile"
+                                    <img src={{ asset('storage/'. $user->profile_img) }} alt="Profile"
                                         class="w-full h-full object-cover" />
                                 @else
                                     <div class="w-full h-full flex items-center justify-center bg-purple-500">
@@ -66,7 +66,7 @@
                                 class="absolute right-0 mt-2 w-64 bg-[#1a1625] rounded-xl shadow-lg border border-purple-500/10 py-1 z-50">
                                 <div class="flex items-center space-x-3 px-4 py-3 border-b border-purple-500/10">
                                     <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-purple-500">
-                                        <img src="{{ asset($user->profile_img ?? 'default-avatar.png') }}"
+                                        <img src="{{ asset('storage/' . $user->profile_img ?? 'default-avatar.png') }}"
                                             alt="Profile" class="w-full h-full object-cover" />
                                     </div>
                                     <div>

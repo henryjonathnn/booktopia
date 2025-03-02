@@ -44,7 +44,7 @@
                         class="flex items-center space-x-2 p-2 rounded-xl hover:bg-purple-500/10">
                         <div class="w-8 h-8 rounded-full overflow-hidden border-2 border-purple-500">
                             @if ($user->profile_img)
-                                <img src="{{ asset($user->profile_img) }}" alt="Profile" class="w-full h-full object-cover" />
+                                <img src="{{ asset('storage/'. $user->profile_img) }}" alt="Profile" class="w-full h-full object-cover" />
                             @else
                                 <div class="w-full h-full bg-purple-500 flex items-center justify-center">
                                     <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" stroke-width="2"
@@ -64,7 +64,7 @@
                         <div class="absolute right-0 top-full mt-2 w-64 bg-[#1A1A2E] rounded-xl shadow-lg border border-purple-500/10 py-2">
                             <div class="flex items-center space-x-3 px-4 py-3 border-b border-purple-500/10">
                                 <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-purple-500">
-                                    <img src="{{ asset($user->profile_img ?? 'default-avatar.png') }}" alt="Profile"
+                                    <img src="{{ asset('storage/'. $user->profile_img ?? 'default-avatar.png') }}" alt="Profile"
                                         class="w-full h-full object-cover" />
                                 </div>
                                 <div>

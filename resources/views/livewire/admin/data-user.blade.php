@@ -144,7 +144,6 @@
                                 <td class="px-6 py-4 whitespace-nowrap" onclick="event.stopPropagation();">
                                     <div class="relative">
                                         <div class="flex items-center gap-2">
-
                                             <!-- Edit Button -->
                                             <button wire:click.stop="editUser({{ $user->id }})"
                                                 class="p-1.5 text-gray-400 hover:bg-gray-800 rounded-lg transition-colors">
@@ -218,6 +217,113 @@
                                 class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
                                 Hapus
                             </button>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
+            <!-- Detail Modal -->
+            @if ($selectedUser && $isDetailModalOpen)
+                <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div class="bg-[#0f0a19] rounded-lg shadow-xl max-w-xl w-full max-h-[90vh] overflow-y-auto">
+                        <div class="p-6">
+                            <!-- Header with title and close button -->
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-xl font-semibold">Detail User</h3>
+                                <button wire:click="closeDetailModal" class="text-gray-400 hover:text-white">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <!-- User detail content -->
+                            <div class="flex flex-col md:flex-row gap-6">
+                                <!-- Profile image -->
+                                <div class="w-full md:w-1/3 flex-shrink-0">
+                                    <div class="bg-gray-800 rounded-lg overflow-hidden h-48 md:h-64 w-full">
+                                        @if ($selectedUser->profile_img)
+                                            <img src="{{ Storage::url($selectedUser->profile_img) }}"
+                                                alt="{{ $selectedUser->name }}" class="w-full h-full object-cover">
+                                        @else
+                                            <div class="flex items-center justify-center h-full">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-600"
+                                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                                </svg>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                <!-- User details -->
+                                <div class="flex-1">
+                                    <h2 class="text-xl font-bold mb-2">{{ $selectedUser->name }}</h2>
+                                    <p class="text-gray-400 mb-4">{{ $selectedUser->email }}</p>
+
+                                    <div class="space-y-4">
+                                        <!-- Informasi Umum -->
+                                        <div>
+                                            <h3 class="text-sm font-medium text-gray-500 uppercase mb-2">Informasi Umum</h3>
+                                            <div class="grid grid-cols-2 gap-2">
+                                                <div>
+                                                    <p class="text-xs text-gray-500">Username</p>
+                                                    <p class="text-sm">{{ $selectedUser->username }}</p>
+                                                </div>
+                                                <div>
+                                                    <p class="text-xs text-gray-500">Role</p>
+                                                    <p class="text-sm">{{ $selectedUser->role }}</p>
+                                                </div>
+                                                <div>
+                                                    <p class="text-xs text-gray-500">Status</p>
+                                                    <p class="text-sm">{{ $selectedUser->is_active ? 'Aktif' : 'Nonaktif' }}</p>
+                                                </div>
+                                                <div>
+                                                    <p class="text-xs text-gray-500">Tanggal Bergabung</p>
+                                                    <p class="text-sm">{{ $selectedUser->created_at->format('d M Y') }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Statistik -->
+                                        <div>
+                                            <h3 class="text-sm font-medium text-gray-500 uppercase mb-2">Statistik</h3>
+                                            <div class="grid grid-cols-2 gap-2">
+                                                <div>
+                                                    <p class="text-xs text-gray-500">Total Peminjaman</p>
+                                                    <p class="text-sm">{{ $selectedUser->peminjaman->count() }}</p>
+                                                </div>
+                                                <div>
+                                                    <p class="text-xs text-gray-500">Buku Disukai</p>
+                                                    <p class="text-sm">{{ $selectedUser->sukas->count() }}</p>
+                                                </div>
+                                                <div>
+                                                    <p class="text-xs text-gray-500">Bookmark</p>
+                                                    <p class="text-sm">{{ $selectedUser->bookmarks->count() }}</p>
+                                                </div>
+                                                <div>
+                                                    <p class="text-xs text-gray-500">Rating Diberikan</p>
+                                                    <p class="text-sm">{{ $selectedUser->ratings->count() }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Footer with action buttons -->
+                            <div class="mt-6 flex justify-end gap-3">
+                                <button wire:click="closeDetailModal"
+                                    class="px-4 py-2 bg-gray-800 text-gray-300 rounded-lg hover:bg-gray-700 transition-colors">
+                                    Tutup
+                                </button>
+                                <button wire:click="editUser({{ $selectedUser->id }})"
+                                    class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+                                    Edit User
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
