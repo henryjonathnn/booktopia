@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Route;
 
 // Home route - accessible for both guest and authenticated users
 Route::get('/', Index::class)->name('home');
+Route::get('/buku', \App\Livewire\Book\Index::class)->name('books');
 
 // Auth Routes - only for guests
 Route::middleware('guest')->group(function () {
