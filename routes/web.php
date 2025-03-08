@@ -7,7 +7,7 @@ use App\Livewire\Admin\DataBuku;
 use App\Livewire\Home\Index;
 use App\Livewire\Auth\Login;
 use App\Livewire\Auth\Register;
-use App\Livewire\Books\Index;
+use App\Livewire\Books\Index as BooksIndex;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -23,6 +23,9 @@ use Illuminate\Support\Facades\Route;
 
 // Home route - accessible for both guest and authenticated users
 Route::get('/', Index::class)->name('home');
+
+Route::get('/buku', BooksIndex::class)->name('buku');
+// Route::get('/buku/{id}', Detail::class)->name('buku');
 
 // Auth Routes - only for guests
 Route::middleware('guest')->group(function () {
@@ -47,6 +50,3 @@ Route::middleware(['auth', 'role:ADMIN'])->group(function () {
     Route::get('/admin/data-buku', DataBuku::class)->name('admin.data-buku');
     Route::get('/admin/data-peminjaman', DataPeminjaman::class)->name('admin.data-peminjaman');
 });
-
-// Books route
-Route::get('/books', Index::class)->name('books');
