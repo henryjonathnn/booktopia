@@ -10,6 +10,7 @@ class Index extends Component
 {
     use WithPagination;
 
+    public $search = '';
     public $selectedCategory = '';
     public $sortBy = 'newest';
     public $categories = [
@@ -18,9 +19,21 @@ class Index extends Component
     ];
 
     protected $queryString = [
+        'search' => ['except' => ''],
         'selectedCategory' => ['except' => ''],
         'sortBy' => ['except' => 'newest']
     ];
+
+    public function mount()
+    {
+        // Ambil parameter search dari URL jika ada
+        $this->search = request()->query('search', '');
+    }
+
+    public function updatedSearch()
+    {
+        $this->resetPage();
+    }
 
     public function updatedSelectedCategory()
     {
@@ -35,6 +48,13 @@ class Index extends Component
     public function render()
     {
         $query = Buku::query()
+            ->when($this->search, function ($query) {
+                $query->where(function($q) {
+                    $q->where('judul', 'like', '%' . $this->search . '%')
+                      ->orWhere('penulis', 'like', '%' . $this->search . '%')
+                      ->orWhere('kategori', 'like', '%' . $this->search . '%');
+                });
+            })
             ->when($this->selectedCategory, function ($query) {
                 $query->where('kategori', $this->selectedCategory);
             });
