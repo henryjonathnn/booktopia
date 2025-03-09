@@ -12,6 +12,7 @@ class Navbar extends Component
     public $isNotifikasiOpen = false;
     public $unreadCount = 0;
     public $notifikasi = [];
+    public $search = '';
 
     public function mount()
     {
@@ -52,6 +53,13 @@ class Navbar extends Component
             }
         }
         $this->unreadCount = collect($this->notifikasi)->where('isRead', false)->count();
+    }
+
+    public function search()
+    {
+        if (trim($this->search) !== '') {
+            return redirect()->route('books', ['search' => $this->search]);
+        }
     }
 
     public function logout()

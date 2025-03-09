@@ -10,7 +10,6 @@ class Index extends Component
 {
     use WithPagination;
 
-    public $search = '';
     public $selectedCategory = '';
     public $sortBy = 'newest';
     public $categories = [
@@ -19,15 +18,9 @@ class Index extends Component
     ];
 
     protected $queryString = [
-        'search' => ['except' => ''],
         'selectedCategory' => ['except' => ''],
         'sortBy' => ['except' => 'newest']
     ];
-
-    public function updatedSearch()
-    {
-        $this->resetPage();
-    }
 
     public function updatedSelectedCategory()
     {
@@ -42,10 +35,6 @@ class Index extends Component
     public function render()
     {
         $query = Buku::query()
-            ->when($this->search, function ($query) {
-                $query->where('judul', 'like', '%' . $this->search . '%')
-                    ->orWhere('penulis', 'like', '%' . $this->search . '%');
-            })
             ->when($this->selectedCategory, function ($query) {
                 $query->where('kategori', $this->selectedCategory);
             });
@@ -63,7 +52,7 @@ class Index extends Component
                 $query->latest();
         }
 
-        $books = $query->paginate(20);
+        $books = $query->paginate(24);
 
         return view('livewire.books.index', [
             'books' => $books
