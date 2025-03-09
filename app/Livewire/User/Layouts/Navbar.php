@@ -52,9 +52,6 @@ class Navbar extends Component
 
     public function viewBook($id)
     {
-        $this->searchResults = [];
-        $this->search = '';
-        // Redirect to book detail page
         return redirect()->route('book.detail', ['id' => $id]);
     }
 
