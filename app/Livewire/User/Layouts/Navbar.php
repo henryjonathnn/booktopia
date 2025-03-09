@@ -15,7 +15,6 @@ class Navbar extends Component
     public $notifikasi = [];
     public $search = '';
     public $searchResults = [];
-    public $showSearchResults = false;
 
     protected $listeners = ['clickedOutside' => 'closeSearchResults'];
 
@@ -24,24 +23,24 @@ class Navbar extends Component
         $this->fetchNotifikasi();
     }
 
-    public function updatedSearch()
+    public function updatedSearch($value)
     {
-        if (strlen(trim($this->search)) >= 2) {
-            $this->searchResults = Buku::where('judul', 'like', '%' . $this->search . '%')
-                ->orWhere('penulis', 'like', '%' . $this->search . '%')
-                ->orWhere('kategori', 'like', '%' . $this->search . '%')
-                ->limit(5)
-                ->get();
-            $this->showSearchResults = true;
+        if (strlen(trim($value)) >= 2) {
+            $this->searchResults = Buku::where(function($query) use ($value) {
+                $query->where('judul', 'like', '%' . $value . '%')
+                      ->orWhere('penulis', 'like', '%' . $value . '%')
+                      ->orWhere('kategori', 'like', '%' . $value . '%');
+            })
+            ->limit(5)
+            ->get();
         } else {
             $this->searchResults = [];
-            $this->showSearchResults = false;
         }
     }
 
     public function closeSearchResults()
     {
-        $this->showSearchResults = false;
+        $this->searchResults = [];
     }
 
     public function viewAllResults()
@@ -53,7 +52,7 @@ class Navbar extends Component
 
     public function viewBook($id)
     {
-        $this->showSearchResults = false;
+        $this->searchResults = [];
         $this->search = '';
         // Redirect to book detail page
         return redirect()->route('book.detail', ['id' => $id]);
