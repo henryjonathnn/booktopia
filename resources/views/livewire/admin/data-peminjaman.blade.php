@@ -62,141 +62,93 @@
                                     width="16" height="16" viewBox="0 0 24 24" fill="none"
                                     stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                     stroke-linejoin="round">
-                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2">
-                                    </rect>
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                                     <line x1="16" y1="2" x2="16" y2="6"></line>
                                     <line x1="8" y1="2" x2="8" y2="6"></line>
                                     <line x1="3" y1="10" x2="21" y2="10"></line>
                                 </svg>
                             </div>
-
+                        
                             <div x-show="isOpen" @click.away="isOpen = false"
-                                class="absolute mt-1 bg-[#1a1625] rounded-lg shadow-lg z-50 p-4 border border-gray-800"
+                                class="absolute mt-1 bg-[#1a1625] rounded-lg shadow-lg z-50 p-4 border border-gray-800 w-72"
                                 x-transition:enter="transition ease-out duration-200"
                                 x-transition:enter-start="opacity-0 scale-95"
                                 x-transition:enter-end="opacity-100 scale-100"
                                 x-transition:leave="transition ease-in duration-100"
                                 x-transition:leave-start="opacity-100 scale-100"
                                 x-transition:leave-end="opacity-0 scale-95">
-                                <div class="flex space-x-4">
-                                    <!-- Start Date Calendar -->
-                                    <div class="w-64">
-                                        <div class="flex justify-between items-center mb-2">
-                                            <span class="text-sm font-medium text-gray-300">Start Date</span>
-                                            <div class="flex space-x-1">
-                                                <button @click="prevMonth('start')"
-                                                    class="p-1 hover:bg-gray-800 rounded-lg">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16"
-                                                        height="16" viewBox="0 0 24 24" fill="none"
-                                                        stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                                        stroke-linejoin="round" class="text-gray-400">
-                                                        <polyline points="15 18 9 12 15 6"></polyline>
-                                                    </svg>
-                                                </button>
-                                                <button @click="nextMonth('start')"
-                                                    class="p-1 hover:bg-gray-800 rounded-lg">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16"
-                                                        height="16" viewBox="0 0 24 24" fill="none"
-                                                        stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                                        stroke-linejoin="round" class="text-gray-400">
-                                                        <polyline points="9 18 15 12 9 6"></polyline>
-                                                    </svg>
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div class="text-center mb-2 text-sm font-medium"
-                                            x-text="formatMonthYear(startMonth, startYear)"></div>
-                                        <div class="grid grid-cols-7 gap-1 mb-1">
-                                            <template x-for="day in ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']"
-                                                :key="day">
-                                                <div class="text-center text-xs text-gray-500 font-medium py-1"
-                                                    x-text="day"></div>
-                                            </template>
-                                        </div>
-                                        <div class="grid grid-cols-7 gap-1">
-                                            <template x-for="blankday in startBlankDays"
-                                                :key="'startblank' + blankday">
-                                                <div class="text-center text-xs text-gray-600 p-1 rounded-lg"></div>
-                                            </template>
-                                            <template x-for="(date, dateIndex) in startDays"
-                                                :key="'start' + dateIndex">
-                                                <div @click="selectDate(date, 'start')"
-                                                    :class="{
-                                                        'bg-purple-900 text-white': isSelectedStartDate(date),
-                                                        'bg-purple-900/20 text-purple-400': isInRange(date) && !
-                                                            isSelectedStartDate(date) && !isSelectedEndDate(date),
-                                                        'hover:bg-gray-800': !isSelectedStartDate(date),
-                                                        'cursor-pointer': true
-                                                    }"
-                                                    class="text-center text-xs p-1 rounded-lg">
-                                                    <span x-text="date"></span>
-                                                </div>
-                                            </template>
-                                        </div>
-                                    </div>
-
-                                    <!-- End Date Calendar -->
-                                    <div class="w-64">
-                                        <div class="flex justify-between items-center mb-2">
-                                            <span class="text-sm font-medium text-gray-300">End Date</span>
-                                            <div class="flex space-x-1">
-                                                <button @click="prevMonth('end')"
-                                                    class="p-1 hover:bg-gray-800 rounded-lg">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16"
-                                                        height="16" viewBox="0 0 24 24" fill="none"
-                                                        stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                                        stroke-linejoin="round" class="text-gray-400">
-                                                        <polyline points="15 18 9 12 15 6"></polyline>
-                                                    </svg>
-                                                </button>
-                                                <button @click="nextMonth('end')"
-                                                    class="p-1 hover:bg-gray-800 rounded-lg">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16"
-                                                        height="16" viewBox="0 0 24 24" fill="none"
-                                                        stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                                        stroke-linejoin="round" class="text-gray-400">
-                                                        <polyline points="9 18 15 12 9 6"></polyline>
-                                                    </svg>
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <div class="text-center mb-2 text-sm font-medium"
-                                            x-text="formatMonthYear(endMonth, endYear)"></div>
-                                        <div class="grid grid-cols-7 gap-1 mb-1">
-                                            <template x-for="day in ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']"
-                                                :key="day">
-                                                <div class="text-center text-xs text-gray-500 font-medium py-1"
-                                                    x-text="day"></div>
-                                            </template>
-                                        </div>
-                                        <div class="grid grid-cols-7 gap-1">
-                                            <template x-for="blankday in endBlankDays" :key="'endblank' + blankday">
-                                                <div class="text-center text-xs text-gray-600 p-1 rounded-lg"></div>
-                                            </template>
-                                            <template x-for="(date, dateIndex) in endDays" :key="'end' + dateIndex">
-                                                <div @click="selectDate(date, 'end')"
-                                                    :class="{
-                                                        'bg-purple-900 text-white': isSelectedEndDate(date),
-                                                        'bg-purple-900/20 text-purple-400': isInRange(date) && !
-                                                            isSelectedStartDate(date) && !isSelectedEndDate(date),
-                                                        'hover:bg-gray-800': !isSelectedEndDate(date),
-                                                        'cursor-pointer': true
-                                                    }"
-                                                    class="text-center text-xs p-1 rounded-lg">
-                                                    <span x-text="date"></span>
-                                                </div>
-                                            </template>
-                                        </div>
-                                    </div>
+                                
+                                <!-- Date Selection Tabs -->
+                                <div class="flex justify-between items-center mb-4">
+                                    <button @click="switchToStartView()" 
+                                        class="text-sm font-medium px-3 py-1.5 rounded-lg transition-colors"
+                                        :class="currentView === 'start' ? 'bg-purple-900 text-white' : 'text-gray-300 hover:bg-gray-800'">
+                                        Start Date <span x-show="startDate" x-text="formatDate(startDate)" class="text-xs"></span>
+                                    </button>
+                                    <button @click="switchToEndView()" 
+                                        class="text-sm font-medium px-3 py-1.5 rounded-lg transition-colors"
+                                        :class="currentView === 'end' ? 'bg-purple-900 text-white' : 'text-gray-300 hover:bg-gray-800'">
+                                        End Date <span x-show="endDate" x-text="formatDate(endDate)" class="text-xs"></span>
+                                    </button>
                                 </div>
-
+                        
+                                <!-- Calendar Title with Month/Year Navigation -->
+                                <div class="flex justify-between items-center mb-3">
+                                    <button @click="prevMonth()"
+                                        class="p-1 hover:bg-gray-800 rounded-lg">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16"
+                                            height="16" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                            stroke-linejoin="round" class="text-gray-400">
+                                            <polyline points="15 18 9 12 15 6"></polyline>
+                                        </svg>
+                                    </button>
+                                    <span class="text-sm font-medium" x-text="formatMonthYear(currentMonth, currentYear)"></span>
+                                    <button @click="nextMonth()"
+                                        class="p-1 hover:bg-gray-800 rounded-lg">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16"
+                                            height="16" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                            stroke-linejoin="round" class="text-gray-400">
+                                            <polyline points="9 18 15 12 9 6"></polyline>
+                                        </svg>
+                                    </button>
+                                </div>
+                        
+                                <!-- Calendar -->
+                                <div class="grid grid-cols-7 gap-1 mb-1">
+                                    <template x-for="day in ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']" :key="day">
+                                        <div class="text-center text-xs text-gray-500 font-medium py-1" x-text="day"></div>
+                                    </template>
+                                </div>
+                                <div class="grid grid-cols-7 gap-1">
+                                    <template x-for="blankday in blankDays" :key="'blank' + blankday">
+                                        <div class="text-center text-xs text-gray-600 p-1 rounded-lg"></div>
+                                    </template>
+                                    <template x-for="(date, dateIndex) in days" :key="dateIndex">
+                                        <div @click="selectDate(date)"
+                                            :class="{
+                                                'bg-purple-900 text-white': isSelectedDate(date),
+                                                'bg-purple-900/20 text-purple-400': isInRange(date) && !isSelectedDate(date),
+                                                'hover:bg-gray-800': !isSelectedDate(date),
+                                                'cursor-pointer': true
+                                            }"
+                                            class="text-center text-xs p-1 rounded-lg">
+                                            <span x-text="date"></span>
+                                        </div>
+                                    </template>
+                                </div>
+                        
+                                <!-- Action Buttons -->
                                 <div class="flex justify-end mt-4 space-x-2">
                                     <button @click="clearDates"
                                         class="px-3 py-1.5 text-xs bg-gray-800 text-gray-300 rounded-lg hover:bg-gray-700 transition-colors">
                                         Clear
                                     </button>
-                                    <button @click="applyDateRange"
-                                        class="px-3 py-1.5 text-xs bg-purple-900 text-white rounded-lg hover:bg-purple-800 transition-colors">
+                                    <button @click="applyDateRange" 
+                                        :disabled="!startDate"
+                                        :class="!startDate ? 'bg-gray-700 cursor-not-allowed' : 'bg-purple-900 hover:bg-purple-800'"
+                                        class="px-3 py-1.5 text-xs text-white rounded-lg transition-colors">
                                         Apply
                                     </button>
                                 </div>

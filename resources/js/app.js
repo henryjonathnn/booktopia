@@ -3,40 +3,26 @@ import Alpine from 'alpinejs'
 
 // Definisikan fungsi untuk sidebar
 document.addEventListener('alpine:init', () => {
-    Alpine.data('sidebar', () => ({
-        sidebarOpen: false,
-        toggleSidebar() {
-            this.sidebarOpen = !this.sidebarOpen;
-        }
-    }));
-
-    // Register dateRangePicker as an Alpine.js component
     Alpine.data('dateRangePicker', () => ({
         isOpen: false,
+        currentView: 'start', // 'start' or 'end'
         startDate: null,
         endDate: null,
-        startMonth: new Date().getMonth(),
-        startYear: new Date().getFullYear(),
-        endMonth: new Date().getMonth(),
-        endYear: new Date().getFullYear(),
-        startDays: [],
-        endDays: [],
-        startBlankDays: [],
-        endBlankDays: [],
+        currentMonth: new Date().getMonth(),
+        currentYear: new Date().getFullYear(),
+        days: [],
+        blankDays: [],
         formattedRange: '',
         months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
         
         init() {
-            this.calculateDays('start');
-            this.calculateDays('end');
-            
-            // Parse existing date range from Livewire
+            this.calculateDays();
             this.parseExistingDateRange();
         },
         
         parseExistingDateRange() {
             // Get the date range from Livewire model
-            const existingRange = this.$wire.get('dateRange');
+            const existingRange = this.$wire?.get('dateRange');
             if (!existingRange) return;
             
             const dates = existingRange.split(' to ');
@@ -48,14 +34,11 @@ document.addEventListener('alpine:init', () => {
                 if (start && end) {
                     this.startDate = start;
                     this.endDate = end;
-                    this.startMonth = start.getMonth();
-                    this.startYear = start.getFullYear();
-                    this.endMonth = end.getMonth();
-                    this.endYear = end.getFullYear();
+                    this.currentMonth = start.getMonth();
+                    this.currentYear = start.getFullYear();
                     this.formattedRange = this.formatDate(start) + ' to ' + this.formatDate(end);
                     
-                    this.calculateDays('start');
-                    this.calculateDays('end');
+                    this.calculateDays();
                 }
             }
         },
@@ -70,18 +53,27 @@ document.addEventListener('alpine:init', () => {
         
         toggleDatepicker() {
             this.isOpen = !this.isOpen;
+            // Always start with start date view when opening
+            if (this.isOpen) {
+                this.currentView = 'start';
+                if (this.startDate) {
+                    this.currentMonth = this.startDate.getMonth();
+                    this.currentYear = this.startDate.getFullYear();
+                } else {
+                    this.currentMonth = new Date().getMonth();
+                    this.currentYear = new Date().getFullYear();
+                }
+                this.calculateDays();
+            }
         },
         
         formatMonthYear(month, year) {
             return this.months[month] + ' ' + year;
         },
         
-        calculateDays(type) {
-            let month = type === 'start' ? this.startMonth : this.endMonth;
-            let year = type === 'start' ? this.startYear : this.endYear;
-            
+        calculateDays() {
             // Get first day of month
-            const firstDay = new Date(year, month, 1).getDay();
+            const firstDay = new Date(this.currentYear, this.currentMonth, 1).getDay();
             
             // Get blank days
             const blankDays = [];
@@ -90,7 +82,7 @@ document.addEventListener('alpine:init', () => {
             }
             
             // Get days in month
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const daysInMonth = new Date(this.currentYear, this.currentMonth + 1, 0).getDate();
             
             // Get days
             const days = [];
@@ -98,63 +90,57 @@ document.addEventListener('alpine:init', () => {
                 days.push(i);
             }
             
-            if (type === 'start') {
-                this.startBlankDays = blankDays;
-                this.startDays = days;
-            } else {
-                this.endBlankDays = blankDays;
-                this.endDays = days;
-            }
+            this.blankDays = blankDays;
+            this.days = days;
         },
         
-        prevMonth(type) {
-            if (type === 'start') {
-                this.startMonth--;
-                if (this.startMonth < 0) {
-                    this.startMonth = 11;
-                    this.startYear--;
-                }
-                this.calculateDays('start');
-            } else {
-                this.endMonth--;
-                if (this.endMonth < 0) {
-                    this.endMonth = 11;
-                    this.endYear--;
-                }
-                this.calculateDays('end');
+        prevMonth() {
+            this.currentMonth--;
+            if (this.currentMonth < 0) {
+                this.currentMonth = 11;
+                this.currentYear--;
             }
+            this.calculateDays();
         },
         
-        nextMonth(type) {
-            if (type === 'start') {
-                this.startMonth++;
-                if (this.startMonth > 11) {
-                    this.startMonth = 0;
-                    this.startYear++;
-                }
-                this.calculateDays('start');
-            } else {
-                this.endMonth++;
-                if (this.endMonth > 11) {
-                    this.endMonth = 0;
-                    this.endYear++;
-                }
-                this.calculateDays('end');
+        nextMonth() {
+            this.currentMonth++;
+            if (this.currentMonth > 11) {
+                this.currentMonth = 0;
+                this.currentYear++;
             }
+            this.calculateDays();
         },
         
-        selectDate(date, type) {
+        selectDate(date) {
             const selectedDate = new Date(
-                type === 'start' ? this.startYear : this.endYear,
-                type === 'start' ? this.startMonth : this.endMonth,
+                this.currentYear,
+                this.currentMonth,
                 date
             );
             
-            if (type === 'start') {
+            if (this.currentView === 'start') {
                 this.startDate = selectedDate;
-                // If end date is before start date, reset end date
+                // Switch to end date view after selecting start date
+                this.currentView = 'end';
+                
+                // If end date exists and is before start date, reset it
                 if (this.endDate && this.endDate < this.startDate) {
                     this.endDate = null;
+                }
+                
+                // Update the calendar to show the month after the start date
+                // This helps users select a range in the future more easily
+                if (!this.endDate) {
+                    this.currentMonth = this.startDate.getMonth();
+                    if (this.currentMonth === 11) {
+                        this.currentMonth = 0;
+                        this.currentYear = this.startDate.getFullYear() + 1;
+                    } else {
+                        this.currentMonth = this.startDate.getMonth() + 1;
+                        this.currentYear = this.startDate.getFullYear();
+                    }
+                    this.calculateDays();
                 }
             } else {
                 // Don't allow end date before start date
@@ -162,46 +148,85 @@ document.addEventListener('alpine:init', () => {
                     return;
                 }
                 this.endDate = selectedDate;
+                // After selecting end date, close the picker or allow editing start date
+                // For now, let's keep it open so user can edit if needed
             }
             
             this.updateFormattedRange();
         },
         
-        isSelectedStartDate(date) {
-            if (!this.startDate) return false;
-            
-            return date === this.startDate.getDate() && 
-                this.startMonth === this.startDate.getMonth() && 
-                this.startYear === this.startDate.getFullYear();
-        },
-        
-        isSelectedEndDate(date) {
-            if (!this.endDate) return false;
-            
-            return date === this.endDate.getDate() && 
-                this.endMonth === this.endDate.getMonth() && 
-                this.endYear === this.endDate.getFullYear();
+        isSelectedDate(date) {
+            if (this.currentView === 'start' && this.startDate) {
+                return date === this.startDate.getDate() && 
+                    this.currentMonth === this.startDate.getMonth() && 
+                    this.currentYear === this.startDate.getFullYear();
+            } else if (this.currentView === 'end' && this.endDate) {
+                return date === this.endDate.getDate() && 
+                    this.currentMonth === this.endDate.getMonth() && 
+                    this.currentYear === this.endDate.getFullYear();
+            }
+            return false;
         },
         
         isInRange(date) {
             if (!this.startDate || !this.endDate) return false;
             
             const currentDate = new Date(
-                this.endMonth === this.startMonth ? this.startYear : this.endYear,
-                this.endMonth === this.startMonth ? this.startMonth : this.endMonth,
+                this.currentYear,
+                this.currentMonth,
                 date
             );
             
             return currentDate >= this.startDate && currentDate <= this.endDate;
         },
         
+        // Switch between start and end date views
+        switchToStartView() {
+            this.currentView = 'start';
+            if (this.startDate) {
+                this.currentMonth = this.startDate.getMonth();
+                this.currentYear = this.startDate.getFullYear();
+                this.calculateDays();
+            }
+        },
+        
+        switchToEndView() {
+            this.currentView = 'end';
+            if (this.endDate) {
+                this.currentMonth = this.endDate.getMonth();
+                this.currentYear = this.endDate.getFullYear();
+                this.calculateDays();
+            } else if (this.startDate) {
+                // If no end date selected yet, show the month after start date
+                let month = this.startDate.getMonth();
+                let year = this.startDate.getFullYear();
+                
+                if (month === 11) {
+                    month = 0;
+                    year += 1;
+                } else {
+                    month += 1;
+                }
+                
+                this.currentMonth = month;
+                this.currentYear = year;
+                this.calculateDays();
+            }
+        },
+        
         clearDates() {
             this.startDate = null;
             this.endDate = null;
             this.formattedRange = '';
+            this.currentView = 'start';
+            this.currentMonth = new Date().getMonth();
+            this.currentYear = new Date().getFullYear();
+            this.calculateDays();
             
-            // Reset Livewire model
-            this.$wire.set('dateRange', '');
+            // Reset Livewire model if using Livewire
+            if (this.$wire) {
+                this.$wire.set('dateRange', '');
+            }
         },
         
         formatDate(date) {
@@ -226,16 +251,20 @@ document.addEventListener('alpine:init', () => {
         
         applyDateRange() {
             if (this.startDate && this.endDate) {
-                // Update Livewire model
-                this.$wire.set('dateRange', this.formattedRange);
+                // Update Livewire model if using Livewire
+                if (this.$wire) {
+                    this.$wire.set('dateRange', this.formattedRange);
+                }
                 this.isOpen = false;
             } else if (this.startDate) {
                 // If only start date is selected, set start and end date to the same day
                 this.endDate = new Date(this.startDate);
                 this.updateFormattedRange();
                 
-                // Update Livewire model
-                this.$wire.set('dateRange', this.formattedRange);
+                // Update Livewire model if using Livewire
+                if (this.$wire) {
+                    this.$wire.set('dateRange', this.formattedRange);
+                }
                 this.isOpen = false;
             }
         }
