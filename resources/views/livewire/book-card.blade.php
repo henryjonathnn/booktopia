@@ -1,4 +1,4 @@
-<div wire:click.prevent="showBookDetail"
+<a href="{{ route('buku.detail', ['id' => $book->id]) }}"
     class="glass-effect rounded-2xl p-3 md:p-4 card-glow border border-purple-500/10 transition-all duration-300 hover:-translate-y-2 flex flex-col cursor-pointer"
     x-data="{ isHovered: false }" 
     @mouseover="isHovered = true" 
@@ -60,4 +60,4 @@
             </div>
         </div>
     </div>
-</div>
+</a>

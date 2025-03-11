@@ -1,4 +1,4 @@
-<div class="px-4 md:px-8 lg:px-16 py-8">
+<div class="px-4 md:px-8 lg:px-16 py-8 pt-32">
     <div class="max-w-6xl mx-auto">
         {{-- Breadcrumb --}}
         <div class="flex items-center space-x-2 text-sm text-gray-400 mb-6">

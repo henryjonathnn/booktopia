@@ -52,7 +52,7 @@ class Navbar extends Component
 
     public function viewBook($id)
     {
-        return redirect()->route('book.detail', ['id' => $id]);
+        return redirect()->route('buku.detail', ['id' => $id]);
     }
 
     public function toggleMobileMenu()
