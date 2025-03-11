@@ -110,14 +110,13 @@
                 </div>
 
                 {{-- Info Box --}}
-                <div class="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
-                    <h3 class="font-medium text-blue-400 mb-2">Informasi Peminjaman</h3>
+                <div class="p-4 rounded-xl bg-purple-500/10 border border-purple-500/20">
+                    <h3 class="font-medium text-purple-400 mb-2">Informasi Peminjaman</h3>
                     <ul class="text-sm text-gray-400 space-y-1">
                         <li>• Peminjaman akan diproses atas nama: {{ auth()->user()->name }}</li>
                         <li>• Durasi peminjaman maksimal 7 hari setelah buku diterima</li>
                         <li>• Keterlambatan pengembalian akan dikenakan denda</li>
                         <li>• Pastikan alamat pengiriman sudah benar dan lengkap</li>
-                        <li>• Notifikasi status peminjaman akan dikirim ke email: {{ auth()->user()->email }}</li>
                     </ul>
                 </div>
 

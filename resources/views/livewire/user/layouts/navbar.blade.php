@@ -113,12 +113,6 @@
                 @endif
             </div>
 
-            <!-- Keranjang -->
-            <a href="/pesanan"
-                class="relative p-3 rounded-xl hover:bg-purple-500/10 text-gray-400 hover:text-purple-400">
-                <x-icon name="shopping-cart" class="w-5 h-5" />
-            </a>
-
             <!-- Login/Profile -->
             @if ($user)
                 <div class="relative">
