@@ -90,23 +90,19 @@
                 </button>
                 @if ($isNotifikasiOpen)
                     <div
-                        class="absolute right-0 top-full mt-2 w-80 bg-[#1A1A2E] rounded-xl shadow-lg border border-purple-500/10 py-2">
+                        class="absolute right-0 top-full mt-2 w-80 bg-[#1A1A2E] rounded-xl shadow-lg border border-purple-500/10 py-2 z-50">
                         @if (count($notifikasi) > 0)
                             @foreach ($notifikasi as $notif)
                                 <div
                                     class="px-4 py-2 hover:bg-purple-500/10 {{ $notif['isRead'] ? 'text-gray-400' : 'text-white' }}">
                                     <div class="flex justify-between items-start">
-                                        <p class="text-sm">{{ $notif['message'] }}</p>
+                                        <p class="text-sm cursor-pointer" wire:click="openNotifikasiModal({{ $notif['id'] }})">{{ $notif['message'] }}</p>
                                         @if (!$notif['isRead'])
                                             <button wire:click="markAsRead({{ $notif['id'] }})"
                                                 class="text-xs text-purple-400 hover:text-purple-300">
                                                 Tandai dibaca
                                             </button>
                                         @endif
-                                        <button wire:click="openNotifikasiDetail({{ $notif['id'] }})"
-                                            class="text-xs text-blue-400 hover:text-blue-300">
-                                            Lihat Detail
-                                        </button>
                                     </div>
                                 </div>
                             @endforeach
@@ -176,3 +172,19 @@
         </div>
     </div>
 </nav>
+
+<!-- Modal for Notifikasi Detail -->
+@if ($isNotifikasiModalOpen)
+    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-[#1A1A2E] rounded-xl shadow-lg border border-purple-500/10 p-6 w-96">
+            <h3 class="text-lg font-semibold text-white mb-4">Detail Notifikasi</h3>
+            <p class="text-sm text-gray-400">{{ $selectedNotifikasiDetail }}</p>
+            <div class="flex justify-end mt-4">
+                <button wire:click="closeNotifikasiModal"
+                    class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:opacity-90 rounded-xl px-4 py-2 font-medium transition-all duration-300">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+@endif

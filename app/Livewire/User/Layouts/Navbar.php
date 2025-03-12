@@ -5,6 +5,7 @@ namespace App\Livewire\User\Layouts;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use App\Models\Buku;
+use App\Models\Notifikasi;
 
 class Navbar extends Component
 {
@@ -15,6 +16,8 @@ class Navbar extends Component
     public $notifikasi = [];
     public $search = '';
     public $searchResults = [];
+    public $isNotifikasiModalOpen = false;
+    public $selectedNotifikasiDetail = '';
 
     protected $listeners = ['clickedOutside' => 'closeSearchResults'];
 
@@ -77,12 +80,11 @@ class Navbar extends Component
 
     public function fetchNotifikasi()
     {
-        // Fetch notifications logic here
-        $this->notifikasi = [
-            ['id' => 1, 'message' => 'Notifikasi 1', 'isRead' => false],
-            ['id' => 2, 'message' => 'Notifikasi 2', 'isRead' => true],
-        ];
-        $this->unreadCount = collect($this->notifikasi)->where('isRead', false)->count();
+        $this->notifikasi = Notifikasi::where('id_user', Auth::id())
+            ->orderBy('created_at', 'desc')
+            ->get(['id', 'message', 'is_read'])
+            ->toArray();
+        $this->unreadCount = collect($this->notifikasi)->where('is_read', false)->count();
     }
 
     public function markAsRead($id)
@@ -104,12 +106,19 @@ class Navbar extends Component
         return redirect('/');
     }
 
-    public function openNotifikasiDetail($id)
+    public function openNotifikasiModal($id)
     {
         $notif = collect($this->notifikasi)->firstWhere('id', $id);
         if ($notif) {
-            $this->dispatchBrowserEvent('openModal', ['message' => $notif['message']]);
+            $this->selectedNotifikasiDetail = $notif['message'];
+            $this->isNotifikasiModalOpen = true;
         }
+    }
+
+    public function closeNotifikasiModal()
+    {
+        $this->isNotifikasiModalOpen = false;
+        $this->selectedNotifikasiDetail = '';
     }
 
     public function render()
