@@ -56,4 +56,5 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/peminjaman/create/{token}', \App\Livewire\Books\CreatePeminjaman::class)->name('peminjaman.create');
     Route::get('/peminjaman/{id}', \App\Livewire\Books\DetailPeminjaman::class)->name('peminjaman.detail');
     Route::get('/peminjaman', \App\Livewire\Books\Peminjaman::class)->name('peminjaman');
+    Route::get('/profile', \App\Livewire\User\Profile::class)->name('profile');
 });
