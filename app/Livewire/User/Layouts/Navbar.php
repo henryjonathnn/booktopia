@@ -52,7 +52,12 @@ class Navbar extends Component
 
     public function viewBook($id)
     {
-        return redirect()->route('buku.detail', ['id' => $id]);
+        $book = Buku::find($id);
+        if ($book) {
+            $slug = \App\Livewire\Books\Detail::generateSlug($book);
+            return redirect()->route('buku.detail', ['slug' => $slug]);
+        }
+        return redirect()->route('buku');
     }
 
     public function toggleMobileMenu()
