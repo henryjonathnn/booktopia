@@ -11,6 +11,16 @@ class Peminjaman extends Model
 
     protected $table = 'peminjamans';
 
+    // Definisikan konstanta untuk status
+    const STATUS_MENUNGGU = 'MENUNGGU';
+    const STATUS_DISETUJUI = 'DISETUJUI';
+    const STATUS_DITOLAK = 'DITOLAK';
+    const STATUS_DIKIRIM = 'DIKIRIM';
+    const STATUS_DIPINJAM = 'DIPINJAM';
+    const STATUS_TERLAMBAT = 'TERLAMBAT';
+    const STATUS_SELESAI = 'SELESAI';
+    const STATUS_DIBATALKAN = 'DIBATALKAN';
+
     protected $fillable = [
         'id_user',
         'id_buku',

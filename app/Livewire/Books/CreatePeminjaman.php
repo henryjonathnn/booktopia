@@ -78,7 +78,7 @@ class CreatePeminjaman extends Component
             'catatan_pengiriman' => $this->catatan_pengiriman,
             'tgl_peminjaman_diinginkan' => $this->tgl_peminjaman_diinginkan,
             'tgl_kembali_rencana' => Carbon::parse($this->tgl_peminjaman_diinginkan)->addDays(7),
-            'status' => 'MENUNGGU',
+            'status' => Peminjaman::STATUS_MENUNGGU,
             'metode_pengiriman' => 'KURIR'
         ]);
 
