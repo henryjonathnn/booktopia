@@ -26,8 +26,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', Index::class)->name('home');
 
 Route::get('/buku', BooksIndex::class)->name('buku');
-Route::get('/buku/{id}', Detail::class)->name('buku.detail');
-// Route::get('/buku/{id}', Detail::class)->name('buku');
+Route::get('/buku/{slug}', Detail::class)->name('buku.detail');
 
 // Auth Routes - only for guests
 Route::middleware('guest')->group(function () {
