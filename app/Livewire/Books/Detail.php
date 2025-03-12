@@ -21,7 +21,11 @@ class Detail extends Component
         $id = explode('-', $slug);
         $id = end($id);
 
-        $this->book = Buku::with(['ratings', 'sukas'])->findOrFail($id);
+        $this->book = Buku::with(['ratings', 'sukas'])->find($id);
+
+        if (!$this->book || $slug !== self::generateSlug($this->book)) {
+            abort(404);
+        }
         
         // Ambil buku terkait berdasarkan kategori
         $this->relatedBooks = Buku::where('kategori', $this->book->kategori)
@@ -38,7 +42,9 @@ class Detail extends Component
                 ->where('id_buku', $this->book->id)
                 ->first();
             
-            $this->userRating = $userRating ? $userRating->rating : 0;
+            if ($userRating) {
+                $this->userRating = $userRating->rating;
+            }
         }
     }
 
