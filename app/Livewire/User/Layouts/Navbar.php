@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 use App\Models\Buku;
 use App\Models\Notifikasi;
+use Carbon\Carbon;
 
 class Navbar extends Component
 {
@@ -18,6 +19,7 @@ class Navbar extends Component
     public $searchResults = [];
     public $isNotifikasiModalOpen = false;
     public $selectedNotifikasiDetail = '';
+    public $selectedNotifikasi = null;
 
     protected $listeners = ['clickedOutside' => 'closeSearchResults'];
 
@@ -76,26 +78,76 @@ class Navbar extends Component
     public function toggleNotifikasi()
     {
         $this->isNotifikasiOpen = !$this->isNotifikasiOpen;
+        if ($this->isNotifikasiOpen) {
+            $this->fetchNotifikasi();
+        }
     }
 
     public function fetchNotifikasi()
     {
-        $this->notifikasi = Notifikasi::where('id_user', Auth::id())
-            ->orderBy('created_at', 'desc')
-            ->get(['id', 'message', 'is_read'])
-            ->toArray();
-        $this->unreadCount = collect($this->notifikasi)->where('is_read', false)->count();
+        if (Auth::check()) {
+            $notifications = Notifikasi::where('id_user', Auth::id())
+                ->orderBy('created_at', 'desc')
+                ->take(5)
+                ->get();
+                
+            $this->notifikasi = $notifications->map(function($notif) {
+                // Add type detection based on message content
+                $type = 'info';
+                if (stripos($notif->message, 'pengembalian') !== false) {
+                    $type = 'pengembalian';
+                } elseif (stripos($notif->message, 'peminjaman') !== false) {
+                    $type = 'peminjaman';
+                }
+                
+                return [
+                    'id' => $notif->id,
+                    'message' => $notif->message,
+                    'is_read' => $notif->is_read,
+                    'created_at' => $notif->created_at,
+                    'type' => $type
+                ];
+            })->toArray();
+            
+            $this->unreadCount = Notifikasi::where('id_user', Auth::id())
+                ->where('is_read', false)
+                ->count();
+        }
     }
 
     public function markAsRead($id)
     {
-        foreach ($this->notifikasi as &$notif) {
-            if ($notif['id'] == $id) {
-                $notif['isRead'] = true;
-                break;
+        $notif = Notifikasi::find($id);
+        if ($notif && $notif->id_user == Auth::id()) {
+            $notif->is_read = true;
+            $notif->save();
+            
+            // Update local array
+            foreach ($this->notifikasi as &$n) {
+                if ($n['id'] == $id) {
+                    $n['is_read'] = true;
+                    break;
+                }
             }
+            
+            $this->unreadCount = Notifikasi::where('id_user', Auth::id())
+                ->where('is_read', false)
+                ->count();
         }
-        $this->unreadCount = collect($this->notifikasi)->where('isRead', false)->count();
+    }
+    
+    public function markAllAsRead()
+    {
+        Notifikasi::where('id_user', Auth::id())
+            ->where('is_read', false)
+            ->update(['is_read' => true]);
+            
+        // Update local array
+        foreach ($this->notifikasi as &$notif) {
+            $notif['is_read'] = true;
+        }
+        
+        $this->unreadCount = 0;
     }
 
     public function logout()
@@ -108,10 +160,22 @@ class Navbar extends Component
 
     public function openNotifikasiModal($id)
     {
-        $notif = collect($this->notifikasi)->firstWhere('id', $id);
-        if ($notif) {
-            $this->selectedNotifikasiDetail = $notif['message'];
+        $notif = Notifikasi::find($id);
+        if ($notif && $notif->id_user == Auth::id()) {
+            $this->selectedNotifikasi = [
+                'id' => $notif->id,
+                'message' => $notif->message,
+                'is_read' => $notif->is_read,
+                'created_at' => $notif->created_at
+            ];
+            
+            $this->selectedNotifikasiDetail = $notif->message;
             $this->isNotifikasiModalOpen = true;
+            
+            // Mark as read when opened
+            if (!$notif->is_read) {
+                $this->markAsRead($id);
+            }
         }
     }
 
@@ -119,6 +183,7 @@ class Navbar extends Component
     {
         $this->isNotifikasiModalOpen = false;
         $this->selectedNotifikasiDetail = '';
+        $this->selectedNotifikasi = null;
     }
 
     public function render()
