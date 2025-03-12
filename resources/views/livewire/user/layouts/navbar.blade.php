@@ -90,7 +90,7 @@
                 </button>
                 @if ($isNotifikasiOpen)
                     <div
-                        class="absolute right-0 top-full mt-2 w-64 bg-[#1A1A2E] rounded-xl shadow-lg border border-purple-500/10 py-2">
+                        class="absolute right-0 top-full mt-2 w-80 bg-[#1A1A2E] rounded-xl shadow-lg border border-purple-500/10 py-2">
                         @if (count($notifikasi) > 0)
                             @foreach ($notifikasi as $notif)
                                 <div
@@ -103,6 +103,10 @@
                                                 Tandai dibaca
                                             </button>
                                         @endif
+                                        <button wire:click="openNotifikasiDetail({{ $notif['id'] }})"
+                                            class="text-xs text-blue-400 hover:text-blue-300">
+                                            Lihat Detail
+                                        </button>
                                     </div>
                                 </div>
                             @endforeach

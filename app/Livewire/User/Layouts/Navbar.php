@@ -104,6 +104,14 @@ class Navbar extends Component
         return redirect('/');
     }
 
+    public function openNotifikasiDetail($id)
+    {
+        $notif = collect($this->notifikasi)->firstWhere('id', $id);
+        if ($notif) {
+            $this->dispatchBrowserEvent('openModal', ['message' => $notif['message']]);
+        }
+    }
+
     public function render()
     {
         $user = Auth::user();
