@@ -52,3 +52,8 @@ Route::middleware(['auth', 'role:ADMIN'])->group(function () {
     Route::get('/admin/data-buku', DataBuku::class)->name('admin.data-buku');
     Route::get('/admin/data-peminjaman', DataPeminjaman::class)->name('admin.data-peminjaman');
 });
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/peminjaman/create/{token}', \App\Livewire\Books\CreatePeminjaman::class)->name('peminjaman.create');
+    Route::get('/peminjaman/{id}', \App\Livewire\Books\DetailPeminjaman::class)->name('peminjaman.detail');
+});

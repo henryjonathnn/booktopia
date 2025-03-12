@@ -58,7 +58,8 @@
                     {{-- Action Buttons --}}
                     <div class="space-y-3">
                         @if($book->stock > 0)
-                            <button class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:opacity-90 rounded-xl py-3 font-medium transition-all duration-300 flex items-center justify-center space-x-2">
+                            <button wire:click="createPeminjamanToken" 
+                                class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:opacity-90 rounded-xl py-3 font-medium transition-all duration-300 flex items-center justify-center space-x-2">
                                 <x-icon name="book-open" class="w-5 h-5" />
                                 <span>Pinjam Buku</span>
                             </button>

@@ -67,6 +67,21 @@ class Detail extends Component
         $this->book->refresh();
     }
 
+    public function createPeminjamanToken()
+    {
+        if (!Auth::check()) {
+            return redirect()->route('login');
+        }
+
+        // Generate token yang berisi ID buku dan waktu kadaluarsa (1 jam)
+        $token = base64_encode(json_encode([
+            'book_id' => $this->book->id,
+            'expiry' => now()->addHour()->toIso8601String()
+        ]));
+
+        return redirect()->route('peminjaman.create', ['token' => $token]);
+    }
+
     public function render()
     {
         return view('livewire.books.detail')->layout('layouts.user');
