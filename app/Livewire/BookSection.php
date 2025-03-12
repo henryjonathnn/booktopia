@@ -40,7 +40,7 @@ class BookSection extends Component
 
     public function showBookDetail($bookId)
     {
-        $this->selectedBook = Buku::find($bookId);
+        return redirect()->route('buku.detail', ['id' => $bookId]);
     }
 
     public function updatingShowFilterModal()

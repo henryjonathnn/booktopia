@@ -26,7 +26,8 @@ class BookCard extends Component
 
     public function showBookDetail()
     {
-        $this->dispatch('showBookDetail', $this->book->id);
+        // Redirect langsung ke halaman detail
+        return redirect()->route('buku.detail', ['id' => $this->book->id]);
     }
 
     public function render()
