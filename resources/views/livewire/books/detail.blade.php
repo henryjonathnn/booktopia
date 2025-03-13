@@ -1,112 +1,102 @@
 <div class="px-4 md:px-8 lg:px-16 py-8 pt-32">
     <div class="max-w-7xl mx-auto">
-        {{-- Breadcrumb dengan desain yang lebih subtle --}}
-        <nav class="flex items-center space-x-2 text-sm text-gray-400 mb-8">
-            <a href="{{ route('home') }}" class="hover:text-purple-400 transition-colors">Home</a>
-            <span class="text-gray-600">/</span>
-            <a href="{{ route('buku') }}" class="hover:text-purple-400 transition-colors">Buku</a>
-            <span class="text-gray-600">/</span>
-            <span class="text-purple-400 truncate max-w-[200px]">{{ $book->judul }}</span>
-        </nav>
-
-        {{-- Main Content dengan Grid Layout yang Responsif --}}
-        <div class="grid grid-cols-12 gap-8">
-            {{-- Left Column: Cover & Quick Actions --}}
-            <div class="col-span-12 md:col-span-4 lg:col-span-3 space-y-6">
-                {{-- Cover Image dalam Card --}}
-                <div class="glass-effect rounded-2xl p-4 border border-purple-500/10">
+        {{-- Hero Section dengan Cover dan Info Utama --}}
+        <div class="glass-effect rounded-3xl p-8 border border-purple-500/10 mb-8">
+            <div class="grid grid-cols-12 gap-8 items-center">
+                {{-- Cover Image --}}
+                <div class="col-span-12 md:col-span-4 lg:col-span-3">
                     @if ($book->cover_img)
                         <img src="{{ asset('storage/' . $book->cover_img) }}" 
                             alt="{{ $book->judul }}"
-                            class="w-full rounded-xl aspect-[3/4] object-cover shadow-lg" />
+                            class="w-full rounded-2xl aspect-[3/4] object-cover shadow-lg" />
                     @else
-                        <div class="w-full rounded-xl aspect-[3/4] bg-gray-800 flex items-center justify-center">
+                        <div class="w-full rounded-2xl aspect-[3/4] bg-gray-800 flex items-center justify-center">
                             <x-icon name="book-open" class="w-16 h-16 text-gray-600" />
                         </div>
                     @endif
                 </div>
 
-                {{-- Quick Actions Card --}}
-                <div class="glass-effect rounded-2xl p-6 border border-purple-500/10 space-y-4">
-                    {{-- Rating & Status --}}
-                    <div class="space-y-3">
-                        <div class="flex items-center justify-between">
-                            <span class="text-gray-400">Rating</span>
-                            <div class="flex items-center space-x-2">
-                                <div class="flex">
-                                    @for ($i = 1; $i <= 5; $i++)
-                                        <x-icon name="star" class="w-4 h-4 {{ $i <= $book->average_rating ? 'text-yellow-400' : 'text-gray-600' }}" />
-                                    @endfor
-                                </div>
-                                <span class="font-medium">{{ number_format($book->average_rating, 1) }}</span>
+                {{-- Book Info --}}
+                <div class="col-span-12 md:col-span-8 lg:col-span-9 space-y-6">
+                    <div>
+                        <div class="flex items-center gap-3 mb-2">
+                            <span class="px-3 py-1 rounded-full text-sm font-medium bg-purple-500/20 text-purple-400">
+                                {{ $book->kategori }}
+                            </span>
+                            <div class="flex items-center gap-1">
+                                @for ($i = 1; $i <= 5; $i++)
+                                    <x-icon name="star" class="w-5 h-5 {{ $i <= $book->average_rating ? 'text-yellow-400' : 'text-gray-600' }}" />
+                                @endfor
+                                <span class="text-sm font-medium ml-1">{{ number_format($book->average_rating, 1) }}</span>
                             </div>
                         </div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-gray-400">Status</span>
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $book->stock > 0 ? 'bg-green-500/10 text-green-400' : 'bg-red-500/10 text-red-400' }}">
+                        <h1 class="text-4xl font-bold mb-2">{{ $book->judul }}</h1>
+                        <p class="text-xl text-gray-400">oleh {{ $book->penulis }}</p>
+                    </div>
+
+                    {{-- Quick Stats --}}
+                    <div class="grid grid-cols-3 gap-4">
+                        <div class="glass-effect rounded-xl p-4 border border-purple-500/10">
+                            <p class="text-gray-400 text-sm mb-1">Status</p>
+                            <p class="font-semibold {{ $book->stock > 0 ? 'text-green-400' : 'text-red-400' }}">
                                 {{ $book->stock > 0 ? 'Tersedia' : 'Tidak Tersedia' }}
-                            </span>
+                            </p>
                         </div>
-                        <div class="flex items-center justify-between">
-                            <span class="text-gray-400">Stok</span>
-                            <span class="font-medium">{{ $book->stock }} buku</span>
+                        <div class="glass-effect rounded-xl p-4 border border-purple-500/10">
+                            <p class="text-gray-400 text-sm mb-1">Stok</p>
+                            <p class="font-semibold">{{ $book->stock }} buku</p>
+                        </div>
+                        <div class="glass-effect rounded-xl p-4 border border-purple-500/10">
+                            <p class="text-gray-400 text-sm mb-1">Total Peminjam</p>
+                            <p class="font-semibold">{{ $book->total_peminjam ?? 0 }}</p>
                         </div>
                     </div>
 
-                    <hr class="border-purple-500/10">
-
                     {{-- Action Buttons --}}
-                    <div class="space-y-3">
+                    <div class="flex gap-4">
                         @if($book->stock > 0)
                             <button wire:click="createPeminjamanToken" 
-                                class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:opacity-90 rounded-xl py-3 font-medium transition-all duration-300 flex items-center justify-center space-x-2">
-                                <x-icon name="book-open" class="w-5 h-5" />
-                                <span>Pinjam Buku</span>
+                                class="flex-1 bg-gradient-to-r from-purple-600 to-indigo-600 hover:opacity-90 rounded-xl py-3.5 font-medium transition-all duration-300">
+                                Pinjam Buku
                             </button>
                         @endif
-                        
                         <button wire:click="toggleBookmark" 
-                            class="w-full rounded-xl py-3 font-medium transition-all duration-300 flex items-center justify-center space-x-2
+                            class="flex-none w-14 rounded-xl transition-all duration-300 flex items-center justify-center
                             {{ $isBookmarked ? 'bg-purple-500 text-white' : 'bg-purple-500/10 hover:bg-purple-500/20' }}">
-                            <x-icon name="bookmark" class="w-5 h-5" />
-                            <span>{{ $isBookmarked ? 'Tersimpan' : 'Simpan' }}</span>
+                            <x-icon name="bookmark" class="w-6 h-6" />
+                        </button>
+                        <button wire:click="$set('showRatingModal', true)"
+                            class="flex-none w-14 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 transition-all duration-300 flex items-center justify-center">
+                            <x-icon name="star" class="w-6 h-6 text-yellow-400" />
                         </button>
                     </div>
                 </div>
             </div>
+        </div>
 
-            {{-- Right Column: Book Details --}}
-            <div class="col-span-12 md:col-span-8 lg:col-span-9 space-y-6">
-                {{-- Book Title & Basic Info --}}
+        {{-- Detail Sections --}}
+        <div class="grid grid-cols-12 gap-8">
+            {{-- Main Content --}}
+            <div class="col-span-12 lg:col-span-8 space-y-8">
+                {{-- Book Details --}}
                 <div class="glass-effect rounded-2xl p-6 border border-purple-500/10">
-                    <div class="flex items-center justify-between mb-4">
-                        <h1 class="text-3xl font-bold">{{ $book->judul }}</h1>
-                        <button wire:click="$set('showRatingModal', true)" 
-                            class="flex items-center space-x-2 px-4 py-2 bg-purple-500/10 hover:bg-purple-500/20 rounded-xl transition-colors">
-                            <x-icon name="star" class="w-5 h-5 text-yellow-400" />
-                            <span>Beri Rating</span>
-                        </button>
-                    </div>
-
-                    {{-- Book Metadata Grid --}}
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                    <h2 class="text-xl font-semibold mb-4">Detail Buku</h2>
+                    <div class="grid grid-cols-2 gap-6">
                         <div>
-                            <h3 class="text-gray-400 text-sm mb-1">Penerbit</h3>
+                            <p class="text-gray-400 mb-1">Penerbit</p>
                             <p class="font-medium">{{ $book->penerbit }}</p>
                         </div>
                         <div>
-                            <h3 class="text-gray-400 text-sm mb-1">Tahun Terbit</h3>
+                            <p class="text-gray-400 mb-1">Tahun Terbit</p>
                             <p class="font-medium">{{ $book->tahun_terbit }}</p>
                         </div>
                         <div>
-                            <h3 class="text-gray-400 text-sm mb-1">ISBN</h3>
+                            <p class="text-gray-400 mb-1">ISBN</p>
                             <p class="font-medium">{{ $book->isbn ?? '-' }}</p>
                         </div>
                         <div>
-                            <h3 class="text-gray-400 text-sm mb-1">Kategori</h3>
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-500/20 text-purple-400">
-                                {{ $book->kategori }}
-                            </span>
+                            <p class="text-gray-400 mb-1">Bahasa</p>
+                            <p class="font-medium">{{ $book->bahasa ?? 'Indonesia' }}</p>
                         </div>
                     </div>
                 </div>
@@ -118,19 +108,36 @@
                         <p class="text-gray-300 leading-relaxed">{{ $book->deskripsi }}</p>
                     </div>
                 </div>
+            </div>
 
+            {{-- Sidebar --}}
+            <div class="col-span-12 lg:col-span-4 space-y-8">
                 {{-- Related Books --}}
                 @if(count($relatedBooks) > 0)
                     <div class="glass-effect rounded-2xl p-6 border border-purple-500/10">
                         <h2 class="text-xl font-semibold mb-4">Buku Terkait</h2>
-                        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                        <div class="space-y-4">
                             @foreach($relatedBooks as $relatedBook)
-                                <livewire:book-card 
-                                    :wire:key="'related-'.$relatedBook->id"
-                                    :book="$relatedBook"
-                                    :show-rating="true"
-                                    right-label="Rating"
-                                />
+                                <a href="{{ route('buku.detail', ['slug' => \App\Livewire\Books\Detail::generateSlug($relatedBook)]) }}" 
+                                    class="flex items-start space-x-4 p-3 rounded-xl hover:bg-purple-500/5 transition-colors">
+                                    @if ($relatedBook->cover_img)
+                                        <img src="{{ asset('storage/' . $relatedBook->cover_img) }}" 
+                                            alt="{{ $relatedBook->judul }}"
+                                            class="w-16 rounded-lg shadow" />
+                                    @else
+                                        <div class="w-16 h-24 rounded-lg bg-gray-800 flex items-center justify-center">
+                                            <x-icon name="book-open" class="w-8 h-8 text-gray-600" />
+                                        </div>
+                                    @endif
+                                    <div class="flex-1">
+                                        <h3 class="font-medium line-clamp-2">{{ $relatedBook->judul }}</h3>
+                                        <p class="text-sm text-gray-400">{{ $relatedBook->penulis }}</p>
+                                        <div class="flex items-center mt-1">
+                                            <x-icon name="star" class="w-4 h-4 text-yellow-400" />
+                                            <span class="text-sm ml-1">{{ number_format($relatedBook->average_rating, 1) }}</span>
+                                        </div>
+                                    </div>
+                                </a>
                             @endforeach
                         </div>
                     </div>
@@ -139,7 +146,7 @@
         </div>
     </div>
 
-    {{-- Rating Modal dengan Desain yang Lebih Menarik --}}
+    {{-- Rating Modal --}}
     <x-modal wire:model="showRatingModal">
         <div class="bg-[#1A1A2E] p-6 rounded-2xl max-w-sm mx-auto">
             <h3 class="text-xl font-bold mb-4">Beri Rating</h3>
