@@ -79,13 +79,10 @@
             <div class="col-span-12 md:col-span-8 lg:col-span-9 space-y-6">
                 {{-- Book Title & Basic Info --}}
                 <div class="glass-effect rounded-2xl p-6 border border-purple-500/10">
-                    <div class="flex items-start justify-between mb-6">
-                        <div>
-                            <h1 class="text-2xl md:text-3xl font-bold mb-2">{{ $book->judul }}</h1>
-                            <p class="text-gray-400">oleh {{ $book->penulis }}</p>
-                        </div>
+                    <div class="flex items-center justify-between mb-4">
+                        <h1 class="text-3xl font-bold">{{ $book->judul }}</h1>
                         <button wire:click="$set('showRatingModal', true)" 
-                            class="flex items-center space-x-2 px-4 py-2 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 transition-colors">
+                            class="flex items-center space-x-2 px-4 py-2 bg-purple-500/10 hover:bg-purple-500/20 rounded-xl transition-colors">
                             <x-icon name="star" class="w-5 h-5 text-yellow-400" />
                             <span>Beri Rating</span>
                         </button>
