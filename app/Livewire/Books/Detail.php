@@ -5,6 +5,7 @@ namespace App\Livewire\Books;
 use App\Models\Buku;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class Detail extends Component
 {
@@ -14,8 +15,12 @@ class Detail extends Component
     public $showRatingModal = false;
     public $relatedBooks = [];
 
-    public function mount($id)
+    public function mount($slug)
     {
+        // Parse slug untuk mendapatkan ID
+        $id = explode('-', $slug);
+        $id = end($id);
+
         $this->book = Buku::with(['ratings', 'sukas'])->findOrFail($id);
         
         // Ambil buku terkait berdasarkan kategori
@@ -35,6 +40,12 @@ class Detail extends Component
             
             $this->userRating = $userRating ? $userRating->rating : 0;
         }
+    }
+
+    // Helper method untuk generate slug
+    public static function generateSlug($book)
+    {
+        return Str::slug($book->judul) . '-' . $book->id;
     }
 
     public function toggleBookmark()

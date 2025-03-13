@@ -6,7 +6,10 @@
             <span class="text-gray-600">/</span>
             <a href="{{ route('buku') }}" class="hover:text-purple-400 transition-colors">Buku</a>
             <span class="text-gray-600">/</span>
-            <a href="{{ route('buku.detail', ['id' => $book->id]) }}" class="hover:text-purple-400 transition-colors">{{ $book->judul }}</a>
+            <a href="{{ route('buku.detail', ['slug' => \App\Livewire\Books\Detail::generateSlug($book)]) }}" 
+                class="hover:text-purple-400 transition-colors">
+                {{ $book->judul }}
+            </a>
             <span class="text-gray-600">/</span>
             <span class="text-purple-400">Pinjam Buku</span>
         </nav>

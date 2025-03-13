@@ -4,7 +4,12 @@
         <nav class="flex items-center space-x-2 text-sm text-gray-400 mb-8">
             <a href="{{ route('home') }}" class="hover:text-purple-400 transition-colors">Home</a>
             <span class="text-gray-600">/</span>
-            <a href="{{ route('peminjaman') }}" class="hover:text-purple-400 transition-colors">Peminjaman</a>
+            <a href="{{ route('buku') }}" class="hover:text-purple-400 transition-colors">Buku</a>
+            <span class="text-gray-600">/</span>
+            <a href="{{ route('buku.detail', ['slug' => \App\Livewire\Books\Detail::generateSlug($peminjaman->buku)]) }}" 
+                class="hover:text-purple-400 transition-colors">
+                {{ $peminjaman->buku->judul }}
+            </a>
             <span class="text-gray-600">/</span>
             <span class="text-purple-400">Detail Peminjaman</span>
         </nav>

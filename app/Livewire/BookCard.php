@@ -26,11 +26,8 @@ class BookCard extends Component
 
     public function showBookDetail()
     {
-        // Tambahkan logging
-        logger('Showing book detail for book ID: ' . $this->book->id);
-        
-        // Redirect ke halaman detail
-        return $this->redirect(route('buku.detail', ['id' => $this->book->id]));
+        $slug = \App\Livewire\Books\Detail::generateSlug($this->book);
+        return $this->redirect(route('buku.detail', ['slug' => $slug]));
     }
 
     public function render()
