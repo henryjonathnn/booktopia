@@ -146,14 +146,14 @@ class DataPeminjaman extends Component
             'buktiPengiriman' => 'required|image|max:10240'
         ]);
 
-        $peminjaman = Peminjaman::findOrFail($peminjamanId);
-
-        if ($peminjaman->status !== 'DIPROSES') {
-            session()->flash('error', 'Status peminjaman tidak valid untuk dikirim');
-            return;
-        }
-
         try {
+            $peminjaman = Peminjaman::findOrFail($peminjamanId);
+            
+            if ($peminjaman->status !== 'DIPROSES') {
+                session()->flash('error', 'Status peminjaman tidak valid untuk dikirim');
+                return;
+            }
+
             // Upload bukti pengiriman
             $path = $this->buktiPengiriman->store('bukti-pengiriman', 'public');
             
