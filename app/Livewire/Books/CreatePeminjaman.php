@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 class CreatePeminjaman extends Component
 {
@@ -70,6 +71,9 @@ class CreatePeminjaman extends Component
     {
         $this->validate();
 
+        // Decrement book stock
+        $this->book->decrement('stock');
+
         // Create peminjaman
         $peminjaman = Peminjaman::create([
             'id_user' => Auth::id(),
@@ -82,13 +86,24 @@ class CreatePeminjaman extends Component
             'metode_pengiriman' => 'KURIR'
         ]);
 
-        // Create notifikasi
+        // Create notifikasi untuk user
         Notifikasi::create([
             'id_user' => Auth::id(),
             'id_peminjaman' => $peminjaman->id,
             'message' => "Peminjaman buku {$this->book->judul} berhasil dibuat dan sedang menunggu persetujuan",
             'tipe' => 'PEMINJAMAN_CREATED'
         ]);
+
+        // Create notifikasi untuk admin
+        $admins = User::where('role', 'ADMIN')->get();
+        foreach ($admins as $admin) {
+            Notifikasi::create([
+                'id_user' => $admin->id,
+                'id_peminjaman' => $peminjaman->id,
+                'message' => "Ada permintaan peminjaman buku baru dari " . Auth::user()->name,
+                'tipe' => 'PEMINJAMAN_CREATED'
+            ]);
+        }
 
         return redirect()->route('peminjaman.detail', ['id' => $peminjaman->id])
             ->with('success', 'Peminjaman berhasil dibuat dan sedang menunggu persetujuan');

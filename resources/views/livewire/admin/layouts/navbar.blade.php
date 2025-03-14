@@ -16,15 +16,47 @@
             </div>
 
             <div class="flex items-center space-x-4">
-                <button class="relative p-2 hover:bg-[#2a2435] rounded-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
-                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                        stroke-linejoin="round" class="feather feather-bell">
-                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                    </svg>
-                    <span class="absolute top-1 right-1 w-2 h-2 bg-purple-500 rounded-full"></span>
-                </button>
+                <!-- Notifikasi Dropdown -->
+                <div class="relative">
+                    <button wire:click="toggleNotifikasi"
+                        class="relative p-2 hover:bg-[#2a2435] rounded-lg text-gray-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" class="feather feather-bell">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                        </svg>
+                        @if ($unreadCount > 0)
+                            <span
+                                class="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                                {{ $unreadCount }}
+                            </span>
+                        @endif
+                    </button>
+
+                    @if ($isNotifikasiOpen)
+                        <div class="absolute right-0 mt-2 w-96 bg-[#1A1A2E] rounded-xl shadow-lg border border-purple-500/10 overflow-hidden">
+                            <div class="p-4 border-b border-purple-500/10">
+                                <h3 class="font-medium">Notifikasi</h3>
+                            </div>
+                            <div class="max-h-[400px] overflow-y-auto">
+                                @forelse($notifikasi as $notif)
+                                    <div wire:click="markAsRead({{ $notif['id'] }})"
+                                        class="p-4 hover:bg-purple-500/10 cursor-pointer {{ !$notif['is_read'] ? 'bg-purple-500/5' : '' }} border-b border-purple-500/10">
+                                        <p class="text-sm">{{ $notif['message'] }}</p>
+                                        <p class="text-xs text-gray-400 mt-1">
+                                            {{ \Carbon\Carbon::parse($notif['created_at'])->diffForHumans() }}
+                                        </p>
+                                    </div>
+                                @empty
+                                    <div class="p-4 text-center text-gray-400">
+                                        Tidak ada notifikasi
+                                    </div>
+                                @endforelse
+                            </div>
+                        </div>
+                    @endif
+                </div>
 
                 <!-- Login/Profile -->
                 @if ($user)
