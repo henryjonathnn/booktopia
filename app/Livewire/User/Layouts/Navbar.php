@@ -23,7 +23,7 @@ class Navbar extends Component
     public $showNotifikasi = false;
     public $showDetailModal = false;
 
-    protected $listeners = ['clickedOutside' => 'closeSearchResults'];
+    protected $listeners = ['clickedOutside' => 'closeSearchResults', 'refreshNotifikasi' => 'refreshNotifikasi'];
 
     public function mount()
     {
@@ -162,11 +162,14 @@ class Navbar extends Component
             $this->selectedNotifikasi->markAsRead();
             $this->refreshNotifikasi();
         }
+        $this->showDetailModal = true;
+        $this->showNotifikasi = false;
     }
 
     public function closeDetail()
     {
         $this->selectedNotifikasi = null;
+        $this->showDetailModal = false;
     }
 
     public function render()

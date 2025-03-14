@@ -83,10 +83,15 @@
         <div class="flex items-center space-x-6">
             <!-- Notifikasi Dropdown -->
             <div x-data="{ 
-                showNotifDropdown: false,
-                showDetailModal: false,
-                selectedNotif: null
+                showNotifDropdown: @entangle('showNotifikasi'),
+                showDetailModal: @entangle('showDetailModal')
             }">
+                <style>
+                    [x-cloak] { 
+                        display: none !important; 
+                    }
+                </style>
+
                 <button @click="showNotifDropdown = !showNotifDropdown"
                     class="relative p-2 hover:bg-[#2a2435] rounded-lg text-gray-400">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -100,6 +105,7 @@
 
                 @if($showNotifDropdown)
                     <div x-show="showNotifDropdown" 
+                         x-cloak
                          @click.away="showNotifDropdown = false"
                          class="absolute right-0 mt-2 w-80 bg-[#1a1625] rounded-xl shadow-lg border border-purple-500/10 overflow-hidden z-50">
                         <!-- Header -->
