@@ -36,6 +36,8 @@ class DataPeminjaman extends Component
     public $buktiPengiriman;
     public $statuses;
     public $metodes;
+    public $isDetailModalOpen = false;
+    public $selectedPeminjaman = null;
 
     protected $rules = [
         'alasanPenolakan' => 'required|min:10',
@@ -189,6 +191,18 @@ class DataPeminjaman extends Component
         } catch (\Exception $e) {
             session()->flash('error', 'Terjadi kesalahan saat mengupload bukti pengiriman');
         }
+    }
+
+    public function openDetailModal($peminjamanId)
+    {
+        $this->selectedPeminjaman = Peminjaman::with(['user', 'buku', 'staff'])->find($peminjamanId);
+        $this->isDetailModalOpen = true;
+    }
+
+    public function closeDetailModal()
+    {
+        $this->isDetailModalOpen = false;
+        $this->selectedPeminjaman = null;
     }
 
     public function render()
