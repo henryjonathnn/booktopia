@@ -29,27 +29,22 @@ class DataPeminjaman extends Component
     public $dateRange = '';
     
     // Modal control properties
-    public $isRejectModalOpen = false;
-    public $selectedPeminjamanId;
-    public $alasanPenolakan;
+    public $activeModal = null; // 'detail', 'reject', atau null
+    public $selectedPeminjaman = null;
+    public $alasanPenolakan = '';
     public $buktiPengiriman;
     public $statuses;
     public $metodes;
-    public $isDetailModalOpen = false;
-    public $selectedPeminjaman = null;
 
-    protected $rules = [
-        'alasanPenolakan' => 'required|min:10',
-        'buktiPengiriman' => 'required|image|max:10240', // max 10MB
-    ];
+    protected $listeners = ['refreshData' => '$refresh'];
 
-    protected $messages = [
-        'alasanPenolakan.required' => 'Alasan penolakan wajib diisi',
-        'alasanPenolakan.min' => 'Alasan penolakan minimal 10 karakter',
-        'buktiPengiriman.required' => 'Bukti pengiriman wajib diupload',
-        'buktiPengiriman.image' => 'File harus berupa gambar',
-        'buktiPengiriman.max' => 'Ukuran file maksimal 10MB',
-    ];
+    protected function rules()
+    {
+        return [
+            'alasanPenolakan' => 'required|min:10',
+            'buktiPengiriman' => 'nullable|image|max:10240'
+        ];
+    }
 
     public function mount()
     {
@@ -69,77 +64,100 @@ class DataPeminjaman extends Component
         ];
     }
 
-    public function openRejectModal($peminjamanId)
+    // Reset semua state modal
+    private function resetModalStates()
     {
-        $this->selectedPeminjamanId = $peminjamanId;
-        $this->isRejectModalOpen = true;
-    }
-
-    public function closeRejectModal()
-    {
-        $this->isRejectModalOpen = false;
-        $this->selectedPeminjamanId = null;
+        $this->activeModal = null;
+        $this->selectedPeminjaman = null;
         $this->alasanPenolakan = '';
-        $this->resetValidation('alasanPenolakan');
+        $this->buktiPengiriman = null;
+        $this->resetValidation();
     }
 
+    // Handler untuk modal detail
+    public function showDetail($peminjamanId)
+    {
+        $this->resetModalStates();
+        $this->selectedPeminjaman = Peminjaman::with(['user', 'buku', 'staff'])->find($peminjamanId);
+        $this->activeModal = 'detail';
+    }
+
+    // Handler untuk modal reject
+    public function showReject($peminjamanId)
+    {
+        $this->resetModalStates();
+        $this->selectedPeminjaman = Peminjaman::find($peminjamanId);
+        $this->activeModal = 'reject';
+    }
+
+    // Handler untuk menutup modal
+    public function closeModal()
+    {
+        $this->resetModalStates();
+    }
+
+    // Handler untuk approve peminjaman
     public function approvePeminjaman($peminjamanId)
     {
-        $peminjaman = Peminjaman::findOrFail($peminjamanId);
-        
-        if ($peminjaman->status !== 'PENDING') {
-            session()->flash('error', 'Status peminjaman tidak valid untuk disetujui');
-            return;
+        try {
+            $peminjaman = Peminjaman::findOrFail($peminjamanId);
+            
+            if ($peminjaman->status !== 'PENDING') {
+                session()->flash('error', 'Status peminjaman tidak valid untuk disetujui');
+                return;
+            }
+
+            $peminjaman->status = 'DIPROSES';
+            $peminjaman->id_staff = auth()->id();
+            $peminjaman->save();
+
+            Notifikasi::create([
+                'id_user' => $peminjaman->id_user,
+                'id_peminjaman' => $peminjaman->id,
+                'message' => "Peminjaman buku {$peminjaman->buku->judul} telah disetujui dan sedang diproses",
+                'tipe' => 'PEMINJAMAN_DIPROSES'
+            ]);
+
+            session()->flash('success', 'Peminjaman berhasil disetujui');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Terjadi kesalahan saat menyetujui peminjaman');
         }
-
-        $peminjaman->status = 'DIPROSES';
-        $peminjaman->id_staff = auth()->id();
-        $peminjaman->save();
-
-        // Kirim notifikasi ke user
-        Notifikasi::create([
-            'id_user' => $peminjaman->id_user,
-            'id_peminjaman' => $peminjaman->id,
-            'message' => "Peminjaman buku {$peminjaman->buku->judul} telah disetujui dan sedang diproses",
-            'tipe' => 'PEMINJAMAN_DIPROSES'
-        ]);
-
-        session()->flash('success', 'Peminjaman berhasil disetujui');
     }
 
+    // Handler untuk reject peminjaman
     public function rejectPeminjaman()
     {
-        $this->validate([
-            'alasanPenolakan' => 'required|min:10'
-        ]);
+        $this->validate();
 
-        $peminjaman = Peminjaman::findOrFail($this->selectedPeminjamanId);
-        
-        if ($peminjaman->status !== 'PENDING') {
-            session()->flash('error', 'Status peminjaman tidak valid untuk ditolak');
-            return;
+        try {
+            $peminjaman = $this->selectedPeminjaman;
+            
+            if ($peminjaman->status !== 'PENDING') {
+                session()->flash('error', 'Status peminjaman tidak valid untuk ditolak');
+                return;
+            }
+
+            $peminjaman->buku->increment('stock');
+            $peminjaman->status = 'DITOLAK';
+            $peminjaman->alasan_penolakan = $this->alasanPenolakan;
+            $peminjaman->id_staff = auth()->id();
+            $peminjaman->save();
+
+            Notifikasi::create([
+                'id_user' => $peminjaman->id_user,
+                'id_peminjaman' => $peminjaman->id,
+                'message' => "Peminjaman buku {$peminjaman->buku->judul} ditolak dengan alasan: {$this->alasanPenolakan}",
+                'tipe' => 'PEMINJAMAN_DITOLAK'
+            ]);
+
+            $this->resetModalStates();
+            session()->flash('success', 'Peminjaman berhasil ditolak');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Terjadi kesalahan saat menolak peminjaman');
         }
-
-        // Kembalikan stok buku
-        $peminjaman->buku->increment('stock');
-        
-        $peminjaman->status = 'DITOLAK';
-        $peminjaman->alasan_penolakan = $this->alasanPenolakan;
-        $peminjaman->id_staff = auth()->id();
-        $peminjaman->save();
-
-        // Kirim notifikasi ke user
-        Notifikasi::create([
-            'id_user' => $peminjaman->id_user,
-            'id_peminjaman' => $peminjaman->id,
-            'message' => "Peminjaman buku {$peminjaman->buku->judul} ditolak dengan alasan: {$this->alasanPenolakan}",
-            'tipe' => 'PEMINJAMAN_DITOLAK'
-        ]);
-
-        $this->closeRejectModal();
-        session()->flash('success', 'Peminjaman berhasil ditolak');
     }
 
+    // Handler untuk upload bukti pengiriman
     public function uploadBuktiPengiriman($peminjamanId)
     {
         $this->validate([
@@ -154,16 +172,13 @@ class DataPeminjaman extends Component
                 return;
             }
 
-            // Upload bukti pengiriman
             $path = $this->buktiPengiriman->store('bukti-pengiriman', 'public');
             
-            // Update status peminjaman
             $peminjaman->bukti_pengiriman = $path;
             $peminjaman->status = 'DIKIRIM';
             $peminjaman->tgl_dikirim = now();
             $peminjaman->save();
 
-            // Kirim notifikasi ke user
             Notifikasi::create([
                 'id_user' => $peminjaman->id_user,
                 'id_peminjaman' => $peminjaman->id,
@@ -176,18 +191,6 @@ class DataPeminjaman extends Component
         } catch (\Exception $e) {
             session()->flash('error', 'Terjadi kesalahan saat mengupload bukti pengiriman');
         }
-    }
-
-    public function openDetailModal($peminjamanId)
-    {
-        $this->selectedPeminjaman = Peminjaman::with(['user', 'buku', 'staff'])->find($peminjamanId);
-        $this->isDetailModalOpen = true;
-    }
-
-    public function closeDetailModal()
-    {
-        $this->isDetailModalOpen = false;
-        $this->selectedPeminjaman = null;
     }
 
     public function render()
@@ -208,10 +211,8 @@ class DataPeminjaman extends Component
             })
             ->latest();
 
-        $peminjamans = $query->paginate($this->perPage);
-
         return view('livewire.admin.data-peminjaman', [
-            'peminjamans' => $peminjamans
+            'peminjamans' => $query->paginate($this->perPage)
         ]);
     }
 

@@ -111,7 +111,7 @@
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                                     </svg>
                                                 </button>
-                                                <button wire:click="openRejectModal({{ $peminjaman->id }})"
+                                                <button wire:click="showReject({{ $peminjaman->id }})"
                                                     class="bg-red-500/10 text-red-500 hover:bg-red-500/20 p-2 rounded-lg transition-colors">
                                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -136,7 +136,7 @@
                                                     <span>Kirim Sekarang</span>
                                                 </label>
                                             @endif
-                                            <button wire:click="openDetailModal({{ $peminjaman->id }})"
+                                            <button wire:click="showDetail({{ $peminjaman->id }})"
                                                 class="bg-gray-500/10 text-gray-400 hover:bg-gray-500/20 p-2 rounded-lg transition-colors">
                                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -173,153 +173,134 @@
     </div>
 
     <!-- Modal Detail -->
-    <div class="relative z-50" aria-labelledby="modal-title" role="dialog" aria-modal="true"
-        x-data="{ show: @entangle('isDetailModalOpen') }"
-        x-show="show"
-        x-cloak>
-        <div class="fixed inset-0 bg-black/50 transition-opacity"></div>
+    @if($activeModal === 'detail' && $selectedPeminjaman)
+        <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+            <div class="flex min-h-screen items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                <div class="fixed inset-0 bg-black/50 transition-opacity" wire:click="closeModal"></div>
+                
+                <div class="relative transform overflow-hidden rounded-lg bg-[#1a1625] px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+                    <div>
+                        <div class="mb-4">
+                            <h3 class="text-lg font-medium">Detail Peminjaman</h3>
+                            <p class="text-sm text-gray-400 mt-1">ID: #{{ $selectedPeminjaman->id }}</p>
+                        </div>
 
-        <div class="fixed inset-0 z-50 overflow-y-auto">
-            <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-                <div x-show="show"
-                    x-transition:enter="ease-out duration-300"
-                    x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                    x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
-                    x-transition:leave="ease-in duration-200"
-                    x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
-                    x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                    class="relative transform overflow-hidden rounded-lg bg-[#1a1625] px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
-                    @if($selectedPeminjaman)
-                        <div>
-                            <div class="mb-4">
-                                <h3 class="text-lg font-medium">Detail Peminjaman</h3>
-                                <p class="text-sm text-gray-400 mt-1">ID: #{{ $selectedPeminjaman->id }}</p>
+                        <div class="space-y-4">
+                            <!-- Informasi Peminjam -->
+                            <div>
+                                <h4 class="text-sm font-medium text-gray-400">Informasi Peminjam</h4>
+                                <p class="mt-1">{{ $selectedPeminjaman->user->name }}</p>
+                                <p class="text-sm text-gray-400">{{ $selectedPeminjaman->user->email }}</p>
                             </div>
 
-                            <div class="space-y-4">
-                                <!-- Informasi Peminjam -->
-                                <div>
-                                    <h4 class="text-sm font-medium text-gray-400">Informasi Peminjam</h4>
-                                    <p class="mt-1">{{ $selectedPeminjaman->user->name }}</p>
-                                    <p class="text-sm text-gray-400">{{ $selectedPeminjaman->user->email }}</p>
-                                </div>
+                            <!-- Informasi Buku -->
+                            <div>
+                                <h4 class="text-sm font-medium text-gray-400">Buku yang Dipinjam</h4>
+                                <p class="mt-1">{{ $selectedPeminjaman->buku->judul }}</p>
+                                <p class="text-sm text-gray-400">{{ $selectedPeminjaman->buku->penulis }}</p>
+                            </div>
 
-                                <!-- Informasi Buku -->
-                                <div>
-                                    <h4 class="text-sm font-medium text-gray-400">Buku yang Dipinjam</h4>
-                                    <p class="mt-1">{{ $selectedPeminjaman->buku->judul }}</p>
-                                    <p class="text-sm text-gray-400">{{ $selectedPeminjaman->buku->penulis }}</p>
-                                </div>
-
-                                <!-- Informasi Pengiriman -->
-                                <div>
-                                    <h4 class="text-sm font-medium text-gray-400">Informasi Pengiriman</h4>
-                                    <p class="mt-1">{{ str_replace('_', ' ', $selectedPeminjaman->metode_pengiriman) }}</p>
-                                    <p class="text-sm text-gray-400">{{ $selectedPeminjaman->alamat_pengiriman }}</p>
-                                    @if($selectedPeminjaman->catatan_pengiriman)
-                                        <p class="text-sm text-gray-400 mt-1">Catatan: {{ $selectedPeminjaman->catatan_pengiriman }}</p>
-                                    @endif
-                                </div>
-
-                                <!-- Tanggal -->
-                                <div>
-                                    <h4 class="text-sm font-medium text-gray-400">Informasi Tanggal</h4>
-                                    <div class="mt-1 space-y-1">
-                                        <p class="text-sm">
-                                            <span class="text-gray-400">Dibuat:</span>
-                                            {{ $selectedPeminjaman->created_at->format('d M Y H:i') }}
-                                        </p>
-                                        <p class="text-sm">
-                                            <span class="text-gray-400">Rencana Pinjam:</span>
-                                            {{ Carbon\Carbon::parse($selectedPeminjaman->tgl_peminjaman_diinginkan)->format('d M Y') }}
-                                        </p>
-                                        @if($selectedPeminjaman->tgl_dikirim)
-                                            <p class="text-sm">
-                                                <span class="text-gray-400">Tanggal Kirim:</span>
-                                                {{ Carbon\Carbon::parse($selectedPeminjaman->tgl_dikirim)->format('d M Y H:i') }}
-                                            </p>
-                                        @endif
-                                    </div>
-                                </div>
-
-                                <!-- Status History -->
-                                @if($selectedPeminjaman->staff)
-                                    <div>
-                                        <h4 class="text-sm font-medium text-gray-400">Diproses Oleh</h4>
-                                        <p class="mt-1">{{ $selectedPeminjaman->staff->name }}</p>
-                                    </div>
+                            <!-- Informasi Pengiriman -->
+                            <div>
+                                <h4 class="text-sm font-medium text-gray-400">Informasi Pengiriman</h4>
+                                <p class="mt-1">{{ str_replace('_', ' ', $selectedPeminjaman->metode_pengiriman) }}</p>
+                                <p class="text-sm text-gray-400">{{ $selectedPeminjaman->alamat_pengiriman }}</p>
+                                @if($selectedPeminjaman->catatan_pengiriman)
+                                    <p class="text-sm text-gray-400 mt-1">Catatan: {{ $selectedPeminjaman->catatan_pengiriman }}</p>
                                 @endif
                             </div>
 
-                            <div class="mt-6">
-                                <button wire:click="closeDetailModal"
-                                    class="w-full inline-flex justify-center rounded-lg bg-purple-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-purple-600">
-                                    Tutup
-                                </button>
+                            <!-- Tanggal -->
+                            <div>
+                                <h4 class="text-sm font-medium text-gray-400">Informasi Tanggal</h4>
+                                <div class="mt-1 space-y-1">
+                                    <p class="text-sm">
+                                        <span class="text-gray-400">Dibuat:</span>
+                                        {{ $selectedPeminjaman->created_at->format('d M Y H:i') }}
+                                    </p>
+                                    <p class="text-sm">
+                                        <span class="text-gray-400">Rencana Pinjam:</span>
+                                        {{ Carbon\Carbon::parse($selectedPeminjaman->tgl_peminjaman_diinginkan)->format('d M Y') }}
+                                    </p>
+                                    @if($selectedPeminjaman->tgl_dikirim)
+                                        <p class="text-sm">
+                                            <span class="text-gray-400">Tanggal Kirim:</span>
+                                            {{ Carbon\Carbon::parse($selectedPeminjaman->tgl_dikirim)->format('d M Y H:i') }}
+                                        </p>
+                                    @endif
+                                </div>
                             </div>
+
+                            <!-- Status History -->
+                            @if($selectedPeminjaman->staff)
+                                <div>
+                                    <h4 class="text-sm font-medium text-gray-400">Diproses Oleh</h4>
+                                    <p class="mt-1">{{ $selectedPeminjaman->staff->name }}</p>
+                                </div>
+                            @endif
                         </div>
-                    @endif
+
+                        <div class="mt-6">
+                            <button wire:click="closeModal"
+                                class="w-full inline-flex justify-center rounded-lg bg-purple-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-purple-600">
+                                Tutup
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    @endif
 
     <!-- Modal Reject -->
-    <div class="relative z-50" aria-labelledby="modal-title" role="dialog" aria-modal="true"
-        x-data="{ show: @entangle('isRejectModalOpen') }"
-        x-show="show"
-        x-cloak>
-        <div class="fixed inset-0 bg-black/50 transition-opacity"></div>
-
-        <div class="fixed inset-0 z-50 overflow-y-auto">
-            <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-                <div x-show="show"
-                    x-transition:enter="ease-out duration-300"
-                    x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                    x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
-                    x-transition:leave="ease-in duration-200"
-                    x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
-                    x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                    class="relative transform overflow-hidden rounded-lg bg-[#1a1625] px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
-                    <div class="sm:flex sm:items-start">
-                        <div class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-500/10 sm:mx-0 sm:h-10 sm:w-10">
+    @if($activeModal === 'reject' && $selectedPeminjaman)
+        <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+            <div class="flex min-h-screen items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                <div class="fixed inset-0 bg-black/50 transition-opacity" wire:click="closeModal"></div>
+                
+                <div class="relative transform overflow-hidden rounded-lg bg-[#1a1625] px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+                    <div>
+                        <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-500/10">
                             <svg class="h-6 w-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                             </svg>
                         </div>
-                        <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-                            <h3 class="text-lg font-medium leading-6 text-gray-200" id="modal-title">
+                        <div class="mt-3 text-center">
+                            <h3 class="text-lg font-medium leading-6 text-gray-200">
                                 Tolak Peminjaman
                             </h3>
                             <div class="mt-2">
                                 <p class="text-sm text-gray-400">
-                                    Masukkan alasan penolakan peminjaman ini. Alasan akan ditampilkan kepada peminjam.
+                                    Masukkan alasan penolakan peminjaman ini
                                 </p>
-                            </div>
-                            <div class="mt-4">
-                                <textarea wire:model="alasanPenolakan"
-                                    class="w-full bg-[#0f0a19] rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 border border-gray-800"
-                                    rows="3"
-                                    placeholder="Contoh: Buku sedang dalam perbaikan"></textarea>
-                                @error('alasanPenolakan')
-                                    <span class="text-sm text-red-400">{{ $message }}</span>
-                                @enderror
                             </div>
                         </div>
                     </div>
-                    <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+
+                    <div class="mt-5">
+                        <textarea
+                            wire:model="alasanPenolakan"
+                            class="w-full bg-[#0f0a19] rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 border border-gray-800"
+                            rows="3"
+                            placeholder="Alasan penolakan..."
+                        ></textarea>
+                        @error('alasanPenolakan')
+                            <span class="text-sm text-red-400 mt-1">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div class="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3">
                         <button wire:click="rejectPeminjaman"
-                            class="inline-flex w-full justify-center rounded-lg bg-red-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-600 sm:ml-3 sm:w-auto">
+                            class="inline-flex w-full justify-center rounded-lg bg-red-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500 sm:col-start-2">
                             Tolak Peminjaman
                         </button>
-                        <button wire:click="closeRejectModal"
-                            class="mt-3 inline-flex w-full justify-center rounded-lg bg-[#2a2435] px-3 py-2 text-sm font-semibold text-gray-300 shadow-sm ring-1 ring-inset ring-gray-800 hover:bg-[#2a2435]/70 sm:mt-0 sm:w-auto">
+                        <button wire:click="closeModal"
+                            class="mt-3 inline-flex w-full justify-center rounded-lg bg-[#2a2435] px-3 py-2 text-sm font-semibold text-gray-300 shadow-sm ring-1 ring-inset ring-gray-800 hover:bg-[#2a2435]/70 sm:col-start-1 sm:mt-0">
                             Batal
                         </button>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    @endif
 </div>
