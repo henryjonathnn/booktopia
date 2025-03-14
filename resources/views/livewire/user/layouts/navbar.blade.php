@@ -81,18 +81,9 @@
 
         <!-- Icon Menu -->
         <div class="flex items-center space-x-6">
-            <!-- Notifikasi Dropdown -->
-            <div x-data="{ 
-                showNotifDropdown: @entangle('showNotifikasi'),
-                showDetailModal: @entangle('showDetailModal')
-            }">
-                <style>
-                    [x-cloak] { 
-                        display: none !important; 
-                    }
-                </style>
-
-                <button @click="showNotifDropdown = !showNotifDropdown"
+            <!-- Notification Button -->
+            <div class="relative">
+                <button wire:click="toggleNotifikasi"
                     class="relative p-2 hover:bg-[#2a2435] rounded-lg text-gray-400">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -103,12 +94,9 @@
                     @endif
                 </button>
 
-                @if($showNotifDropdown)
-                    <div x-show="showNotifDropdown" 
-                         x-cloak
-                         @click.away="showNotifDropdown = false"
-                         class="absolute right-0 mt-2 w-80 bg-[#1a1625] rounded-xl shadow-lg border border-purple-500/10 overflow-hidden z-50">
-                        <!-- Header -->
+                <!-- Notification Dropdown -->
+                @if($showNotifikasi)
+                    <div class="absolute right-0 mt-2 w-80 bg-[#1a1625] rounded-xl shadow-lg border border-purple-500/10 overflow-hidden z-50">
                         <div class="p-4 border-b border-purple-500/10">
                             <div class="flex items-center justify-between">
                                 <h3 class="font-medium">Notifikasi</h3>
@@ -121,19 +109,12 @@
                             </div>
                         </div>
 
-                        <!-- Notification List -->
                         <div class="max-h-96 overflow-y-auto">
                             @forelse($notifikasi as $notif)
                                 <div wire:key="notif-{{ $notif->id }}"
-                                    @click="
-                                        showNotifDropdown = false;
-                                        $wire.showDetail({{ $notif->id }}).then(() => {
-                                            showDetailModal = true;
-                                        });
-                                    "
+                                    wire:click="showDetail({{ $notif->id }})"
                                     class="p-4 border-b border-purple-500/10 hover:bg-purple-500/5 cursor-pointer {{ !$notif->is_read ? 'bg-purple-500/5' : '' }}">
                                     <div class="flex items-start gap-3">
-                                        <!-- Icon berdasarkan tipe -->
                                         <div @class([
                                             'flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center',
                                             'bg-blue-500/10 text-blue-400' => $notif->tipe === 'PEMINJAMAN_BARU',
@@ -143,6 +124,7 @@
                                             'bg-yellow-500/10 text-yellow-400' => $notif->tipe === 'PEMINJAMAN_TERLAMBAT',
                                             'bg-gray-500/10 text-gray-400' => $notif->tipe === 'PEMINJAMAN_DIKEMBALIKAN',
                                         ])>
+                                            <!-- Icons based on type -->
                                             @switch($notif->tipe)
                                                 @case('PEMINJAMAN_BARU')
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -156,7 +138,7 @@
                                                     @break
                                                 @case('PEMINJAMAN_DIKIRIM')
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7M13 3v18m0-18l6 6m-6-6L7 9" />
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                                                     </svg>
                                                     @break
                                                 @case('PEMINJAMAN_DITOLAK')
@@ -175,29 +157,14 @@
                                                     </svg>
                                             @endswitch
                                         </div>
-
                                         <div class="flex-1 min-w-0">
                                             <p class="text-sm text-gray-300">{{ $notif->message }}</p>
-                                            <p class="text-xs text-gray-400 mt-1">{{ $notif->created_at->diffForHumans() }}</p>
+                                            <p class="text-xs text-gray-500 mt-1">{{ $notif->created_at->diffForHumans() }}</p>
                                         </div>
-
-                                        <button wire:click="showDetail({{ $notif->id }})"
-                                            class="flex-shrink-0 text-gray-400 hover:text-gray-300">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M9 5l7 7-7 7" />
-                                            </svg>
-                                        </button>
                                     </div>
                                 </div>
                             @empty
                                 <div class="p-8 text-center">
-                                    <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-purple-500/10 flex items-center justify-center">
-                                        <svg class="w-8 h-8 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                                        </svg>
-                                    </div>
                                     <p class="text-gray-400">Belum ada notifikasi</p>
                                 </div>
                             @endforelse
@@ -267,67 +234,26 @@
     </div>
 </nav>
 
-<!-- Modal Detail Notifikasi -->
-<div x-show="showDetailModal" 
-     x-cloak
-     class="fixed inset-0 z-50 overflow-y-auto"
-     aria-labelledby="modal-title" 
-     role="dialog" 
-     aria-modal="true">
-    <div class="flex min-h-screen items-center justify-center p-4">
-        <div class="fixed inset-0 bg-black/50 transition-opacity" 
-             @click="showDetailModal = false; $wire.closeDetail();">
-        </div>
+<!-- Detail Modal -->
+@if($showDetailModal && $selectedNotifikasi)
+    <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex min-h-screen items-center justify-center p-4">
+            <div class="fixed inset-0 bg-black/50 transition-opacity" wire:click="closeDetail"></div>
 
-        <div class="relative transform overflow-hidden rounded-lg bg-[#1a1625] px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
-            @if($selectedNotifikasi)
-                <div @class([
-                    'mx-auto flex h-12 w-12 items-center justify-center rounded-full',
-                    'bg-blue-500/10' => $selectedNotifikasi->tipe === 'PEMINJAMAN_BARU',
-                    'bg-green-500/10' => $selectedNotifikasi->tipe === 'PEMINJAMAN_DIPROSES',
-                    'bg-purple-500/10' => $selectedNotifikasi->tipe === 'PEMINJAMAN_DIKIRIM',
-                    'bg-red-500/10' => $selectedNotifikasi->tipe === 'PEMINJAMAN_DITOLAK',
-                    'bg-yellow-500/10' => $selectedNotifikasi->tipe === 'PEMINJAMAN_TERLAMBAT',
-                    'bg-gray-500/10' => $selectedNotifikasi->tipe === 'PEMINJAMAN_DIKEMBALIKAN',
-                ])>
-                    <!-- Icon sesuai tipe -->
-                    @switch($selectedNotifikasi->tipe)
-                        @case('PEMINJAMAN_BARU')
-                            <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                            </svg>
-                            @break
-                        @case('PEMINJAMAN_DIPROSES')
-                            <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                            </svg>
-                            @break
-                        @case('PEMINJAMAN_DIKIRIM')
-                            <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7M13 3v18m0-18l6 6m-6-6L7 9" />
-                            </svg>
-                            @break
-                        @case('PEMINJAMAN_DITOLAK')
-                            <svg class="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                            @break
-                        @case('PEMINJAMAN_TERLAMBAT')
-                            <svg class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            @break
-                        @default
-                            <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                            </svg>
-                    @endswitch
+            <div class="relative transform overflow-hidden rounded-lg bg-[#1a1625] px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+                <div class="absolute right-0 top-0 pr-4 pt-4">
+                    <button wire:click="closeDetail" class="text-gray-400 hover:text-gray-300">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
                 </div>
+
                 <div class="mt-3 text-center sm:mt-5">
                     <h3 class="text-lg font-medium leading-6 text-gray-200">
                         Detail Notifikasi
                     </h3>
-                    <div class="mt-2">
+                    <div class="mt-4">
                         <p class="text-sm text-gray-400">
                             {{ $selectedNotifikasi->message }}
                         </p>
@@ -339,7 +265,7 @@
                                             class="w-16 h-24 object-cover rounded" 
                                             alt="{{ $selectedNotifikasi->peminjaman->buku->judul }}">
                                     @endif
-                                    <div class="flex-1 min-w-0">
+                                    <div class="flex-1 min-w-0 text-left">
                                         <p class="text-sm font-medium text-gray-200">
                                             {{ $selectedNotifikasi->peminjaman->buku->judul }}
                                         </p>
@@ -348,25 +274,11 @@
                                         </p>
                                     </div>
                                 </div>
-                                @if($selectedNotifikasi->peminjaman->bukti_pengiriman && $selectedNotifikasi->tipe === 'PEMINJAMAN_DIKIRIM')
-                                    <div class="mt-4">
-                                        <p class="text-sm text-gray-400 mb-2">Bukti Pengiriman:</p>
-                                        <img src="{{ Storage::url($selectedNotifikasi->peminjaman->bukti_pengiriman) }}"
-                                            alt="Bukti Pengiriman"
-                                            class="max-h-64 mx-auto rounded-lg">
-                                    </div>
-                                @endif
                             </div>
                         @endif
                     </div>
                 </div>
-                <div class="mt-5 sm:mt-6">
-                    <button @click="showDetailModal = false; $wire.closeDetail();"
-                        class="inline-flex w-full justify-center rounded-lg bg-purple-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-purple-600">
-                        Tutup
-                    </button>
-                </div>
-            @endif
+            </div>
         </div>
     </div>
-</div>
+@endif
