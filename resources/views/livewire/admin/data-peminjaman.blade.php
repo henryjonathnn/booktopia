@@ -13,7 +13,7 @@
             </div>
 
             <!-- Search & Filter Bar -->
-            <div class="bg-[#1a1625] p-4 rounded-xl mb-6">
+            <div class="bg-[#1a1625] p-4 rounded-xl mb-6 shadow-lg">
                 <div class="flex flex-col md:flex-row gap-4">
                     <div class="relative flex-1">
                         <svg xmlns="http://www.w3.org/2000/svg"
@@ -24,7 +24,7 @@
                             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                         </svg>
                         <input wire:model.live.debounce.300ms="search" type="search"
-                            class="w-full bg-[#0f0a19] rounded-lg pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            class="w-full bg-[#0f0a19] rounded-lg pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 border border-gray-800"
                             placeholder="Cari peminjaman..." />
                     </div>
 
@@ -32,7 +32,7 @@
                         <!-- Status Filter -->
                         <div class="w-full sm:w-40">
                             <select wire:model.live="status"
-                                class="w-full px-3 py-2.5 bg-[#0f0a19] rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm">
+                                class="w-full px-3 py-2.5 bg-[#0f0a19] rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm border border-gray-800">
                                 <option value="">Semua Status</option>
                                 @foreach ($statuses as $status)
                                     <option value="{{ $status }}">{{ $status }}</option>
@@ -43,7 +43,7 @@
                         <!-- Metode Pengiriman Filter -->
                         <div class="w-full sm:w-40">
                             <select wire:model.live="metode"
-                                class="w-full px-3 py-2.5 bg-[#0f0a19] rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm">
+                                class="w-full px-3 py-2.5 bg-[#0f0a19] rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm border border-gray-800">
                                 <option value="">Semua Metode</option>
                                 @foreach ($metodes as $metode)
                                     <option value="{{ $metode }}">{{ str_replace('_', ' ', $metode) }}</option>
@@ -55,20 +55,21 @@
                         <div class="w-full sm:w-64" x-data="dateRangePicker">
                             <div class="relative">
                                 <input type="text" readonly x-model="formattedRange" @click="toggleDatepicker"
-                                    class="w-full px-3 py-2.5 bg-[#0f0a19] rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm cursor-pointer"
+                                    class="w-full px-3 py-2.5 bg-[#0f0a19] rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm cursor-pointer border border-gray-800"
                                     placeholder="Rentang Tanggal" />
                                 <svg xmlns="http://www.w3.org/2000/svg"
                                     class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
                                     width="16" height="16" viewBox="0 0 24 24" fill="none"
                                     stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                     stroke-linejoin="round">
-                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2">
+                                    </rect>
                                     <line x1="16" y1="2" x2="16" y2="6"></line>
                                     <line x1="8" y1="2" x2="8" y2="6"></line>
                                     <line x1="3" y1="10" x2="21" y2="10"></line>
                                 </svg>
                             </div>
-                        
+
                             <div x-show="isOpen" @click.away="isOpen = false"
                                 class="absolute mt-1 bg-[#1a1625] rounded-lg shadow-lg z-50 p-4 border border-gray-800 w-72"
                                 x-transition:enter="transition ease-out duration-200"
@@ -77,48 +78,53 @@
                                 x-transition:leave="transition ease-in duration-100"
                                 x-transition:leave-start="opacity-100 scale-100"
                                 x-transition:leave-end="opacity-0 scale-95">
-                                
+
                                 <!-- Date Selection Tabs -->
                                 <div class="flex justify-between items-center mb-4">
-                                    <button @click="switchToStartView()" 
+                                    <button @click="switchToStartView()"
                                         class="text-sm font-medium px-3 py-1.5 rounded-lg transition-colors"
-                                        :class="currentView === 'start' ? 'bg-purple-900 text-white' : 'text-gray-300 hover:bg-gray-800'">
-                                        Start Date <span x-show="startDate" x-text="formatDate(startDate)" class="text-xs"></span>
+                                        :class="currentView === 'start' ? 'bg-purple-900 text-white' :
+                                            'text-gray-300 hover:bg-gray-800'">
+                                        Start Date <span x-show="startDate" x-text="formatDate(startDate)"
+                                            class="text-xs"></span>
                                     </button>
-                                    <button @click="switchToEndView()" 
+                                    <button @click="switchToEndView()"
                                         class="text-sm font-medium px-3 py-1.5 rounded-lg transition-colors"
-                                        :class="currentView === 'end' ? 'bg-purple-900 text-white' : 'text-gray-300 hover:bg-gray-800'">
-                                        End Date <span x-show="endDate" x-text="formatDate(endDate)" class="text-xs"></span>
+                                        :class="currentView === 'end' ? 'bg-purple-900 text-white' :
+                                            'text-gray-300 hover:bg-gray-800'">
+                                        End Date <span x-show="endDate" x-text="formatDate(endDate)"
+                                            class="text-xs"></span>
                                     </button>
                                 </div>
-                        
+
                                 <!-- Calendar Title with Month/Year Navigation -->
                                 <div class="flex justify-between items-center mb-3">
-                                    <button @click="prevMonth()"
-                                        class="p-1 hover:bg-gray-800 rounded-lg">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16"
-                                            height="16" viewBox="0 0 24 24" fill="none"
-                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                            stroke-linejoin="round" class="text-gray-400">
+                                    <button @click="prevMonth()" class="p-1 hover:bg-gray-800 rounded-lg">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                            class="text-gray-400">
                                             <polyline points="15 18 9 12 15 6"></polyline>
                                         </svg>
                                     </button>
-                                    <span class="text-sm font-medium" x-text="formatMonthYear(currentMonth, currentYear)"></span>
-                                    <button @click="nextMonth()"
-                                        class="p-1 hover:bg-gray-800 rounded-lg">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16"
-                                            height="16" viewBox="0 0 24 24" fill="none"
-                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                            stroke-linejoin="round" class="text-gray-400">
+                                    <span class="text-sm font-medium"
+                                        x-text="formatMonthYear(currentMonth, currentYear)"></span>
+                                    <button @click="nextMonth()" class="p-1 hover:bg-gray-800 rounded-lg">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                            class="text-gray-400">
                                             <polyline points="9 18 15 12 9 6"></polyline>
                                         </svg>
                                     </button>
                                 </div>
-                        
+
                                 <!-- Calendar -->
                                 <div class="grid grid-cols-7 gap-1 mb-1">
-                                    <template x-for="day in ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']" :key="day">
-                                        <div class="text-center text-xs text-gray-500 font-medium py-1" x-text="day"></div>
+                                    <template x-for="day in ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']"
+                                        :key="day">
+                                        <div class="text-center text-xs text-gray-500 font-medium py-1"
+                                            x-text="day"></div>
                                     </template>
                                 </div>
                                 <div class="grid grid-cols-7 gap-1">
@@ -129,7 +135,8 @@
                                         <div @click="selectDate(date)"
                                             :class="{
                                                 'bg-purple-900 text-white': isSelectedDate(date),
-                                                'bg-purple-900/20 text-purple-400': isInRange(date) && !isSelectedDate(date),
+                                                'bg-purple-900/20 text-purple-400': isInRange(date) && !isSelectedDate(
+                                                    date),
                                                 'hover:bg-gray-800': !isSelectedDate(date),
                                                 'cursor-pointer': true
                                             }"
@@ -138,16 +145,16 @@
                                         </div>
                                     </template>
                                 </div>
-                        
+
                                 <!-- Action Buttons -->
                                 <div class="flex justify-end mt-4 space-x-2">
                                     <button @click="clearDates"
                                         class="px-3 py-1.5 text-xs bg-gray-800 text-gray-300 rounded-lg hover:bg-gray-700 transition-colors">
                                         Clear
                                     </button>
-                                    <button @click="applyDateRange" 
-                                        :disabled="!startDate"
-                                        :class="!startDate ? 'bg-gray-700 cursor-not-allowed' : 'bg-purple-900 hover:bg-purple-800'"
+                                    <button @click="applyDateRange" :disabled="!startDate"
+                                        :class="!startDate ? 'bg-gray-700 cursor-not-allowed' :
+                                            'bg-purple-900 hover:bg-purple-800'"
                                         class="px-3 py-1.5 text-xs text-white rounded-lg transition-colors">
                                         Apply
                                     </button>
@@ -159,40 +166,45 @@
             </div>
 
             <!-- Peminjaman Table -->
-            <div class="overflow-x-auto bg-[#1a1625] rounded-xl">
+            <div class="overflow-hidden bg-[#1a1625] rounded-xl shadow-lg">
                 <table class="min-w-full">
                     <thead>
-                        <tr class="border-b border-gray-800">
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                        <tr class="border-b border-gray-800 bg-[#221c2e]">
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                                 Info Peminjaman
                             </th>
                             <th
-                                class="px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                class="px-6 py-4 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">
                                 Status
                             </th>
                             <th
-                                class="hidden md:table-cell px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                class="hidden md:table-cell px-6 py-4 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">
                                 Metode
                             </th>
                             <th
-                                class="hidden md:table-cell px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                class="hidden md:table-cell px-6 py-4 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">
                                 Tanggal
                             </th>
                             <th
-                                class="px-6 py-3 text-right sm:text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                                Actions
+                                class="px-6 py-4 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                Aksi
                             </th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="divide-y divide-gray-800">
                         @forelse($peminjamans as $peminjaman)
-                            <tr class="border-b border-gray-800 hover:bg-[#2a2435] transition-colors cursor-pointer"
+                            <tr class="hover:bg-[#2a2435] transition-colors cursor-pointer group"
                                 wire:click="viewPeminjamanDetails({{ $peminjaman->id }})">
-                                <td class="px-6 py-4 whitespace-nowrap">
+                                <td class="px-6 py-5 whitespace-nowrap">
                                     <div class="flex items-center gap-3">
+                                        <div
+                                            class="h-10 w-10 flex-shrink-0 rounded-lg bg-purple-900/20 flex items-center justify-center text-purple-400 text-lg font-medium">
+                                            {{ substr($peminjaman->user->name, 0, 1) }}
+                                        </div>
                                         <div class="min-w-0">
                                             <div class="font-medium text-white">{{ $peminjaman->user->name }}</div>
-                                            <div class="text-sm text-gray-400">{{ $peminjaman->buku->judul }}</div>
+                                            <div class="text-sm text-gray-400 truncate max-w-xs">
+                                                {{ $peminjaman->buku->judul }}</div>
                                             @if ($peminjaman->nomor_resi)
                                                 <div class="text-xs text-gray-500">Resi: {{ $peminjaman->nomor_resi }}
                                                 </div>
@@ -200,80 +212,155 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-center">
+                                <td class="px-6 py-5 whitespace-nowrap text-center">
                                     <span
-                                        class="px-2 py-1 text-xs inline-flex leading-5 font-medium rounded-full 
+                                        class="px-3 py-1.5 text-xs inline-flex items-center justify-center leading-5 font-medium rounded-full 
                                         @switch($peminjaman->status)
                                             @case('PENDING')
-                                                bg-yellow-500/10 text-yellow-400
+                                                bg-yellow-500/20 text-yellow-400 border border-yellow-500/30
                                                 @break
                                             @case('DIPROSES')
-                                                bg-blue-500/10 text-blue-400
+                                                bg-blue-500/20 text-blue-400 border border-blue-500/30
                                                 @break
                                             @case('DIKIRIM')
-                                                bg-indigo-500/10 text-indigo-400
+                                                bg-indigo-500/20 text-indigo-400 border border-indigo-500/30
                                                 @break
                                             @case('DIPINJAM')
-                                                bg-green-500/10 text-green-400
+                                                bg-green-500/20 text-green-400 border border-green-500/30
                                                 @break
                                             @case('TERLAMBAT')
-                                                bg-red-500/10 text-red-400
+                                                bg-red-500/20 text-red-400 border border-red-500/30
                                                 @break
                                             @case('DIKEMBALIKAN')
-                                                bg-purple-500/10 text-purple-400
+                                                bg-purple-500/20 text-purple-400 border border-purple-500/30
                                                 @break
                                             @case('DITOLAK')
-                                                bg-gray-500/10 text-gray-400
+                                                bg-gray-500/20 text-gray-400 border border-gray-500/30
                                                 @break
                                             @default
-                                                bg-gray-500/10 text-gray-400
+                                                bg-gray-500/20 text-gray-400 border border-gray-500/30
                                         @endswitch">
                                         {{ $peminjaman->status }}
                                     </span>
                                 </td>
                                 <td
-                                    class="hidden md:table-cell px-6 py-4 whitespace-nowrap text-center text-sm text-gray-400">
-                                    {{ str_replace('_', ' ', $peminjaman->metode_pengiriman) }}
+                                    class="hidden md:table-cell px-6 py-5 whitespace-nowrap text-center text-sm text-gray-400">
+                                    <span class="px-3 py-1.5 rounded-lg bg-[#2a2435]">
+                                        {{ str_replace('_', ' ', $peminjaman->metode_pengiriman) }}
+                                    </span>
                                 </td>
                                 <td
-                                    class="hidden md:table-cell px-6 py-4 whitespace-nowrap text-center text-sm text-gray-400">
-                                    {{ $peminjaman->tgl_peminjaman_diinginkan->format('d M Y') }}
+                                    class="hidden md:table-cell px-6 py-5 whitespace-nowrap text-center text-sm text-gray-400">
+                                    <div class="flex items-center justify-center gap-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                                            class="text-purple-400">
+                                            <rect x="3" y="4" width="18" height="18" rx="2"
+                                                ry="2"></rect>
+                                            <line x1="16" y1="2" x2="16" y2="6">
+                                            </line>
+                                            <line x1="8" y1="2" x2="8" y2="6">
+                                            </line>
+                                            <line x1="3" y1="10" x2="21" y2="10">
+                                            </line>
+                                        </svg>
+                                        {{ $peminjaman->tgl_peminjaman_diinginkan->format('d M Y') }}
+                                    </div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap" onclick="event.stopPropagation();">
-                                    <div class="flex justify-end sm:justify-start gap-2">
-                                        <!-- Status Update Button -->
-                                        <div class="relative" x-data="{ open: false }">
-                                            <button @click="open = !open"
-                                                class="p-1.5 hover:bg-gray-800 rounded-lg transition-colors">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                                <td class="px-6 py-5 whitespace-nowrap text-center"
+                                    onclick="event.stopPropagation();">
+                                    <div class="flex justify-center items-center gap-2">
+                                        @if ($peminjaman->status === 'PENDING')
+                                            <!-- Approve Button -->
+                                            <button wire:click="updateStatus({{ $peminjaman->id }}, 'DIPROSES')"
+                                                class="p-2 bg-green-500/10 text-green-400 rounded-full hover:bg-green-500/20 transform transition-all duration-200 hover:scale-110 group-hover:opacity-100"
+                                                title="Setujui Peminjaman">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                    class="text-gray-400">
-                                                    <circle cx="12" cy="12" r="1"></circle>
-                                                    <circle cx="12" cy="5" r="1"></circle>
-                                                    <circle cx="12" cy="19" r="1"></circle>
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <polyline points="20 6 9 17 4 12"></polyline>
                                                 </svg>
                                             </button>
-                                            <div x-show="open" @click.away="open = false"
-                                                class="absolute right-0 mt-2 w-48 bg-[#0f0a19] rounded-lg shadow-xl z-10">
-                                                @foreach ($statuses as $status)
-                                                    @if ($status !== $peminjaman->status)
-                                                        <button
-                                                            wire:click="updateStatus({{ $peminjaman->id }}, '{{ $status }}')"
-                                                            class="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800">
-                                                            Ubah ke {{ $status }}
-                                                        </button>
-                                                    @endif
-                                                @endforeach
+
+                                            <!-- Reject Button -->
+                                            <button wire:click="updateStatus({{ $peminjaman->id }}, 'DITOLAK')"
+                                                class="p-2 bg-red-500/10 text-red-400 rounded-full hover:bg-red-500/20 transform transition-all duration-200 hover:scale-110 group-hover:opacity-100"
+                                                title="Tolak Peminjaman">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <line x1="18" y1="6" x2="6"
+                                                        y2="18"></line>
+                                                    <line x1="6" y1="6" x2="18"
+                                                        y2="18"></line>
+                                                </svg>
+                                            </button>
+                                        @else
+                                            <!-- Status Update Button -->
+                                            <div class="relative" x-data="{ open: false }">
+                                                <button @click="open = !open"
+                                                    class="p-2 bg-[#2a2435] text-gray-400 rounded-full hover:bg-[#332b3f] transition-colors">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16"
+                                                        height="16" viewBox="0 0 24 24" fill="none"
+                                                        stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                        stroke-linejoin="round">
+                                                        <circle cx="12" cy="12" r="1"></circle>
+                                                        <circle cx="12" cy="5" r="1"></circle>
+                                                        <circle cx="12" cy="19" r="1"></circle>
+                                                    </svg>
+                                                </button>
+                                                <div x-show="open" @click.away="open = false"
+                                                    class="absolute right-0 mt-2 w-48 bg-[#0f0a19] rounded-lg shadow-xl z-10 overflow-hidden border border-gray-800"
+                                                    x-transition:enter="transition ease-out duration-200"
+                                                    x-transition:enter-start="opacity-0 scale-95"
+                                                    x-transition:enter-end="opacity-100 scale-100"
+                                                    x-transition:leave="transition ease-in duration-100"
+                                                    x-transition:leave-start="opacity-100 scale-100"
+                                                    x-transition:leave-end="opacity-0 scale-95">
+
+                                                    @foreach ($statuses as $status)
+                                                        @if ($status !== $peminjaman->status)
+                                                            <button
+                                                                wire:click="updateStatus({{ $peminjaman->id }}, '{{ $status }}')"
+                                                                class="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 border-b border-gray-800 last:border-b-0">
+                                                                Ubah ke {{ $status }}
+                                                            </button>
+                                                        @endif
+                                                    @endforeach
+                                                </div>
                                             </div>
-                                        </div>
+
+                                            <!-- View Details Button -->
+                                            <button wire:click="viewPeminjamanDetails({{ $peminjaman->id }})"
+                                                class="p-2 bg-purple-500/10 text-purple-400 rounded-full hover:bg-purple-500/20 transform transition-all duration-200 hover:scale-110"
+                                                title="Lihat Detail">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                                    <circle cx="12" cy="12" r="3"></circle>
+                                                </svg>
+                                            </button>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="px-6 py-4 text-center text-gray-400">
-                                    Tidak ada peminjaman yang ditemukan
+                                <td colspan="5" class="px-6 py-8 text-center text-gray-400 bg-[#0f0a19]/30">
+                                    <div class="flex flex-col items-center justify-center py-6">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
+                                            class="text-gray-500 mb-4">
+                                            <path
+                                                d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
+                                            </path>
+                                        </svg>
+                                        <p class="text-lg font-medium">Tidak ada peminjaman yang ditemukan</p>
+                                        <p class="text-sm text-gray-500 mt-1">Coba ubah filter pencarian anda</p>
+                                    </div>
                                 </td>
                             </tr>
                         @endforelse
@@ -282,7 +369,7 @@
             </div>
 
             <!-- Pagination -->
-            <div class="mt-4">
+            <div class="mt-6">
                 {{ $peminjamans->links() }}
             </div>
 
