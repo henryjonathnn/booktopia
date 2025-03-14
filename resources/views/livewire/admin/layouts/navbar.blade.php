@@ -35,25 +35,89 @@
                     </button>
 
                     @if ($isNotifikasiOpen)
-                        <div class="absolute right-0 mt-2 w-96 bg-[#1A1A2E] rounded-xl shadow-lg border border-purple-500/10 overflow-hidden">
-                            <div class="p-4 border-b border-purple-500/10">
-                                <h3 class="font-medium">Notifikasi</h3>
+                        <div class="absolute right-0 mt-2 w-[420px] bg-[#1A1A2E] rounded-xl shadow-lg border border-purple-500/10 overflow-hidden">
+                            <!-- Header -->
+                            <div class="p-4 border-b border-purple-500/10 flex justify-between items-center">
+                                <div class="flex items-center space-x-2">
+                                    <h3 class="font-medium">Notifikasi</h3>
+                                    @if($unreadCount > 0)
+                                        <span class="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
+                                            {{ $unreadCount }} baru
+                                        </span>
+                                    @endif
+                                </div>
+                                @if($unreadCount > 0)
+                                    <button wire:click="markAllAsRead" 
+                                        class="text-sm text-purple-400 hover:text-purple-300 transition-colors">
+                                        Tandai semua telah dibaca
+                                    </button>
+                                @endif
                             </div>
-                            <div class="max-h-[400px] overflow-y-auto">
+
+                            <!-- Notification List -->
+                            <div class="max-h-[480px] overflow-y-auto">
                                 @forelse($notifikasi as $notif)
                                     <div wire:click="markAsRead({{ $notif['id'] }})"
                                         class="p-4 hover:bg-purple-500/10 cursor-pointer {{ !$notif['is_read'] ? 'bg-purple-500/5' : '' }} border-b border-purple-500/10">
-                                        <p class="text-sm">{{ $notif['message'] }}</p>
-                                        <p class="text-xs text-gray-400 mt-1">
-                                            {{ \Carbon\Carbon::parse($notif['created_at'])->diffForHumans() }}
-                                        </p>
+                                        <div class="flex items-start space-x-3">
+                                            <!-- Icon berdasarkan tipe notifikasi -->
+                                            <div class="flex-shrink-0 w-10 h-10 rounded-full bg-purple-500/10 flex items-center justify-center">
+                                                @if($notif['type'] === 'peminjaman')
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                                    </svg>
+                                                @endif
+                                            </div>
+
+                                            <div class="flex-1 min-w-0">
+                                                <!-- Message -->
+                                                <p class="text-sm text-gray-200">
+                                                    {{ $notif['message'] }}
+                                                </p>
+
+                                                <!-- Timestamp & Status -->
+                                                <div class="mt-1 flex items-center space-x-2">
+                                                    <span class="text-xs text-gray-400">
+                                                        {{ \Carbon\Carbon::parse($notif['created_at'])->diffForHumans() }}
+                                                    </span>
+                                                    @if(!$notif['is_read'])
+                                                        <span class="flex items-center text-xs text-purple-400">
+                                                            <span class="w-1.5 h-1.5 bg-purple-400 rounded-full mr-1"></span>
+                                                            Belum dibaca
+                                                        </span>
+                                                    @endif
+                                                </div>
+                                            </div>
+
+                                            <!-- Action Button -->
+                                            <button class="flex-shrink-0 p-2 hover:bg-purple-500/20 rounded-lg transition-colors">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                                </svg>
+                                            </button>
+                                        </div>
                                     </div>
                                 @empty
-                                    <div class="p-4 text-center text-gray-400">
-                                        Tidak ada notifikasi
+                                    <div class="p-8 text-center">
+                                        <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-purple-500/10 flex items-center justify-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                                            </svg>
+                                        </div>
+                                        <p class="text-gray-400 mb-1">Tidak ada notifikasi</p>
+                                        <p class="text-sm text-gray-500">Anda akan melihat notifikasi ketika ada aktivitas baru</p>
                                     </div>
                                 @endforelse
                             </div>
+
+                            <!-- Footer -->
+                            @if(count($notifikasi) > 0)
+                                <div class="p-4 border-t border-purple-500/10">
+                                    <button class="w-full text-center text-sm text-purple-400 hover:text-purple-300 transition-colors">
+                                        Lihat semua notifikasi
+                                    </button>
+                                </div>
+                            @endif
                         </div>
                     @endif
                 </div>
