@@ -162,14 +162,11 @@ class Navbar extends Component
             $this->selectedNotifikasi->markAsRead();
             $this->refreshNotifikasi();
         }
-        $this->showNotifikasi = false;
-        $this->showDetailModal = true;
     }
 
     public function closeDetail()
     {
         $this->selectedNotifikasi = null;
-        $this->showDetailModal = false;
     }
 
     public function render()

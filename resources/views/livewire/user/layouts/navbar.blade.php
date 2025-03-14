@@ -82,8 +82,12 @@
         <!-- Icon Menu -->
         <div class="flex items-center space-x-6">
             <!-- Notifikasi Dropdown -->
-            <div class="relative">
-                <button wire:click="toggleNotifikasi"
+            <div x-data="{ 
+                showNotifDropdown: false,
+                showDetailModal: false,
+                selectedNotif: null
+            }">
+                <button @click="showNotifDropdown = !showNotifDropdown"
                     class="relative p-2 hover:bg-[#2a2435] rounded-lg text-gray-400">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -94,8 +98,10 @@
                     @endif
                 </button>
 
-                @if($showNotifikasi)
-                    <div class="absolute right-0 mt-2 w-80 bg-[#1a1625] rounded-xl shadow-lg border border-purple-500/10 overflow-hidden z-50">
+                @if($showNotifDropdown)
+                    <div x-show="showNotifDropdown" 
+                         @click.away="showNotifDropdown = false"
+                         class="absolute right-0 mt-2 w-80 bg-[#1a1625] rounded-xl shadow-lg border border-purple-500/10 overflow-hidden z-50">
                         <!-- Header -->
                         <div class="p-4 border-b border-purple-500/10">
                             <div class="flex items-center justify-between">
@@ -113,7 +119,13 @@
                         <div class="max-h-96 overflow-y-auto">
                             @forelse($notifikasi as $notif)
                                 <div wire:key="notif-{{ $notif->id }}"
-                                    class="p-4 border-b border-purple-500/10 hover:bg-purple-500/5 {{ !$notif->is_read ? 'bg-purple-500/5' : '' }}">
+                                    @click="
+                                        showNotifDropdown = false;
+                                        $wire.showDetail({{ $notif->id }}).then(() => {
+                                            showDetailModal = true;
+                                        });
+                                    "
+                                    class="p-4 border-b border-purple-500/10 hover:bg-purple-500/5 cursor-pointer {{ !$notif->is_read ? 'bg-purple-500/5' : '' }}">
                                     <div class="flex items-start gap-3">
                                         <!-- Icon berdasarkan tipe -->
                                         <div @class([
@@ -250,100 +262,105 @@
 </nav>
 
 <!-- Modal Detail Notifikasi -->
-@if($showDetailModal && $selectedNotifikasi)
-    <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        <div class="flex min-h-screen items-end justify-center p-4 text-center sm:items-center sm:p-0">
-            <div class="fixed inset-0 bg-black/50 transition-opacity" wire:click="closeDetail"></div>
+<div x-show="showDetailModal" 
+     x-cloak
+     class="fixed inset-0 z-50 overflow-y-auto"
+     aria-labelledby="modal-title" 
+     role="dialog" 
+     aria-modal="true">
+    <div class="flex min-h-screen items-center justify-center p-4">
+        <div class="fixed inset-0 bg-black/50 transition-opacity" 
+             @click="showDetailModal = false; $wire.closeDetail();">
+        </div>
 
-            <div class="relative transform overflow-hidden rounded-lg bg-[#1a1625] px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
-                <div>
-                    <div @class([
-                        'mx-auto flex h-12 w-12 items-center justify-center rounded-full',
-                        'bg-blue-500/10' => $selectedNotifikasi->tipe === 'PEMINJAMAN_BARU',
-                        'bg-green-500/10' => $selectedNotifikasi->tipe === 'PEMINJAMAN_DIPROSES',
-                        'bg-purple-500/10' => $selectedNotifikasi->tipe === 'PEMINJAMAN_DIKIRIM',
-                        'bg-red-500/10' => $selectedNotifikasi->tipe === 'PEMINJAMAN_DITOLAK',
-                        'bg-yellow-500/10' => $selectedNotifikasi->tipe === 'PEMINJAMAN_TERLAMBAT',
-                        'bg-gray-500/10' => $selectedNotifikasi->tipe === 'PEMINJAMAN_DIKEMBALIKAN',
-                    ])>
-                        <!-- Icon sesuai tipe -->
-                        @switch($selectedNotifikasi->tipe)
-                            @case('PEMINJAMAN_BARU')
-                                <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                                </svg>
-                                @break
-                            @case('PEMINJAMAN_DIPROSES')
-                                <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                </svg>
-                                @break
-                            @case('PEMINJAMAN_DIKIRIM')
-                                <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7M13 3v18m0-18l6 6m-6-6L7 9" />
-                                </svg>
-                                @break
-                            @case('PEMINJAMAN_DITOLAK')
-                                <svg class="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                                @break
-                            @case('PEMINJAMAN_TERLAMBAT')
-                                <svg class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                @break
-                            @default
-                                <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                                </svg>
-                        @endswitch
-                    </div>
-                    <div class="mt-3 text-center sm:mt-5">
-                        <h3 class="text-lg font-medium leading-6 text-gray-200">
-                            Detail Notifikasi
-                        </h3>
-                        <div class="mt-2">
-                            <p class="text-sm text-gray-400">
-                                {{ $selectedNotifikasi->message }}
-                            </p>
-                            @if($selectedNotifikasi->peminjaman)
-                                <div class="mt-4 p-4 bg-purple-500/5 rounded-lg">
-                                    <div class="flex items-center space-x-3">
-                                        @if($selectedNotifikasi->peminjaman->buku->cover_img)
-                                            <img src="{{ Storage::url($selectedNotifikasi->peminjaman->buku->cover_img) }}" 
-                                                class="w-16 h-24 object-cover rounded" 
-                                                alt="{{ $selectedNotifikasi->peminjaman->buku->judul }}">
-                                        @endif
-                                        <div class="flex-1 min-w-0">
-                                            <p class="text-sm font-medium text-gray-200">
-                                                {{ $selectedNotifikasi->peminjaman->buku->judul }}
-                                            </p>
-                                            <p class="text-sm text-gray-400">
-                                                {{ $selectedNotifikasi->peminjaman->buku->penulis }}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    @if($selectedNotifikasi->peminjaman->bukti_pengiriman && $selectedNotifikasi->tipe === 'PEMINJAMAN_DIKIRIM')
-                                        <div class="mt-4">
-                                            <p class="text-sm text-gray-400 mb-2">Bukti Pengiriman:</p>
-                                            <img src="{{ Storage::url($selectedNotifikasi->peminjaman->bukti_pengiriman) }}"
-                                                alt="Bukti Pengiriman"
-                                                class="max-h-64 mx-auto rounded-lg">
-                                        </div>
+        <div class="relative transform overflow-hidden rounded-lg bg-[#1a1625] px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+            @if($selectedNotifikasi)
+                <div @class([
+                    'mx-auto flex h-12 w-12 items-center justify-center rounded-full',
+                    'bg-blue-500/10' => $selectedNotifikasi->tipe === 'PEMINJAMAN_BARU',
+                    'bg-green-500/10' => $selectedNotifikasi->tipe === 'PEMINJAMAN_DIPROSES',
+                    'bg-purple-500/10' => $selectedNotifikasi->tipe === 'PEMINJAMAN_DIKIRIM',
+                    'bg-red-500/10' => $selectedNotifikasi->tipe === 'PEMINJAMAN_DITOLAK',
+                    'bg-yellow-500/10' => $selectedNotifikasi->tipe === 'PEMINJAMAN_TERLAMBAT',
+                    'bg-gray-500/10' => $selectedNotifikasi->tipe === 'PEMINJAMAN_DIKEMBALIKAN',
+                ])>
+                    <!-- Icon sesuai tipe -->
+                    @switch($selectedNotifikasi->tipe)
+                        @case('PEMINJAMAN_BARU')
+                            <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                            </svg>
+                            @break
+                        @case('PEMINJAMAN_DIPROSES')
+                            <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            @break
+                        @case('PEMINJAMAN_DIKIRIM')
+                            <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7M13 3v18m0-18l6 6m-6-6L7 9" />
+                            </svg>
+                            @break
+                        @case('PEMINJAMAN_DITOLAK')
+                            <svg class="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                            @break
+                        @case('PEMINJAMAN_TERLAMBAT')
+                            <svg class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            @break
+                        @default
+                            <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                            </svg>
+                    @endswitch
+                </div>
+                <div class="mt-3 text-center sm:mt-5">
+                    <h3 class="text-lg font-medium leading-6 text-gray-200">
+                        Detail Notifikasi
+                    </h3>
+                    <div class="mt-2">
+                        <p class="text-sm text-gray-400">
+                            {{ $selectedNotifikasi->message }}
+                        </p>
+                        @if($selectedNotifikasi->peminjaman)
+                            <div class="mt-4 p-4 bg-purple-500/5 rounded-lg">
+                                <div class="flex items-center space-x-3">
+                                    @if($selectedNotifikasi->peminjaman->buku->cover_img)
+                                        <img src="{{ Storage::url($selectedNotifikasi->peminjaman->buku->cover_img) }}" 
+                                            class="w-16 h-24 object-cover rounded" 
+                                            alt="{{ $selectedNotifikasi->peminjaman->buku->judul }}">
                                     @endif
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm font-medium text-gray-200">
+                                            {{ $selectedNotifikasi->peminjaman->buku->judul }}
+                                        </p>
+                                        <p class="text-sm text-gray-400">
+                                            {{ $selectedNotifikasi->peminjaman->buku->penulis }}
+                                        </p>
+                                    </div>
                                 </div>
-                            @endif
-                        </div>
+                                @if($selectedNotifikasi->peminjaman->bukti_pengiriman && $selectedNotifikasi->tipe === 'PEMINJAMAN_DIKIRIM')
+                                    <div class="mt-4">
+                                        <p class="text-sm text-gray-400 mb-2">Bukti Pengiriman:</p>
+                                        <img src="{{ Storage::url($selectedNotifikasi->peminjaman->bukti_pengiriman) }}"
+                                            alt="Bukti Pengiriman"
+                                            class="max-h-64 mx-auto rounded-lg">
+                                    </div>
+                                @endif
+                            </div>
+                        @endif
                     </div>
                 </div>
                 <div class="mt-5 sm:mt-6">
-                    <button wire:click="closeDetail"
+                    <button @click="showDetailModal = false; $wire.closeDetail();"
                         class="inline-flex w-full justify-center rounded-lg bg-purple-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-purple-600">
                         Tutup
                     </button>
                 </div>
-            </div>
+            @endif
         </div>
     </div>
-@endif
+</div>
