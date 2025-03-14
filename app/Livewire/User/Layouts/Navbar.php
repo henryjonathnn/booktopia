@@ -3,6 +3,7 @@
 namespace App\Livewire\User\Layouts;
 
 use App\Models\Notifikasi;
+use App\Models\Book;
 use Livewire\Component;
 
 class Navbar extends Component
@@ -13,6 +14,9 @@ class Navbar extends Component
     public $unreadCount;
     public $notifikasi;
     public $search = '';
+    public $searchResults = [];
+    public $user;
+    public $isProfileDropdownOpen = false;
 
     protected $listeners = [
         'refreshNotifikasi' => 'refreshNotifikasi',
@@ -21,17 +25,37 @@ class Navbar extends Component
 
     public function mount()
     {
+        $this->user = auth()->user();
         $this->refreshNotifikasi();
     }
 
     public function updatedSearch()
     {
-        $this->dispatch('searchUpdated', $this->search);
+        if (strlen(trim($this->search)) >= 2) {
+            $this->searchResults = Book::where('judul', 'like', '%' . $this->search . '%')
+                ->orWhere('penulis', 'like', '%' . $this->search . '%')
+                ->orWhere('kategori', 'like', '%' . $this->search . '%')
+                ->take(5)
+                ->get();
+        } else {
+            $this->searchResults = [];
+        }
     }
 
-    public function handleSearch($search)
+    public function viewBook($bookId)
     {
-        $this->search = $search;
+        return redirect()->route('books.show', $bookId);
+    }
+
+    public function toggleProfileDropdown()
+    {
+        $this->isProfileDropdownOpen = !$this->isProfileDropdownOpen;
+    }
+
+    public function logout()
+    {
+        auth()->logout();
+        return redirect()->route('login');
     }
 
     public function toggleNotifikasi()
@@ -40,13 +64,16 @@ class Navbar extends Component
         if ($this->showNotifikasi) {
             $this->showDetailModal = false;
             $this->selectedNotifikasi = null;
+            $this->isProfileDropdownOpen = false;
         }
     }
 
     public function refreshNotifikasi()
     {
-        $this->notifikasi = auth()->user()->notifikasi()->latest()->take(5)->get();
-        $this->unreadCount = auth()->user()->notifikasi()->where('is_read', false)->count();
+        if ($this->user) {
+            $this->notifikasi = $this->user->notifikasi()->latest()->take(5)->get();
+            $this->unreadCount = $this->user->notifikasi()->where('is_read', false)->count();
+        }
     }
 
     public function showDetail($notifId)
@@ -68,7 +95,7 @@ class Navbar extends Component
 
     public function markAllAsRead()
     {
-        auth()->user()->notifikasi()->where('is_read', false)->update(['is_read' => true]);
+        $this->user->notifikasi()->where('is_read', false)->update(['is_read' => true]);
         $this->refreshNotifikasi();
     }
 
