@@ -165,349 +165,278 @@
                 </div>
             </div>
 
-            <!-- Peminjaman Table -->
-            <div class="overflow-hidden bg-[#1a1625] rounded-xl shadow-lg">
-                <table class="min-w-full">
-                    <thead>
-                        <tr class="border-b border-gray-800 bg-[#221c2e]">
-                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
-                                Info Peminjaman
-                            </th>
-                            <th
-                                class="px-6 py-4 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">
-                                Status
-                            </th>
-                            <th
-                                class="hidden md:table-cell px-6 py-4 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">
-                                Metode
-                            </th>
-                            <th
-                                class="hidden md:table-cell px-6 py-4 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">
-                                Tanggal
-                            </th>
-                            <th
-                                class="px-6 py-4 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">
-                                Aksi
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-800">
-                        @forelse($peminjamans as $peminjaman)
-                            <tr class="hover:bg-[#2a2435] transition-colors cursor-pointer group"
-                                wire:click="viewPeminjamanDetails({{ $peminjaman->id }})">
-                                <td class="px-6 py-5 whitespace-nowrap">
-                                    <div class="flex items-center gap-3">
-                                        <div
-                                            class="h-10 w-10 flex-shrink-0 rounded-lg bg-purple-900/20 flex items-center justify-center text-purple-400 text-lg font-medium">
-                                            {{ substr($peminjaman->user->name, 0, 1) }}
+            <!-- Data Table -->
+            <div class="bg-[#1a1625] rounded-xl shadow-lg overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="bg-[#2a2435]">
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                    Peminjam</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                    Buku</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                    Tanggal</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                    Status</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                    Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-800">
+                            @forelse($peminjamans as $peminjaman)
+                                <tr class="hover:bg-[#2a2435] transition-colors">
+                                    <td class="px-4 py-3 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="h-10 w-10 flex-shrink-0">
+                                                @if($peminjaman->user->profile_img)
+                                                    <img class="h-10 w-10 rounded-full object-cover" 
+                                                        src="{{ asset('storage/' . $peminjaman->user->profile_img) }}" 
+                                                        alt="{{ $peminjaman->user->name }}" />
+                                                @else
+                                                    <div class="h-10 w-10 rounded-full bg-purple-500/10 flex items-center justify-center">
+                                                        <svg class="w-6 h-6 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                                        </svg>
+                                                    </div>
+                                                @endif
+                                            </div>
+                                            <div class="ml-4">
+                                                <div class="font-medium text-gray-200">{{ $peminjaman->user->name }}</div>
+                                                <div class="text-sm text-gray-400">{{ $peminjaman->user->email }}</div>
+                                            </div>
                                         </div>
-                                        <div class="min-w-0">
-                                            <div class="font-medium text-white">{{ $peminjaman->user->name }}</div>
-                                            <div class="text-sm text-gray-400 truncate max-w-xs">
-                                                {{ $peminjaman->buku->judul }}</div>
-                                            @if ($peminjaman->nomor_resi)
-                                                <div class="text-xs text-gray-500">Resi: {{ $peminjaman->nomor_resi }}
-                                                </div>
-                                            @endif
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="h-10 w-8 flex-shrink-0">
+                                                @if($peminjaman->buku->cover_img)
+                                                    <img class="h-10 w-8 rounded object-cover" 
+                                                        src="{{ asset('storage/' . $peminjaman->buku->cover_img) }}" 
+                                                        alt="{{ $peminjaman->buku->judul }}" />
+                                                @else
+                                                    <div class="h-10 w-8 rounded bg-purple-500/10 flex items-center justify-center">
+                                                        <svg class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                                d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                                        </svg>
+                                                    </div>
+                                                @endif
+                                            </div>
+                                            <div class="ml-4">
+                                                <div class="font-medium text-gray-200">{{ $peminjaman->buku->judul }}</div>
+                                                <div class="text-sm text-gray-400">{{ $peminjaman->buku->penulis }}</div>
+                                            </div>
                                         </div>
-                                    </div>
-                                </td>
-                                <td class="px-6 py-5 whitespace-nowrap text-center">
-                                    <span
-                                        class="px-3 py-1.5 text-xs inline-flex items-center justify-center leading-5 font-medium rounded-full 
-                                        @switch($peminjaman->status)
-                                            @case('PENDING')
-                                                bg-yellow-500/20 text-yellow-400 border border-yellow-500/30
-                                                @break
-                                            @case('DIPROSES')
-                                                bg-blue-500/20 text-blue-400 border border-blue-500/30
-                                                @break
-                                            @case('DIKIRIM')
-                                                bg-indigo-500/20 text-indigo-400 border border-indigo-500/30
-                                                @break
-                                            @case('DIPINJAM')
-                                                bg-green-500/20 text-green-400 border border-green-500/30
-                                                @break
-                                            @case('TERLAMBAT')
-                                                bg-red-500/20 text-red-400 border border-red-500/30
-                                                @break
-                                            @case('DIKEMBALIKAN')
-                                                bg-purple-500/20 text-purple-400 border border-purple-500/30
-                                                @break
-                                            @case('DITOLAK')
-                                                bg-gray-500/20 text-gray-400 border border-gray-500/30
-                                                @break
-                                            @default
-                                                bg-gray-500/20 text-gray-400 border border-gray-500/30
-                                        @endswitch">
-                                        {{ $peminjaman->status }}
-                                    </span>
-                                </td>
-                                <td
-                                    class="hidden md:table-cell px-6 py-5 whitespace-nowrap text-center text-sm text-gray-400">
-                                    <span class="px-3 py-1.5 rounded-lg bg-[#2a2435]">
-                                        {{ str_replace('_', ' ', $peminjaman->metode_pengiriman) }}
-                                    </span>
-                                </td>
-                                <td
-                                    class="hidden md:table-cell px-6 py-5 whitespace-nowrap text-center text-sm text-gray-400">
-                                    <div class="flex items-center justify-center gap-2">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                            class="text-purple-400">
-                                            <rect x="3" y="4" width="18" height="18" rx="2"
-                                                ry="2"></rect>
-                                            <line x1="16" y1="2" x2="16" y2="6">
-                                            </line>
-                                            <line x1="8" y1="2" x2="8" y2="6">
-                                            </line>
-                                            <line x1="3" y1="10" x2="21" y2="10">
-                                            </line>
-                                        </svg>
-                                        {{ $peminjaman->tgl_peminjaman_diinginkan->format('d M Y') }}
-                                    </div>
-                                </td>
-                                <td class="px-6 py-5 whitespace-nowrap text-center"
-                                    onclick="event.stopPropagation();">
-                                    <div class="flex justify-center items-center gap-2">
-                                        @if ($peminjaman->status === 'PENDING')
-                                            <!-- Approve Button -->
-                                            <button wire:click="updateStatus({{ $peminjaman->id }}, 'DIPROSES')"
-                                                class="p-2 bg-green-500/10 text-green-400 rounded-full hover:bg-green-500/20 transform transition-all duration-200 hover:scale-110 group-hover:opacity-100"
-                                                title="Setujui Peminjaman">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                    <polyline points="20 6 9 17 4 12"></polyline>
-                                                </svg>
-                                            </button>
-
-                                            <!-- Reject Button -->
-                                            <button wire:click="updateStatus({{ $peminjaman->id }}, 'DITOLAK')"
-                                                class="p-2 bg-red-500/10 text-red-400 rounded-full hover:bg-red-500/20 transform transition-all duration-200 hover:scale-110 group-hover:opacity-100"
-                                                title="Tolak Peminjaman">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                    <line x1="18" y1="6" x2="6"
-                                                        y2="18"></line>
-                                                    <line x1="6" y1="6" x2="18"
-                                                        y2="18"></line>
-                                                </svg>
-                                            </button>
-                                        @else
-                                            <!-- Status Update Button -->
-                                            <div class="relative" x-data="{ open: false }">
-                                                <button @click="open = !open"
-                                                    class="p-2 bg-[#2a2435] text-gray-400 rounded-full hover:bg-[#332b3f] transition-colors">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16"
-                                                        height="16" viewBox="0 0 24 24" fill="none"
-                                                        stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                                        stroke-linejoin="round">
-                                                        <circle cx="12" cy="12" r="1"></circle>
-                                                        <circle cx="12" cy="5" r="1"></circle>
-                                                        <circle cx="12" cy="19" r="1"></circle>
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap">
+                                        <div class="text-sm text-gray-200">
+                                            {{ $peminjaman->tgl_peminjaman_diinginkan->format('d M Y') }}
+                                        </div>
+                                        <div class="text-xs text-gray-400">
+                                            {{ $peminjaman->tgl_peminjaman_diinginkan->format('H:i') }}
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                            {{ $peminjaman->status === 'PENDING' ? 'bg-yellow-500/10 text-yellow-400' : '' }}
+                                            {{ $peminjaman->status === 'DIPROSES' ? 'bg-blue-500/10 text-blue-400' : '' }}
+                                            {{ $peminjaman->status === 'DIKIRIM' ? 'bg-indigo-500/10 text-indigo-400' : '' }}
+                                            {{ $peminjaman->status === 'DIPINJAM' ? 'bg-green-500/10 text-green-400' : '' }}
+                                            {{ $peminjaman->status === 'TERLAMBAT' ? 'bg-red-500/10 text-red-400' : '' }}
+                                            {{ $peminjaman->status === 'DIKEMBALIKAN' ? 'bg-gray-500/10 text-gray-400' : '' }}
+                                            {{ $peminjaman->status === 'DITOLAK' ? 'bg-red-500/10 text-red-400' : '' }}">
+                                            {{ $peminjaman->status }}
+                                        </span>
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap text-sm">
+                                        <div class="flex items-center space-x-2">
+                                            @if($peminjaman->status === 'PENDING')
+                                                <button wire:click="approvePeminjaman({{ $peminjaman->id }})"
+                                                    class="p-2 bg-green-500/10 text-green-400 rounded-lg hover:bg-green-500/20 transition-colors">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                                     </svg>
                                                 </button>
-                                                <div x-show="open" @click.away="open = false"
-                                                    class="absolute right-0 mt-2 w-48 bg-[#0f0a19] rounded-lg shadow-xl z-10 overflow-hidden border border-gray-800"
-                                                    x-transition:enter="transition ease-out duration-200"
-                                                    x-transition:enter-start="opacity-0 scale-95"
-                                                    x-transition:enter-end="opacity-100 scale-100"
-                                                    x-transition:leave="transition ease-in duration-100"
-                                                    x-transition:leave-start="opacity-100 scale-100"
-                                                    x-transition:leave-end="opacity-0 scale-95">
-
-                                                    @foreach ($statuses as $status)
-                                                        @if ($status !== $peminjaman->status)
-                                                            <button
-                                                                wire:click="updateStatus({{ $peminjaman->id }}, '{{ $status }}')"
-                                                                class="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 border-b border-gray-800 last:border-b-0">
-                                                                Ubah ke {{ $status }}
-                                                            </button>
-                                                        @endif
-                                                    @endforeach
-                                                </div>
-                                            </div>
-
-                                            <!-- View Details Button -->
-                                            <button wire:click="viewPeminjamanDetails({{ $peminjaman->id }})"
-                                                class="p-2 bg-purple-500/10 text-purple-400 rounded-full hover:bg-purple-500/20 transform transition-all duration-200 hover:scale-110"
-                                                title="Lihat Detail">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                                    <circle cx="12" cy="12" r="3"></circle>
+                                                <button wire:click="showRejectModal({{ $peminjaman->id }})"
+                                                    class="p-2 bg-red-500/10 text-red-400 rounded-lg hover:bg-red-500/20 transition-colors">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                </button>
+                                            @elseif($peminjaman->status === 'DIPROSES')
+                                                <button wire:click="showShipmentModal({{ $peminjaman->id }})"
+                                                    class="px-3 py-1 bg-purple-500/10 text-purple-400 rounded-lg hover:bg-purple-500/20 transition-colors">
+                                                    Kirim Sekarang
+                                                </button>
+                                            @endif
+                                            <button wire:click="showDetailModal({{ $peminjaman->id }})"
+                                                class="p-2 bg-gray-500/10 text-gray-400 rounded-lg hover:bg-gray-500/20 transition-colors">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                                 </svg>
                                             </button>
-                                        @endif
-                                    </div>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="5" class="px-6 py-8 text-center text-gray-400 bg-[#0f0a19]/30">
-                                    <div class="flex flex-col items-center justify-center py-6">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                            stroke-width="1" stroke-linecap="round" stroke-linejoin="round"
-                                            class="text-gray-500 mb-4">
-                                            <path
-                                                d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z">
-                                            </path>
-                                        </svg>
-                                        <p class="text-lg font-medium">Tidak ada peminjaman yang ditemukan</p>
-                                        <p class="text-sm text-gray-500 mt-1">Coba ubah filter pencarian anda</p>
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="px-4 py-8 text-center text-gray-400">
+                                        <div class="flex flex-col items-center">
+                                            <svg class="w-12 h-12 mb-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                            </svg>
+                                            <p class="mb-1">Tidak ada data peminjaman</p>
+                                            <p class="text-sm">Data peminjaman akan muncul di sini ketika ada permintaan baru</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="px-4 py-3 border-t border-gray-800">
+                    {{ $peminjamans->links() }}
+                </div>
             </div>
+        </div>
+    </div>
 
-            <!-- Pagination -->
-            <div class="mt-6">
-                {{ $peminjamans->links() }}
-            </div>
+    <!-- Modal Reject -->
+    <div class="relative z-50" aria-labelledby="modal-title" role="dialog" aria-modal="true"
+        x-data="{ show: @entangle('showRejectModal') }"
+        x-show="show"
+        x-cloak>
+        <div class="fixed inset-0 bg-black/50 transition-opacity"></div>
 
-            <!-- Detail Modal -->
-            @if ($selectedPeminjaman && $isDetailModalOpen)
-                <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div class="bg-[#0f0a19] rounded-lg shadow-xl max-w-xl w-full max-h-[90vh] overflow-y-auto">
-                        <div class="p-6">
-                            <!-- Header with title and close button -->
-                            <div class="flex justify-between items-center mb-4">
-                                <h3 class="text-xl font-semibold">Detail Peminjaman</h3>
-                                <button wire:click="closeDetailModal" class="text-gray-400 hover:text-white">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                            d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                </button>
+        <div class="fixed inset-0 z-50 overflow-y-auto">
+            <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                <div x-show="show"
+                    x-transition:enter="ease-out duration-300"
+                    x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                    x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                    x-transition:leave="ease-in duration-200"
+                    x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                    x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                    class="relative transform overflow-hidden rounded-lg bg-[#1a1625] px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-500/10 sm:mx-0 sm:h-10 sm:w-10">
+                            <svg class="h-6 w-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                        </div>
+                        <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                            <h3 class="text-lg font-medium leading-6 text-gray-200" id="modal-title">
+                                Tolak Peminjaman
+                            </h3>
+                            <div class="mt-2">
+                                <p class="text-sm text-gray-400">
+                                    Masukkan alasan penolakan peminjaman ini. Alasan akan ditampilkan kepada peminjam.
+                                </p>
                             </div>
-
-                            <!-- Peminjaman detail content -->
-                            <div class="space-y-6">
-                                <!-- User & Book Info -->
-                                <div>
-                                    <h3 class="text-sm font-medium text-gray-500 uppercase mb-2">Informasi Peminjam &
-                                        Buku</h3>
-                                    <div class="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <p class="text-xs text-gray-500">Peminjam</p>
-                                            <p class="text-sm">{{ $selectedPeminjaman->user->name }}</p>
-                                        </div>
-                                        <div>
-                                            <p class="text-xs text-gray-500">Buku</p>
-                                            <p class="text-sm">{{ $selectedPeminjaman->buku->judul }}</p>
-                                        </div>
-                                        <div>
-                                            <p class="text-xs text-gray-500">Staff</p>
-                                            <p class="text-sm">{{ $selectedPeminjaman->staff->name ?? '-' }}</p>
-                                        </div>
-                                        <div>
-                                            <p class="text-xs text-gray-500">Status</p>
-                                            <p class="text-sm">{{ $selectedPeminjaman->status }}</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Shipping Info -->
-                                <div>
-                                    <h3 class="text-sm font-medium text-gray-500 uppercase mb-2">Informasi Pengiriman
-                                    </h3>
-                                    <div class="grid grid-cols-2 gap-4">
-                                        <div class="col-span-2">
-                                            <p class="text-xs text-gray-500">Alamat Pengiriman</p>
-                                            <p class="text-sm">{{ $selectedPeminjaman->alamat_pengiriman }}</p>
-                                        </div>
-                                        <div>
-                                            <p class="text-xs text-gray-500">Metode Pengiriman</p>
-                                            <p class="text-sm">
-                                                {{ str_replace('_', ' ', $selectedPeminjaman->metode_pengiriman) }}</p>
-                                        </div>
-                                        @if ($selectedPeminjaman->nomor_resi)
-                                            <div>
-                                                <p class="text-xs text-gray-500">Nomor Resi</p>
-                                                <p class="text-sm">{{ $selectedPeminjaman->nomor_resi }}</p>
-                                            </div>
-                                        @endif
-                                    </div>
-                                </div>
-
-                                <!-- Date Info -->
-                                <div>
-                                    <h3 class="text-sm font-medium text-gray-500 uppercase mb-2">Informasi Tanggal</h3>
-                                    <div class="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <p class="text-xs text-gray-500">Tanggal Peminjaman</p>
-                                            <p class="text-sm">
-                                                {{ $selectedPeminjaman->tgl_peminjaman_diinginkan->format('d M Y') }}
-                                            </p>
-                                        </div>
-                                        <div>
-                                            <p class="text-xs text-gray-500">Rencana Kembali</p>
-                                            <p class="text-sm">
-                                                {{ $selectedPeminjaman->tgl_kembali_rencana ? $selectedPeminjaman->tgl_kembali_rencana->format('d M Y') : '-' }}
-                                            </p>
-                                        </div>
-                                        @if ($selectedPeminjaman->tgl_dikirim)
-                                            <div>
-                                                <p class="text-xs text-gray-500">Tanggal Dikirim</p>
-                                                <p class="text-sm">
-                                                    {{ $selectedPeminjaman->tgl_dikirim->format('d M Y') }}</p>
-                                            </div>
-                                        @endif
-                                        @if ($selectedPeminjaman->tgl_kembali_aktual)
-                                            <div>
-                                                <p class="text-xs text-gray-500">Tanggal Kembali Aktual</p>
-                                                <p class="text-sm">
-                                                    {{ $selectedPeminjaman->tgl_kembali_aktual->format('d M Y') }}</p>
-                                            </div>
-                                        @endif
-                                    </div>
-                                </div>
-
-                                <!-- Additional Info -->
-                                @if ($selectedPeminjaman->total_denda > 0 || $selectedPeminjaman->alasan_penolakan)
-                                    <div>
-                                        <h3 class="text-sm font-medium text-gray-500 uppercase mb-2">Informasi Tambahan
-                                        </h3>
-                                        <div class="grid grid-cols-2 gap-4">
-                                            @if ($selectedPeminjaman->total_denda > 0)
-                                                <div>
-                                                    <p class="text-xs text-gray-500">Total Denda</p>
-                                                    <p class="text-sm">Rp
-                                                        {{ number_format($selectedPeminjaman->total_denda, 0, ',', '.') }}
-                                                    </p>
-                                                </div>
-                                            @endif
-                                            @if ($selectedPeminjaman->alasan_penolakan)
-                                                <div class="col-span-2">
-                                                    <p class="text-xs text-gray-500">Alasan Penolakan</p>
-                                                    <p class="text-sm">{{ $selectedPeminjaman->alasan_penolakan }}</p>
-                                                </div>
-                                            @endif
-                                        </div>
-                                    </div>
-                                @endif
-                            </div>
-
-                            <!-- Footer with action buttons -->
-                            <div class="mt-6 flex justify-end gap-3">
-                                <button wire:click="closeDetailModal"
-                                    class="px-4 py-2 bg-gray-800 text-gray-300 rounded-lg hover:bg-gray-700 transition-colors">
-                                    Tutup
-                                </button>
+                            <div class="mt-4">
+                                <textarea wire:model="alasanPenolakan"
+                                    class="w-full bg-[#0f0a19] rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 border border-gray-800"
+                                    rows="3"
+                                    placeholder="Contoh: Buku sedang dalam perbaikan"></textarea>
+                                @error('alasanPenolakan')
+                                    <span class="text-sm text-red-400">{{ $message }}</span>
+                                @enderror
                             </div>
                         </div>
                     </div>
+                    <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+                        <button wire:click="rejectPeminjaman"
+                            class="inline-flex w-full justify-center rounded-lg bg-red-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-600 sm:ml-3 sm:w-auto">
+                            Tolak Peminjaman
+                        </button>
+                        <button wire:click="closeRejectModal"
+                            class="mt-3 inline-flex w-full justify-center rounded-lg bg-[#2a2435] px-3 py-2 text-sm font-semibold text-gray-300 shadow-sm ring-1 ring-inset ring-gray-800 hover:bg-[#2a2435]/70 sm:mt-0 sm:w-auto">
+                            Batal
+                        </button>
+                    </div>
                 </div>
-            @endif
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Shipment -->
+    <div class="relative z-50" aria-labelledby="modal-title" role="dialog" aria-modal="true"
+        x-data="{ show: @entangle('showShipmentModal') }"
+        x-show="show"
+        x-cloak>
+        <div class="fixed inset-0 bg-black/50 transition-opacity"></div>
+
+        <div class="fixed inset-0 z-50 overflow-y-auto">
+            <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                <div x-show="show"
+                    x-transition:enter="ease-out duration-300"
+                    x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                    x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                    x-transition:leave="ease-in duration-200"
+                    x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                    x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                    class="relative transform overflow-hidden rounded-lg bg-[#1a1625] px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+                    <div>
+                        <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-purple-500/10">
+                            <svg class="h-6 w-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 13l4 4L19 7" />
+                            </svg>
+                        </div>
+                        <div class="mt-3 text-center">
+                            <h3 class="text-lg font-medium leading-6 text-gray-200" id="modal-title">
+                                Upload Bukti Pengiriman
+                            </h3>
+                            <div class="mt-2">
+                                <p class="text-sm text-gray-400">
+                                    Upload foto bukti pengiriman untuk memperbarui status peminjaman menjadi "Dikirim"
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-5">
+                        <div class="rounded-lg border-2 border-dashed border-gray-800 p-4">
+                            <div class="text-center">
+                                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                                <div class="mt-4 flex text-sm leading-6 text-gray-400">
+                                    <label for="file-upload"
+                                        class="relative cursor-pointer rounded-md bg-[#1a1625] font-semibold text-purple-400 focus-within:outline-none focus-within:ring-2 focus-within:ring-purple-500 focus-within:ring-offset-2 hover:text-purple-300">
+                                        <span>Upload file</span>
+                                        <input wire:model="buktiPengiriman" id="file-upload" type="file" class="sr-only">
+                                    </label>
+                                    <p class="pl-1">atau drag and drop</p>
+                                </div>
+                                <p class="text-xs text-gray-400">PNG, JPG, GIF up to 10MB</p>
+                            </div>
+                            @error('buktiPengiriman')
+                                <span class="text-sm text-red-400">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3">
+                        <button wire:click="uploadBuktiPengiriman"
+                            class="inline-flex w-full justify-center rounded-lg bg-purple-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-purple-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-500 sm:col-start-2">
+                            Upload dan Kirim
+                        </button>
+                        <button wire:click="closeShipmentModal"
+                            class="mt-3 inline-flex w-full justify-center rounded-lg bg-[#2a2435] px-3 py-2 text-sm font-semibold text-gray-300 shadow-sm ring-1 ring-inset ring-gray-800 hover:bg-[#2a2435]/70 sm:col-start-1 sm:mt-0">
+                            Batal
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

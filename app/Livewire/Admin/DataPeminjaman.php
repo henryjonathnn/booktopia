@@ -5,6 +5,7 @@ namespace App\Livewire\Admin;
 use App\Models\Peminjaman;
 use App\Models\User;
 use App\Models\Buku;
+use App\Models\Notifikasi;
 use App\Events\PeminjamanStatusChanged;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -585,5 +586,106 @@ class DataPeminjaman extends Component
         $this->existingBuktiPembayaranDenda = null;
         $this->alasanPenolakan = '';
         $this->nomorResi = '';
+    }
+
+    public function showRejectModal($peminjamanId)
+    {
+        $this->selectedPeminjamanId = $peminjamanId;
+        $this->showRejectModal = true;
+    }
+
+    public function closeRejectModal()
+    {
+        $this->showRejectModal = false;
+        $this->selectedPeminjamanId = null;
+        $this->alasanPenolakan = '';
+    }
+
+    public function showShipmentModal($peminjamanId)
+    {
+        $this->selectedPeminjamanId = $peminjamanId;
+        $this->showShipmentModal = true;
+    }
+
+    public function closeShipmentModal()
+    {
+        $this->showShipmentModal = false;
+        $this->selectedPeminjamanId = null;
+        $this->buktiPengiriman = null;
+    }
+
+    public function approvePeminjaman($peminjamanId)
+    {
+        $peminjaman = Peminjaman::findOrFail($peminjamanId);
+        $peminjaman->status = 'DIPROSES';
+        $peminjaman->id_staff = auth()->id();
+        $peminjaman->save();
+
+        // Kirim notifikasi ke user
+        Notifikasi::create([
+            'id_user' => $peminjaman->id_user,
+            'id_peminjaman' => $peminjaman->id,
+            'message' => "Peminjaman buku {$peminjaman->buku->judul} telah disetujui dan sedang diproses",
+            'tipe' => 'PEMINJAMAN_DIPROSES'
+        ]);
+
+        session()->flash('success', 'Peminjaman berhasil disetujui');
+    }
+
+    public function rejectPeminjaman()
+    {
+        $this->validate([
+            'alasanPenolakan' => 'required|min:10'
+        ]);
+
+        $peminjaman = Peminjaman::findOrFail($this->selectedPeminjamanId);
+        
+        // Kembalikan stok buku
+        $peminjaman->buku->increment('stock');
+        
+        $peminjaman->status = 'DITOLAK';
+        $peminjaman->alasan_penolakan = $this->alasanPenolakan;
+        $peminjaman->id_staff = auth()->id();
+        $peminjaman->save();
+
+        // Kirim notifikasi ke user
+        Notifikasi::create([
+            'id_user' => $peminjaman->id_user,
+            'id_peminjaman' => $peminjaman->id,
+            'message' => "Peminjaman buku {$peminjaman->buku->judul} ditolak dengan alasan: {$this->alasanPenolakan}",
+            'tipe' => 'PEMINJAMAN_DITOLAK'
+        ]);
+
+        $this->closeRejectModal();
+        session()->flash('success', 'Peminjaman berhasil ditolak');
+    }
+
+    public function uploadBuktiPengiriman()
+    {
+        $this->validate([
+            'buktiPengiriman' => 'required|image|max:10240'
+        ]);
+
+        $peminjaman = Peminjaman::findOrFail($this->selectedPeminjamanId);
+
+        // Upload bukti pengiriman
+        $path = $this->buktiPengiriman->store('bukti-pengiriman', 'public');
+        
+        // Update status peminjaman
+        $peminjaman->bukti_pengiriman = $path;
+        $peminjaman->status = 'DIKIRIM';
+        $peminjaman->tgl_dikirim = now();
+        $peminjaman->save();
+
+        // Kirim notifikasi ke user
+        Notifikasi::create([
+            'id_user' => $peminjaman->id_user,
+            'id_peminjaman' => $peminjaman->id,
+            'message' => "Peminjaman buku {$peminjaman->buku->judul} telah dikirim. Silakan cek bukti pengiriman",
+            'tipe' => 'PEMINJAMAN_DIKIRIM'
+        ]);
+
+        $this->closeShipmentModal();
+        session()->flash('success', 'Bukti pengiriman berhasil diupload');
     }
 } 
