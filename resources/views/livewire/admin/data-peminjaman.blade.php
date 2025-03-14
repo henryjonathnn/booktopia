@@ -50,97 +50,124 @@
                 </div>
             </div>
 
-            <!-- Data Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                @forelse($peminjamans as $peminjaman)
-                    <div class="bg-[#1a1625] rounded-xl shadow-lg border border-purple-500/10 overflow-hidden hover:border-purple-500/20 transition-colors">
-                        <div class="p-4">
-                            <!-- Header -->
-                            <div class="flex justify-between items-start mb-3">
-                                <div>
-                                    <h3 class="font-medium truncate">{{ $peminjaman->user->name }}</h3>
-                                    <p class="text-sm text-gray-400">{{ $peminjaman->created_at->format('d M Y') }}</p>
-                                </div>
-                                <div class="flex items-center">
-                                    <span @class([
-                                        'px-2 py-1 text-xs rounded-lg',
-                                        'bg-yellow-500/10 text-yellow-500' => $peminjaman->status === 'PENDING',
-                                        'bg-blue-500/10 text-blue-500' => $peminjaman->status === 'DIPROSES',
-                                        'bg-green-500/10 text-green-500' => $peminjaman->status === 'DIKIRIM',
-                                        'bg-purple-500/10 text-purple-500' => $peminjaman->status === 'DIPINJAM',
-                                        'bg-red-500/10 text-red-500' => $peminjaman->status === 'TERLAMBAT',
-                                        'bg-gray-500/10 text-gray-500' => $peminjaman->status === 'DIKEMBALIKAN',
-                                        'bg-red-500/10 text-red-500' => $peminjaman->status === 'DITOLAK',
-                                    ])>
-                                        {{ $peminjaman->status }}
-                                    </span>
-                                </div>
-                            </div>
-
-                            <!-- Book Info -->
-                            <div class="flex items-center space-x-3 mb-4">
-                                <img src="{{ Storage::url($peminjaman->buku->cover_img) }}" 
-                                    alt="Cover {{ $peminjaman->buku->judul }}"
-                                    class="w-12 h-16 object-cover rounded-lg">
-                                <div class="flex-1 min-w-0">
-                                    <h4 class="font-medium truncate">{{ $peminjaman->buku->judul }}</h4>
-                                    <p class="text-sm text-gray-400 truncate">{{ $peminjaman->buku->penulis }}</p>
-                                </div>
-                            </div>
-
-                            <!-- Action Buttons -->
-                            <div class="flex justify-between items-center">
-                                <button wire:click="openDetailModal({{ $peminjaman->id }})"
-                                    class="text-sm text-purple-400 hover:text-purple-300 transition-colors">
-                                    Lihat Detail
-                                </button>
-                                
-                                <div class="flex items-center space-x-2">
-                                    @if($peminjaman->status === 'PENDING')
-                                        <button wire:click="approvePeminjaman({{ $peminjaman->id }})"
-                                            class="bg-green-500/10 text-green-500 hover:bg-green-500/20 p-2 rounded-lg transition-colors">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                            </svg>
-                                        </button>
-                                        <button wire:click="openRejectModal({{ $peminjaman->id }})"
-                                            class="bg-red-500/10 text-red-500 hover:bg-red-500/20 p-2 rounded-lg transition-colors">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                            </svg>
-                                        </button>
-                                    @elseif($peminjaman->status === 'DIPROSES')
-                                        <button wire:click="openShipmentModal({{ $peminjaman->id }})"
-                                            class="bg-purple-500/10 text-purple-500 hover:bg-purple-500/20 px-3 py-1.5 rounded-lg transition-colors inline-flex items-center space-x-1">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                                            </svg>
-                                            <span>Kirim</span>
-                                        </button>
-                                    @endif
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                @empty
-                    <div class="col-span-full">
-                        <div class="text-center bg-[#1a1625] rounded-xl p-8">
-                            <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-purple-500/10 flex items-center justify-center">
-                                <svg class="w-8 h-8 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                        d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                </svg>
-                            </div>
-                            <h3 class="text-lg font-medium mb-1">Tidak ada data peminjaman</h3>
-                            <p class="text-gray-400">Belum ada peminjaman buku yang tercatat</p>
-                        </div>
-                    </div>
-                @endforelse
-            </div>
-
-            <!-- Pagination -->
-            <div class="mt-6">
-                {{ $peminjamans->links() }}
+            <!-- Data Table -->
+            <div class="bg-[#1a1625] rounded-xl shadow-lg overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b border-purple-500/10">
+                                <th class="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Peminjam</th>
+                                <th class="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Buku</th>
+                                <th class="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Tanggal</th>
+                                <th class="px-6 py-4 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-purple-500/10">
+                            @forelse($peminjamans as $peminjaman)
+                                <tr class="hover:bg-purple-500/5 transition-colors">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div>
+                                                <div class="font-medium">{{ $peminjaman->user->name }}</div>
+                                                <div class="text-sm text-gray-400">{{ $peminjaman->user->email }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center space-x-3">
+                                            <img src="{{ Storage::url($peminjaman->buku->cover_img) }}" 
+                                                class="h-12 w-9 object-cover rounded" 
+                                                alt="{{ $peminjaman->buku->judul }}">
+                                            <div>
+                                                <div class="font-medium">{{ $peminjaman->buku->judul }}</div>
+                                                <div class="text-sm text-gray-400">{{ $peminjaman->buku->penulis }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <span @class([
+                                            'px-2 py-1 text-xs rounded-lg inline-flex items-center',
+                                            'bg-yellow-500/10 text-yellow-500' => $peminjaman->status === 'PENDING',
+                                            'bg-blue-500/10 text-blue-500' => $peminjaman->status === 'DIPROSES',
+                                            'bg-green-500/10 text-green-500' => $peminjaman->status === 'DIKIRIM',
+                                            'bg-purple-500/10 text-purple-500' => $peminjaman->status === 'DIPINJAM',
+                                            'bg-red-500/10 text-red-500' => $peminjaman->status === 'TERLAMBAT',
+                                            'bg-gray-500/10 text-gray-500' => $peminjaman->status === 'DIKEMBALIKAN',
+                                            'bg-red-500/10 text-red-500' => $peminjaman->status === 'DITOLAK',
+                                        ])>
+                                            {{ $peminjaman->status }}
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
+                                        {{ $peminjaman->created_at->format('d M Y') }}
+                                    </td>
+                                    <td class="px-6 py-4 text-right">
+                                        <div class="flex items-center justify-end space-x-2">
+                                            @if($peminjaman->status === 'PENDING')
+                                                <button wire:click="approvePeminjaman({{ $peminjaman->id }})"
+                                                    class="bg-green-500/10 text-green-500 hover:bg-green-500/20 p-2 rounded-lg transition-colors">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                </button>
+                                                <button wire:click="openRejectModal({{ $peminjaman->id }})"
+                                                    class="bg-red-500/10 text-red-500 hover:bg-red-500/20 p-2 rounded-lg transition-colors">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                </button>
+                                            @elseif($peminjaman->status === 'DIPROSES')
+                                                <input 
+                                                    type="file" 
+                                                    wire:model="buktiPengiriman" 
+                                                    id="buktiPengiriman_{{ $peminjaman->id }}"
+                                                    class="hidden"
+                                                    accept="image/*"
+                                                    wire:change="uploadBuktiPengiriman({{ $peminjaman->id }})"
+                                                >
+                                                <label 
+                                                    for="buktiPengiriman_{{ $peminjaman->id }}"
+                                                    class="bg-purple-500/10 text-purple-500 hover:bg-purple-500/20 px-3 py-1.5 rounded-lg transition-colors inline-flex items-center space-x-1 cursor-pointer"
+                                                >
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                                    </svg>
+                                                    <span>Kirim Sekarang</span>
+                                                </label>
+                                            @endif
+                                            <button wire:click="openDetailModal({{ $peminjaman->id }})"
+                                                class="bg-gray-500/10 text-gray-400 hover:bg-gray-500/20 p-2 rounded-lg transition-colors">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="px-6 py-10 text-center">
+                                        <div class="flex flex-col items-center">
+                                            <div class="w-16 h-16 mb-4 rounded-full bg-purple-500/10 flex items-center justify-center">
+                                                <svg class="w-8 h-8 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                                </svg>
+                                            </div>
+                                            <p class="text-gray-400">Belum ada data peminjaman</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Pagination -->
+                <div class="px-6 py-3 border-t border-purple-500/10">
+                    {{ $peminjamans->links() }}
+                </div>
             </div>
         </div>
     </div>

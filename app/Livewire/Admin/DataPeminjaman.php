@@ -30,7 +30,6 @@ class DataPeminjaman extends Component
     
     // Modal control properties
     public $isRejectModalOpen = false;
-    public $isShipmentModalOpen = false;
     public $selectedPeminjamanId;
     public $alasanPenolakan;
     public $buktiPengiriman;
@@ -82,20 +81,6 @@ class DataPeminjaman extends Component
         $this->selectedPeminjamanId = null;
         $this->alasanPenolakan = '';
         $this->resetValidation('alasanPenolakan');
-    }
-
-    public function openShipmentModal($peminjamanId)
-    {
-        $this->selectedPeminjamanId = $peminjamanId;
-        $this->isShipmentModalOpen = true;
-    }
-
-    public function closeShipmentModal()
-    {
-        $this->isShipmentModalOpen = false;
-        $this->selectedPeminjamanId = null;
-        $this->buktiPengiriman = null;
-        $this->resetValidation('buktiPengiriman');
     }
 
     public function approvePeminjaman($peminjamanId)
@@ -155,13 +140,13 @@ class DataPeminjaman extends Component
         session()->flash('success', 'Peminjaman berhasil ditolak');
     }
 
-    public function uploadBuktiPengiriman()
+    public function uploadBuktiPengiriman($peminjamanId)
     {
         $this->validate([
             'buktiPengiriman' => 'required|image|max:10240'
         ]);
 
-        $peminjaman = Peminjaman::findOrFail($this->selectedPeminjamanId);
+        $peminjaman = Peminjaman::findOrFail($peminjamanId);
 
         if ($peminjaman->status !== 'DIPROSES') {
             session()->flash('error', 'Status peminjaman tidak valid untuk dikirim');
@@ -186,7 +171,7 @@ class DataPeminjaman extends Component
                 'tipe' => 'PEMINJAMAN_DIKIRIM'
             ]);
 
-            $this->closeShipmentModal();
+            $this->buktiPengiriman = null;
             session()->flash('success', 'Bukti pengiriman berhasil diupload');
         } catch (\Exception $e) {
             session()->flash('error', 'Terjadi kesalahan saat mengupload bukti pengiriman');
