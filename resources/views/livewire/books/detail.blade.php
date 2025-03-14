@@ -6,8 +6,7 @@
                 {{-- Cover Image --}}
                 <div class="col-span-12 md:col-span-4 lg:col-span-3">
                     @if ($book->cover_img)
-                        <img src="{{ asset('storage/' . $book->cover_img) }}" 
-                            alt="{{ $book->judul }}"
+                        <img src="{{ asset('storage/' . $book->cover_img) }}" alt="{{ $book->judul }}"
                             class="w-full rounded-2xl aspect-[3/4] object-cover shadow-lg" />
                     @else
                         <div class="w-full rounded-2xl aspect-[3/4] bg-gray-800 flex items-center justify-center">
@@ -25,9 +24,11 @@
                             </span>
                             <div class="flex items-center gap-1">
                                 @for ($i = 1; $i <= 5; $i++)
-                                    <x-icon name="star" class="w-5 h-5 {{ $i <= $book->average_rating ? 'text-yellow-400' : 'text-gray-600' }}" />
+                                    <x-icon name="star"
+                                        class="w-5 h-5 {{ $i <= $book->average_rating ? 'text-yellow-400' : 'text-gray-600' }}" />
                                 @endfor
-                                <span class="text-sm font-medium ml-1">{{ number_format($book->average_rating, 1) }}</span>
+                                <span
+                                    class="text-sm font-medium ml-1">{{ number_format($book->average_rating, 1) }}</span>
                             </div>
                         </div>
                         <h1 class="text-4xl font-bold mb-2">{{ $book->judul }}</h1>
@@ -54,13 +55,13 @@
 
                     {{-- Action Buttons --}}
                     <div class="flex gap-4">
-                        @if($book->stock > 0)
-                            <button wire:click="createPeminjamanToken" 
+                        @if ($book->stock > 0)
+                            <button wire:click="createPeminjamanToken"
                                 class="flex-1 bg-gradient-to-r from-purple-600 to-indigo-600 hover:opacity-90 rounded-xl py-3.5 font-medium transition-all duration-300">
                                 Pinjam Buku
                             </button>
                         @endif
-                        <button wire:click="toggleBookmark" 
+                        <button wire:click="toggleBookmark"
                             class="flex-none w-14 rounded-xl transition-all duration-300 flex items-center justify-center
                             {{ $isBookmarked ? 'bg-purple-500 text-white' : 'bg-purple-500/10 hover:bg-purple-500/20' }}">
                             <x-icon name="bookmark" class="w-6 h-6" />
@@ -75,7 +76,7 @@
         </div>
 
         {{-- Detail Sections --}}
-        <div class="grid grid-cols-12 gap-8">
+        <div class="glass-effect rounded-3xl p-8 border border-purple-500/10 mb-8">
             {{-- Main Content --}}
             <div class="col-span-12 lg:col-span-8 space-y-8">
                 {{-- Book Details --}}
@@ -113,17 +114,16 @@
             {{-- Sidebar --}}
             <div class="col-span-12 lg:col-span-4 space-y-8">
                 {{-- Related Books --}}
-                @if(count($relatedBooks) > 0)
+                @if (count($relatedBooks) > 0)
                     <div class="glass-effect rounded-2xl p-6 border border-purple-500/10">
                         <h2 class="text-xl font-semibold mb-4">Buku Terkait</h2>
                         <div class="space-y-4">
-                            @foreach($relatedBooks as $relatedBook)
-                                <a href="{{ route('buku.detail', ['slug' => \App\Livewire\Books\Detail::generateSlug($relatedBook)]) }}" 
+                            @foreach ($relatedBooks as $relatedBook)
+                                <a href="{{ route('buku.detail', ['slug' => \App\Livewire\Books\Detail::generateSlug($relatedBook)]) }}"
                                     class="flex items-start space-x-4 p-3 rounded-xl hover:bg-purple-500/5 transition-colors">
                                     @if ($relatedBook->cover_img)
-                                        <img src="{{ asset('storage/' . $relatedBook->cover_img) }}" 
-                                            alt="{{ $relatedBook->judul }}"
-                                            class="w-16 rounded-lg shadow" />
+                                        <img src="{{ asset('storage/' . $relatedBook->cover_img) }}"
+                                            alt="{{ $relatedBook->judul }}" class="w-16 rounded-lg shadow" />
                                     @else
                                         <div class="w-16 h-24 rounded-lg bg-gray-800 flex items-center justify-center">
                                             <x-icon name="book-open" class="w-8 h-8 text-gray-600" />
@@ -134,7 +134,8 @@
                                         <p class="text-sm text-gray-400">{{ $relatedBook->penulis }}</p>
                                         <div class="flex items-center mt-1">
                                             <x-icon name="star" class="w-4 h-4 text-yellow-400" />
-                                            <span class="text-sm ml-1">{{ number_format($relatedBook->average_rating, 1) }}</span>
+                                            <span
+                                                class="text-sm ml-1">{{ number_format($relatedBook->average_rating, 1) }}</span>
                                         </div>
                                     </div>
                                 </a>
@@ -152,23 +153,23 @@
             <h3 class="text-xl font-bold mb-4">Beri Rating</h3>
             <div class="flex justify-center space-x-2 mb-6">
                 @for ($i = 1; $i <= 5; $i++)
-                    <button wire:click="$set('userRating', {{ $i }})" 
+                    <button wire:click="$set('userRating', {{ $i }})"
                         class="p-2 hover:scale-110 transition-transform">
-                        <x-icon name="star" 
+                        <x-icon name="star"
                             class="w-8 h-8 {{ $i <= $userRating ? 'text-yellow-400' : 'text-gray-600' }}" />
                     </button>
                 @endfor
             </div>
             <div class="flex space-x-3">
-                <button wire:click="submitRating" 
+                <button wire:click="submitRating"
                     class="flex-1 bg-purple-500 hover:bg-purple-600 rounded-xl py-2.5 font-medium transition-colors">
                     Simpan Rating
                 </button>
-                <button wire:click="$set('showRatingModal', false)" 
+                <button wire:click="$set('showRatingModal', false)"
                     class="flex-1 bg-gray-700 hover:bg-gray-600 rounded-xl py-2.5 font-medium transition-colors">
                     Batal
                 </button>
             </div>
         </div>
     </x-modal>
-</div> 
+</div>
