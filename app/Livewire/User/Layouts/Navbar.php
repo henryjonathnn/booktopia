@@ -21,6 +21,7 @@ class Navbar extends Component
     public $selectedNotifikasiDetail = '';
     public $selectedNotifikasi = null;
     public $showNotifikasi = false;
+    public $showDetailModal = false;
 
     protected $listeners = ['clickedOutside' => 'closeSearchResults'];
 
@@ -79,6 +80,10 @@ class Navbar extends Component
     public function toggleNotifikasi()
     {
         $this->showNotifikasi = !$this->showNotifikasi;
+        if ($this->showNotifikasi) {
+            $this->showDetailModal = false;
+            $this->selectedNotifikasi = null;
+        }
     }
 
     public function refreshNotifikasi()
@@ -152,17 +157,19 @@ class Navbar extends Component
 
     public function showDetail($notifId)
     {
-        $this->selectedNotifikasi = Notifikasi::with('peminjaman')->find($notifId);
+        $this->selectedNotifikasi = Notifikasi::with('peminjaman.buku')->find($notifId);
         if (!$this->selectedNotifikasi->is_read) {
             $this->selectedNotifikasi->markAsRead();
             $this->refreshNotifikasi();
         }
-        $this->showNotifikasi = false; // Tutup dropdown saat membuka detail
+        $this->showNotifikasi = false;
+        $this->showDetailModal = true;
     }
 
     public function closeDetail()
     {
         $this->selectedNotifikasi = null;
+        $this->showDetailModal = false;
     }
 
     public function render()
