@@ -12,12 +12,26 @@ class Navbar extends Component
     public $selectedNotifikasi = null;
     public $unreadCount;
     public $notifikasi;
+    public $search = '';
 
-    protected $listeners = ['refreshNotifikasi' => 'refreshNotifikasi'];
+    protected $listeners = [
+        'refreshNotifikasi' => 'refreshNotifikasi',
+        'searchUpdated' => 'handleSearch'
+    ];
 
     public function mount()
     {
         $this->refreshNotifikasi();
+    }
+
+    public function updatedSearch()
+    {
+        $this->dispatch('searchUpdated', $this->search);
+    }
+
+    public function handleSearch($search)
+    {
+        $this->search = $search;
     }
 
     public function toggleNotifikasi()
