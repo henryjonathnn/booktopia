@@ -31,4 +31,10 @@ class Notifikasi extends Model
     {
         return $this->belongsTo(Peminjaman::class, 'id_peminjaman');
     }
+
+    public function markAsRead()
+    {
+        $this->is_read = true;
+        $this->save();
+    }
 }
