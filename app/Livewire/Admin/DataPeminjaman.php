@@ -35,6 +35,7 @@ class DataPeminjaman extends Component
     public $buktiPengiriman;
     public $statuses;
     public $metodes;
+    public $uploadingPeminjamanId;
 
     protected $listeners = ['refreshData' => '$refresh'];
 
@@ -157,15 +158,24 @@ class DataPeminjaman extends Component
         }
     }
 
+    // Handler untuk modal upload bukti pengiriman
+    public function showUpload($peminjamanId)
+    {
+        $this->resetModalStates();
+        $this->selectedPeminjaman = Peminjaman::find($peminjamanId);
+        $this->uploadingPeminjamanId = $peminjamanId;
+        $this->activeModal = 'upload';
+    }
+
     // Handler untuk upload bukti pengiriman
-    public function uploadBuktiPengiriman($peminjamanId)
+    public function uploadBuktiPengiriman()
     {
         $this->validate([
             'buktiPengiriman' => 'required|image|max:10240'
         ]);
 
         try {
-            $peminjaman = Peminjaman::findOrFail($peminjamanId);
+            $peminjaman = Peminjaman::findOrFail($this->uploadingPeminjamanId);
             
             if ($peminjaman->status !== 'DIPROSES') {
                 session()->flash('error', 'Status peminjaman tidak valid untuk dikirim');
@@ -186,7 +196,7 @@ class DataPeminjaman extends Component
                 'tipe' => 'PEMINJAMAN_DIKIRIM'
             ]);
 
-            $this->buktiPengiriman = null;
+            $this->resetModalStates();
             session()->flash('success', 'Bukti pengiriman berhasil diupload');
         } catch (\Exception $e) {
             session()->flash('error', 'Terjadi kesalahan saat mengupload bukti pengiriman');
@@ -213,7 +223,7 @@ class DataPeminjaman extends Component
 
         return view('livewire.admin.data-peminjaman', [
             'peminjamans' => $query->paginate($this->perPage)
-        ]);
+        ])->layout('layouts.admin', ['title' => 'Data Peminjaman']);
     }
 
     public function updatingSearch()

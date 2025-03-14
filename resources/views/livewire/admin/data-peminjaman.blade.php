@@ -118,23 +118,13 @@
                                                     </svg>
                                                 </button>
                                             @elseif($peminjaman->status === 'DIPROSES')
-                                                <input 
-                                                    type="file" 
-                                                    wire:model="buktiPengiriman" 
-                                                    id="buktiPengiriman_{{ $peminjaman->id }}"
-                                                    class="hidden"
-                                                    accept="image/*"
-                                                    wire:change="uploadBuktiPengiriman({{ $peminjaman->id }})"
-                                                >
-                                                <label 
-                                                    for="buktiPengiriman_{{ $peminjaman->id }}"
-                                                    class="bg-purple-500/10 text-purple-500 hover:bg-purple-500/20 px-3 py-1.5 rounded-lg transition-colors inline-flex items-center space-x-1 cursor-pointer"
-                                                >
+                                                <button wire:click="showUpload({{ $peminjaman->id }})"
+                                                    class="bg-purple-500/10 text-purple-500 hover:bg-purple-500/20 px-3 py-1.5 rounded-lg transition-colors inline-flex items-center space-x-1">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                                                     </svg>
                                                     <span>Kirim Sekarang</span>
-                                                </label>
+                                                </button>
                                             @endif
                                             <button wire:click="showDetail({{ $peminjaman->id }})"
                                                 class="bg-gray-500/10 text-gray-400 hover:bg-gray-500/20 p-2 rounded-lg transition-colors">
@@ -293,6 +283,81 @@
                         <button wire:click="rejectPeminjaman"
                             class="inline-flex w-full justify-center rounded-lg bg-red-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500 sm:col-start-2">
                             Tolak Peminjaman
+                        </button>
+                        <button wire:click="closeModal"
+                            class="mt-3 inline-flex w-full justify-center rounded-lg bg-[#2a2435] px-3 py-2 text-sm font-semibold text-gray-300 shadow-sm ring-1 ring-inset ring-gray-800 hover:bg-[#2a2435]/70 sm:col-start-1 sm:mt-0">
+                            Batal
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- Modal Upload -->
+    @if($activeModal === 'upload' && $selectedPeminjaman)
+        <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+            <div class="flex min-h-screen items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                <div class="fixed inset-0 bg-black/50 transition-opacity" wire:click="closeModal"></div>
+                
+                <div class="relative transform overflow-hidden rounded-lg bg-[#1a1625] px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+                    <div>
+                        <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-purple-500/10">
+                            <svg class="h-6 w-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                            </svg>
+                        </div>
+                        <div class="mt-3 text-center">
+                            <h3 class="text-lg font-medium leading-6 text-gray-200">
+                                Upload Bukti Pengiriman
+                            </h3>
+                            <div class="mt-2">
+                                <p class="text-sm text-gray-400">
+                                    Upload foto bukti pengiriman untuk memperbarui status peminjaman menjadi "Dikirim"
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-5">
+                        <div class="rounded-lg border-2 border-dashed border-gray-800 p-4">
+                            <div class="text-center">
+                                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                                <div class="mt-4 flex text-sm leading-6 text-gray-400">
+                                    <label for="file-upload"
+                                        class="relative cursor-pointer rounded-md bg-[#1a1625] font-semibold text-purple-400 focus-within:outline-none focus-within:ring-2 focus-within:ring-purple-500 focus-within:ring-offset-2 hover:text-purple-300">
+                                        <span>Upload file</span>
+                                        <input wire:model="buktiPengiriman" id="file-upload" type="file" class="sr-only" accept="image/*">
+                                    </label>
+                                    <p class="pl-1">atau drag and drop</p>
+                                </div>
+                                <p class="text-xs text-gray-400">PNG, JPG, GIF up to 10MB</p>
+                            </div>
+                            @error('buktiPengiriman')
+                                <span class="text-sm text-red-400 block mt-2">{{ $message }}</span>
+                            @enderror
+                            @if($buktiPengiriman)
+                                <div class="mt-4">
+                                    <div class="text-sm text-gray-400">Preview:</div>
+                                    <div class="mt-2 rounded-lg overflow-hidden bg-[#0f0a19] p-2">
+                                        <img src="{{ $buktiPengiriman->temporaryUrl() }}" 
+                                            class="max-h-48 mx-auto object-contain" 
+                                            alt="Preview">
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+
+                    <div class="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3">
+                        <button wire:click="uploadBuktiPengiriman"
+                            class="inline-flex w-full justify-center rounded-lg bg-purple-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-purple-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-500 sm:col-start-2"
+                            @if(!$buktiPengiriman) disabled @endif>
+                            Upload dan Kirim
                         </button>
                         <button wire:click="closeModal"
                             class="mt-3 inline-flex w-full justify-center rounded-lg bg-[#2a2435] px-3 py-2 text-sm font-semibold text-gray-300 shadow-sm ring-1 ring-inset ring-gray-800 hover:bg-[#2a2435]/70 sm:col-start-1 sm:mt-0">
