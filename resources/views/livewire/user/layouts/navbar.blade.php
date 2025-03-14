@@ -84,289 +84,109 @@
             <!-- Notifikasi Dropdown -->
             <div class="relative">
                 <button wire:click="toggleNotifikasi"
-                    class="relative p-3 rounded-xl hover:bg-purple-500/10 text-gray-400 hover:text-purple-400">
-                    <x-icon name="bell" class="w-5 h-5" />
-                    @if ($unreadCount > 0)
-                        <span
-                            class="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                            {{ $unreadCount }}
-                        </span>
+                    class="relative p-2 hover:bg-[#2a2435] rounded-lg text-gray-400">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                    </svg>
+                    @if($unreadCount > 0)
+                        <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
                     @endif
                 </button>
-                @if ($isNotifikasiOpen)
-                    <div class="absolute right-0 mt-2 w-96 bg-[#1A1A2E]/95 rounded-xl shadow-lg shadow-purple-500/10 border border-purple-500/10 backdrop-blur-xl z-50"
-                        wire:click.stop>
+
+                @if($showNotifikasi)
+                    <div class="absolute right-0 mt-2 w-80 bg-[#1a1625] rounded-xl shadow-lg border border-purple-500/10 overflow-hidden z-50">
                         <!-- Header -->
-                        <div class="sticky top-0 z-10 bg-[#1A1A2E] border-b border-purple-500/10 backdrop-blur-xl">
-                            <div class="flex items-center justify-between px-4 py-3">
-                                <div class="flex items-center space-x-2">
-                                    <x-icon name="bell" class="w-4 h-4 text-purple-400" />
-                                    <h3 class="font-semibold">Notifikasi</h3>
-                                    <div class="flex items-center space-x-2">
-                                        @if (count($notifikasi) > 0)
-                                            <span
-                                                class="text-xs bg-purple-500/10 text-purple-400 px-2 py-0.5 rounded-full">
-                                                {{ count($notifikasi) }}
-                                            </span>
-                                        @endif
-                                        @if ($unreadCount > 0)
-                                            <span
-                                                class="text-xs bg-red-500/10 text-red-400 px-2 py-0.5 rounded-full flex items-center space-x-1">
-                                                <span>{{ $unreadCount }}</span>
-                                                <span>Baru</span>
-                                            </span>
-                                        @endif
-                                    </div>
-                                </div>
-                                @if ($unreadCount > 0)
+                        <div class="p-4 border-b border-purple-500/10">
+                            <div class="flex items-center justify-between">
+                                <h3 class="font-medium">Notifikasi</h3>
+                                @if($unreadCount > 0)
                                     <button wire:click="markAllAsRead"
-                                        class="text-xs text-purple-400 hover:text-purple-300 transition-colors duration-200">
-                                        Tandai semua dibaca
+                                        class="text-sm text-purple-400 hover:text-purple-300">
+                                        Tandai semua telah dibaca
                                     </button>
                                 @endif
                             </div>
                         </div>
 
-                        <!-- Content -->
-                        <div class="max-h-[360px] overflow-y-auto custom-scrollbar">
-                            @if (count($notifikasi) === 0)
-                                <div class="flex flex-col items-center justify-center py-8 px-4 text-gray-400">
-                                    <x-icon name="bell" class="w-12 h-12 mb-3 opacity-20" />
-                                    <p class="text-sm">Tidak ada notifikasi</p>
-                                </div>
-                            @else
-                                <div class="divide-y divide-purple-500/10">
-                                    @foreach ($notifikasi as $notif)
-                                        <div wire:click="openNotifikasiModal({{ $notif['id'] }})"
-                                            class="relative p-4 hover:bg-purple-500/5 cursor-pointer transition-all duration-200 group">
-                                            <!-- Unread Indicator -->
-                                            @if (!$notif['is_read'])
-                                                <div
-                                                    class="absolute top-4 right-4 w-2 h-2 bg-red-500 rounded-full animate-pulse">
-                                                </div>
-                                            @endif
-
-                                            <div class="flex items-start space-x-3">
-                                                <!-- Icon based on notification type -->
-                                                @php
-                                                    $iconClass = '';
-                                                    $colorClass = '';
-                                                    $badgeText = '';
-
-                                                    if (isset($notif['type'])) {
-                                                        switch ($notif['type']) {
-                                                            case 'peminjaman':
-                                                                $iconClass = 'package';
-                                                                $colorClass = 'bg-blue-500/10 text-blue-500';
-                                                                $badgeText = 'Permintaan Baru';
-                                                                break;
-                                                            case 'PEMINJAMAN_DIPROSES':
-                                                                $iconClass = 'refresh-cw';
-                                                                $colorClass = 'bg-purple-500/10 text-purple-500';
-                                                                $badgeText = 'Diproses';
-                                                                break;
-                                                            case 'PEMINJAMAN_DIKIRIM':
-                                                                $iconClass = 'check-circle';
-                                                                $colorClass = 'bg-green-500/10 text-green-500';
-                                                                $badgeText = 'Dikirim';
-                                                                break;
-                                                            case 'pengembalian':
-                                                                $iconClass = 'book-open';
-                                                                $colorClass = 'bg-teal-500/10 text-teal-500';
-                                                                $badgeText = 'Dikembalikan';
-                                                                break;
-                                                            case 'DUE_REMINDER':
-                                                                $iconClass = 'clock';
-                                                                $colorClass = 'bg-yellow-500/10 text-yellow-500';
-                                                                $badgeText = 'Pengingat';
-                                                                break;
-                                                            case 'OVERDUE_NOTICE':
-                                                                $iconClass = 'alert-triangle';
-                                                                $colorClass = 'bg-orange-500/10 text-orange-500';
-                                                                $badgeText = 'Terlambat';
-                                                                break;
-                                                            default:
-                                                                $iconClass = 'bell';
-                                                                $colorClass = 'bg-gray-500/10 text-gray-500';
-                                                                $badgeText = 'Notifikasi';
-                                                                break;
-                                                        }
-                                                    }
-                                                @endphp
-
-                                                <div class="flex-shrink-0 p-2 rounded-xl {{ $colorClass }}">
-                                                    <x-icon name="{{ $iconClass }}" class="w-5 h-5" />
-                                                </div>
-
-                                                <div class="flex-1 min-w-0">
-                                                    <div class="flex items-center gap-2 mb-1 flex-wrap">
-                                                        <span
-                                                            class="text-xs px-2 py-0.5 rounded-full {{ $colorClass }}">
-                                                            {{ $badgeText }}
-                                                        </span>
-                                                        @if ($notif['is_read'])
-                                                            <span
-                                                                class="text-xs bg-gray-500/10 text-gray-400 px-2 py-0.5 rounded-full flex items-center gap-1">
-                                                                <x-icon name="eye" class="w-3 h-3" />
-                                                                <span>Telah dibaca</span>
-                                                            </span>
-                                                        @else
-                                                            <span
-                                                                class="text-xs bg-red-500/10 text-red-400 px-2 py-0.5 rounded-full">
-                                                                Belum dibaca
-                                                            </span>
-                                                        @endif
-                                                        <span class="text-xs text-gray-400 ml-auto">
-                                                            {{ isset($notif['created_at']) ? \Carbon\Carbon::parse($notif['created_at'])->diffForHumans() : 'Baru saja' }}
-                                                        </span>
-                                                    </div>
-                                                    <p class="text-sm text-gray-200 leading-relaxed line-clamp-2">
-                                                        {{ $notif['message'] }}
-                                                    </p>
-                                                    @if (!$notif['is_read'])
-                                                        <div
-                                                            class="flex items-center mt-2 text-xs text-purple-400 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                                                            <x-icon name="eye" class="w-3 h-3 mr-1" />
-                                                            <span>Klik untuk menandai sudah dibaca</span>
-                                                        </div>
-                                                    @endif
-                                                </div>
-                                            </div>
-
-                                            <!-- View Detail button -->
-                                            <div
-                                                class="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                <button
-                                                    class="text-xs text-purple-400 hover:text-purple-300 px-2 py-1 rounded-full bg-purple-500/10 hover:bg-purple-500/20 transition-colors">
-                                                    Lihat Detail
-                                                </button>
-                                            </div>
+                        <!-- Notification List -->
+                        <div class="max-h-96 overflow-y-auto">
+                            @forelse($notifikasi as $notif)
+                                <div wire:key="notif-{{ $notif->id }}"
+                                    class="p-4 border-b border-purple-500/10 hover:bg-purple-500/5 {{ !$notif->is_read ? 'bg-purple-500/5' : '' }}">
+                                    <div class="flex items-start gap-3">
+                                        <!-- Icon berdasarkan tipe -->
+                                        <div @class([
+                                            'flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center',
+                                            'bg-blue-500/10 text-blue-400' => $notif->tipe === 'PEMINJAMAN_BARU',
+                                            'bg-green-500/10 text-green-400' => $notif->tipe === 'PEMINJAMAN_DIPROSES',
+                                            'bg-purple-500/10 text-purple-400' => $notif->tipe === 'PEMINJAMAN_DIKIRIM',
+                                            'bg-red-500/10 text-red-400' => $notif->tipe === 'PEMINJAMAN_DITOLAK',
+                                            'bg-yellow-500/10 text-yellow-400' => $notif->tipe === 'PEMINJAMAN_TERLAMBAT',
+                                            'bg-gray-500/10 text-gray-400' => $notif->tipe === 'PEMINJAMAN_DIKEMBALIKAN',
+                                        ])>
+                                            @switch($notif->tipe)
+                                                @case('PEMINJAMAN_BARU')
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                                                    </svg>
+                                                    @break
+                                                @case('PEMINJAMAN_DIPROSES')
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                    @break
+                                                @case('PEMINJAMAN_DIKIRIM')
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7M13 3v18m0-18l6 6m-6-6L7 9" />
+                                                    </svg>
+                                                    @break
+                                                @case('PEMINJAMAN_DITOLAK')
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                    @break
+                                                @case('PEMINJAMAN_TERLAMBAT')
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                    @break
+                                                @default
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                                    </svg>
+                                            @endswitch
                                         </div>
-                                    @endforeach
-                                </div>
-                            @endif
-                        </div>
 
-                        <!-- Footer -->
-                        @if (count($notifikasi) > 0)
-                            <div class="sticky bottom-0 border-t border-purple-500/10 bg-[#1A1A2E] backdrop-blur-xl">
-                                <div class="px-4 py-2 text-xs text-gray-400 text-center">
-                                    @if ($unreadCount > 0)
-                                        <span>
-                                            {{ $unreadCount }} belum dibaca dari {{ count($notifikasi) }} notifikasi
-                                        </span>
-                                    @else
-                                        <span>Semua notifikasi telah dibaca</span>
-                                    @endif
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-sm text-gray-300">{{ $notif->message }}</p>
+                                            <p class="text-xs text-gray-400 mt-1">{{ $notif->created_at->diffForHumans() }}</p>
+                                        </div>
+
+                                        <button wire:click="showDetail({{ $notif->id }})"
+                                            class="flex-shrink-0 text-gray-400 hover:text-gray-300">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M9 5l7 7-7 7" />
+                                            </svg>
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                        @endif
+                            @empty
+                                <div class="p-8 text-center">
+                                    <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-purple-500/10 flex items-center justify-center">
+                                        <svg class="w-8 h-8 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                                        </svg>
+                                    </div>
+                                    <p class="text-gray-400">Belum ada notifikasi</p>
+                                </div>
+                            @endforelse
+                        </div>
                     </div>
                 @endif
             </div>
-
-            <!-- Notification Detail Modal -->
-            @if ($isNotifikasiModalOpen)
-                <div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 backdrop-blur-sm"
-                    wire:click.self="closeNotifikasiModal">
-                    <div
-                        class="bg-[#1A1A2E]/95 rounded-xl shadow-lg shadow-purple-500/10 border border-purple-500/10 p-5 w-96 max-w-[90vw]">
-                        <!-- Header -->
-                        <div class="flex items-center justify-between mb-5">
-                            <h3 class="text-lg font-semibold text-white">Detail Notifikasi</h3>
-                            <button wire:click="closeNotifikasiModal"
-                                class="text-gray-400 hover:text-white transition-colors">
-                                <x-icon name="x" class="h-5 w-5" />
-                            </button>
-                        </div>
-
-                        <!-- Content -->
-                        <div class="space-y-4">
-                            <!-- Status & Time -->
-                            <div class="flex justify-between items-center">
-                                <div>
-                                    @if ($selectedNotifikasi['is_read'])
-                                        <span
-                                            class="text-xs bg-gray-500/10 text-gray-400 px-2 py-0.5 rounded-full flex items-center gap-1">
-                                            <x-icon name="eye" class="w-3 h-3" />
-                                            <span>Telah dibaca</span>
-                                        </span>
-                                    @else
-                                        <button wire:click="markAsRead({{ $selectedNotifikasi['id'] }})"
-                                            class="text-xs bg-purple-500/10 text-purple-400 px-2 py-0.5 rounded-full hover:bg-purple-500/20 transition-colors flex items-center gap-1">
-                                            <x-icon name="eye" class="w-3 h-3" />
-                                            <span>Tandai sudah dibaca</span>
-                                        </button>
-                                    @endif
-                                </div>
-                                <span class="text-xs text-gray-400">
-                                    {{ isset($selectedNotifikasi['created_at']) ? \Carbon\Carbon::parse($selectedNotifikasi['created_at'])->diffForHumans() : 'Baru saja' }}
-                                </span>
-                            </div>
-
-                            <!-- Message -->
-                            <div class="bg-purple-500/10 rounded-lg p-4 border border-purple-500/20">
-                                <p class="text-gray-300">{{ $selectedNotifikasiDetail }}</p>
-                            </div>
-
-                            <!-- Info -->
-                            <div class="grid grid-cols-2 gap-3 text-sm">
-                                <div class="bg-purple-500/5 p-3 rounded-lg">
-                                    <p class="text-gray-400 text-xs mb-1">Waktu</p>
-                                    <p class="text-white">
-                                        {{ isset($selectedNotifikasi['created_at']) ? \Carbon\Carbon::parse($selectedNotifikasi['created_at'])->format('d F Y, H:i') : 'Waktu tidak tersedia' }}
-                                    </p>
-                                </div>
-                                <div class="bg-purple-500/5 p-3 rounded-lg">
-                                    <p class="text-gray-400 text-xs mb-1">Tipe</p>
-                                    <p class="text-white">
-                                        @php
-                                            $tipeName = 'Notifikasi';
-                                            if (isset($selectedNotifikasi['type'])) {
-                                                switch ($selectedNotifikasi['type']) {
-                                                    case 'peminjaman':
-                                                        $tipeName = 'Peminjaman Baru';
-                                                        break;
-                                                    case 'PEMINJAMAN_DIPROSES':
-                                                        $tipeName = 'Peminjaman Diproses';
-                                                        break;
-                                                    case 'PEMINJAMAN_DIKIRIM':
-                                                        $tipeName = 'Peminjaman Dikirim';
-                                                        break;
-                                                    case 'pengembalian':
-                                                        $tipeName = 'Pengembalian';
-                                                        break;
-                                                    case 'DUE_REMINDER':
-                                                        $tipeName = 'Pengingat Jatuh Tempo';
-                                                        break;
-                                                    case 'OVERDUE_NOTICE':
-                                                        $tipeName = 'Pemberitahuan Keterlambatan';
-                                                        break;
-                                                }
-                                            }
-                                        @endphp
-                                        {{ $tipeName }}
-                                    </p>
-                                </div>
-                                @if (isset($selectedNotifikasi['peminjaman_id']))
-                                    <div class="bg-purple-500/5 p-3 rounded-lg col-span-2">
-                                        <p class="text-gray-400 text-xs mb-1">ID Peminjaman</p>
-                                        <p class="text-white">#{!! $selectedNotifikasi['peminjaman_id'] !!}</p>
-                                    </div>
-                                @endif
-                            </div>
-                        </div>
-
-                        <!-- Footer -->
-                        <div class="flex justify-end mt-6">
-                            <button wire:click="closeNotifikasiModal"
-                                class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:opacity-90 rounded-xl px-6 py-2 font-medium transition-all duration-300">
-                                Tutup
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            @endif
 
             <!-- Login/Profile -->
             @if ($user)
@@ -429,17 +249,49 @@
     </div>
 </nav>
 
-<!-- Modal for Notifikasi Detail -->
-@if ($isNotifikasiModalOpen)
-    <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div class="bg-[#1A1A2E] rounded-xl shadow-lg border border-purple-500/10 p-6 w-96">
-            <h3 class="text-lg font-semibold text-white mb-4">Detail Notifikasi</h3>
-            <p class="text-sm text-gray-400">{{ $selectedNotifikasiDetail }}</p>
-            <div class="flex justify-end mt-4">
-                <button wire:click="closeNotifikasiModal"
-                    class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:opacity-90 rounded-xl px-4 py-2 font-medium transition-all duration-300">
-                    Tutup
-                </button>
+<!-- Modal Detail Notifikasi -->
+@if($selectedNotifikasi)
+    <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex min-h-screen items-end justify-center p-4 text-center sm:items-center sm:p-0">
+            <div class="fixed inset-0 bg-black/50 transition-opacity" wire:click="closeDetail"></div>
+
+            <div class="relative transform overflow-hidden rounded-lg bg-[#1a1625] px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+                <div>
+                    <div @class([
+                        'mx-auto flex h-12 w-12 items-center justify-center rounded-full',
+                        'bg-blue-500/10' => $selectedNotifikasi->tipe === 'PEMINJAMAN_BARU',
+                        'bg-green-500/10' => $selectedNotifikasi->tipe === 'PEMINJAMAN_DIPROSES',
+                        'bg-purple-500/10' => $selectedNotifikasi->tipe === 'PEMINJAMAN_DIKIRIM',
+                        'bg-red-500/10' => $selectedNotifikasi->tipe === 'PEMINJAMAN_DITOLAK',
+                        'bg-yellow-500/10' => $selectedNotifikasi->tipe === 'PEMINJAMAN_TERLAMBAT',
+                        'bg-gray-500/10' => $selectedNotifikasi->tipe === 'PEMINJAMAN_DIKEMBALIKAN',
+                    ])>
+                        <!-- Icon sesuai tipe -->
+                    </div>
+                    <div class="mt-3 text-center sm:mt-5">
+                        <h3 class="text-lg font-medium leading-6 text-gray-200">
+                            Detail Notifikasi
+                        </h3>
+                        <div class="mt-2">
+                            <p class="text-sm text-gray-400">
+                                {{ $selectedNotifikasi->message }}
+                            </p>
+                            @if($selectedNotifikasi->peminjaman && $selectedNotifikasi->peminjaman->bukti_pengiriman && $selectedNotifikasi->tipe === 'PEMINJAMAN_DIKIRIM')
+                                <div class="mt-4">
+                                    <img src="{{ Storage::url($selectedNotifikasi->peminjaman->bukti_pengiriman) }}"
+                                        alt="Bukti Pengiriman"
+                                        class="max-h-64 mx-auto rounded-lg">
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-5 sm:mt-6">
+                    <button wire:click="closeDetail"
+                        class="inline-flex w-full justify-center rounded-lg bg-purple-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-purple-600">
+                        Tutup
+                    </button>
+                </div>
             </div>
         </div>
     </div>

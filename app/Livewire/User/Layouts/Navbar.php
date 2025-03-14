@@ -186,6 +186,19 @@ class Navbar extends Component
         $this->selectedNotifikasi = null;
     }
 
+    public function showDetail($notifId)
+    {
+        $this->selectedNotifikasi = Notifikasi::with('peminjaman')->find($notifId);
+        if (!$this->selectedNotifikasi->is_read) {
+            $this->selectedNotifikasi->markAsRead();
+        }
+    }
+
+    public function closeDetail()
+    {
+        $this->selectedNotifikasi = null;
+    }
+
     public function render()
     {
         $user = Auth::user();
