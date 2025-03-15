@@ -68,6 +68,11 @@ class Navbar extends Component
     }
 
     public function toggleMobileMenu()
+    /**
+     * Toggle the mobile menu's open state.
+     *
+     * @return void
+     */
     {
         $this->isMobileMenuOpen = !$this->isMobileMenuOpen;
     }
@@ -88,8 +93,13 @@ class Navbar extends Component
 
     public function refreshNotifikasi()
     {
-        $this->notifikasi = auth()->user()->notifikasi()->latest()->take(5)->get();
-        $this->unreadCount = auth()->user()->notifikasi()->where('is_read', false)->count();
+        if (auth()->check()) {
+            $this->notifikasi = auth()->user()->notifikasi()->latest()->take(5)->get();
+            $this->unreadCount = auth()->user()->notifikasi()->where('is_read', false)->count();
+        } else {
+            $this->notifikasi = [];
+            $this->unreadCount = 0;
+        }
     }
 
     public function markAsRead($id)
