@@ -11,8 +11,6 @@ class Detail extends Component
 {
     public $book;
     public $isBookmarked = false;
-    public $userRating = 0;
-    public $showRatingModal = false;
     public $relatedBooks = [];
 
     public function mount($slug)
@@ -27,24 +25,51 @@ class Detail extends Component
             abort(404);
         }
         
+        // Calculate average rating from all ratings
+        $this->calculateAverageRating();
+        
         // Ambil buku terkait berdasarkan kategori
         $this->relatedBooks = Buku::where('kategori', $this->book->kategori)
             ->where('id', '!=', $this->book->id)
             ->limit(5)
             ->get();
 
+        // Calculate average rating for each related book
+        foreach ($this->relatedBooks as $relatedBook) {
+            $this->calculateBookRating($relatedBook);
+        }
+
         if (Auth::check()) {
             $this->isBookmarked = Auth::user()->bookmarks()
                 ->where('id_buku', $this->book->id)
                 ->exists();
-            
-            $userRating = Auth::user()->ratings()
-                ->where('id_buku', $this->book->id)
-                ->first();
-            
-            if ($userRating) {
-                $this->userRating = $userRating->rating;
-            }
+        }
+    }
+
+    // Helper method to calculate average rating
+    private function calculateAverageRating()
+    {
+        // Get all ratings for this book
+        $ratings = $this->book->ratings;
+        
+        if ($ratings->count() > 0) {
+            // Calculate the average of all ratings
+            $this->book->average_rating = $ratings->avg('rating');
+        } else {
+            // If no ratings, set to 0
+            $this->book->average_rating = 0;
+        }
+    }
+    
+    // Helper method to calculate average rating for a related book
+    private function calculateBookRating($book)
+    {
+        $ratings = $book->ratings()->get();
+        
+        if ($ratings->count() > 0) {
+            $book->average_rating = $ratings->avg('rating');
+        } else {
+            $book->average_rating = 0;
         }
     }
 
@@ -69,21 +94,6 @@ class Detail extends Component
         $this->isBookmarked = !$this->isBookmarked;
     }
 
-    public function submitRating()
-    {
-        if (!Auth::check()) {
-            return redirect()->route('login');
-        }
-
-        Auth::user()->ratings()->updateOrCreate(
-            ['id_buku' => $this->book->id],
-            ['rating' => $this->userRating]
-        );
-
-        $this->showRatingModal = false;
-        $this->book->refresh();
-    }
-
     public function createPeminjamanToken()
     {
         if (!Auth::check()) {
@@ -103,4 +113,4 @@ class Detail extends Component
     {
         return view('livewire.books.detail')->layout('layouts.user');
     }
-} 
+}
