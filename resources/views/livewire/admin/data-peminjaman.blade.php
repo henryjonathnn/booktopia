@@ -56,11 +56,21 @@
                     <table class="w-full">
                         <thead>
                             <tr class="border-b border-purple-500/10">
-                                <th class="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Peminjam</th>
-                                <th class="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Buku</th>
-                                <th class="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
-                                <th class="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Tanggal</th>
-                                <th class="px-6 py-4 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">Aksi</th>
+                                <th
+                                    class="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                    Peminjam</th>
+                                <th
+                                    class="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                    Buku</th>
+                                <th
+                                    class="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                    Status</th>
+                                <th
+                                    class="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                    Tanggal</th>
+                                <th
+                                    class="px-6 py-4 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                    Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-purple-500/10">
@@ -76,12 +86,13 @@
                                     </td>
                                     <td class="px-6 py-4">
                                         <div class="flex items-center space-x-3">
-                                            <img src="{{ Storage::url($peminjaman->buku->cover_img) }}" 
-                                                class="h-12 w-9 object-cover rounded" 
+                                            <img src="{{ Storage::url($peminjaman->buku->cover_img) }}"
+                                                class="h-12 w-9 object-cover rounded"
                                                 alt="{{ $peminjaman->buku->judul }}">
                                             <div>
                                                 <div class="font-medium">{{ $peminjaman->buku->judul }}</div>
-                                                <div class="text-sm text-gray-400">{{ $peminjaman->buku->penulis }}</div>
+                                                <div class="text-sm text-gray-400">{{ $peminjaman->buku->penulis }}
+                                                </div>
                                             </div>
                                         </div>
                                     </td>
@@ -104,33 +115,44 @@
                                     </td>
                                     <td class="px-6 py-4 text-right">
                                         <div class="flex items-center justify-end space-x-2">
-                                            @if($peminjaman->status === 'PENDING')
+                                            @if ($peminjaman->status === 'PENDING')
                                                 <button wire:click="approvePeminjaman({{ $peminjaman->id }})"
                                                     class="bg-green-500/10 text-green-500 hover:bg-green-500/20 p-2 rounded-lg transition-colors">
-                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2" d="M5 13l4 4L19 7" />
                                                     </svg>
                                                 </button>
                                                 <button wire:click="showReject({{ $peminjaman->id }})"
                                                     class="bg-red-500/10 text-red-500 hover:bg-red-500/20 p-2 rounded-lg transition-colors">
-                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                                     </svg>
                                                 </button>
                                             @elseif($peminjaman->status === 'DIPROSES')
                                                 <button wire:click="showUpload({{ $peminjaman->id }})"
-                                                    class="bg-purple-500/10 text-purple-500 hover:bg-purple-500/20 px-3 py-1.5 rounded-lg transition-colors inline-flex items-center space-x-1">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                                    class="bg-purple-500/10 text-purple-500 hover:bg-purple-500/20 p-2 rounded-lg transition-colors inline-flex items-center justify-center"
+                                                    title="Kirim Sekarang">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                                                     </svg>
-                                                    <span>Kirim Sekarang</span>
                                                 </button>
                                             @endif
                                             <button wire:click="showDetail({{ $peminjaman->id }})"
                                                 class="bg-gray-500/10 text-gray-400 hover:bg-gray-500/20 p-2 rounded-lg transition-colors">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                                 </svg>
                                             </button>
                                         </div>
@@ -140,9 +162,12 @@
                                 <tr>
                                     <td colspan="5" class="px-6 py-10 text-center">
                                         <div class="flex flex-col items-center">
-                                            <div class="w-16 h-16 mb-4 rounded-full bg-purple-500/10 flex items-center justify-center">
-                                                <svg class="w-8 h-8 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                            <div
+                                                class="w-16 h-16 mb-4 rounded-full bg-purple-500/10 flex items-center justify-center">
+                                                <svg class="w-8 h-8 text-purple-400" fill="none"
+                                                    viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                                                 </svg>
                                             </div>
                                             <p class="text-gray-400">Belum ada data peminjaman</p>
@@ -153,7 +178,7 @@
                         </tbody>
                     </table>
                 </div>
-                
+
                 <!-- Pagination -->
                 <div class="px-6 py-3 border-t border-purple-500/10">
                     {{ $peminjamans->links() }}
@@ -163,12 +188,14 @@
     </div>
 
     <!-- Modal Detail -->
-    @if($activeModal === 'detail' && $selectedPeminjaman)
-        <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    @if ($activeModal === 'detail' && $selectedPeminjaman)
+        <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog"
+            aria-modal="true">
             <div class="flex min-h-screen items-end justify-center p-4 text-center sm:items-center sm:p-0">
                 <div class="fixed inset-0 bg-black/50 transition-opacity" wire:click="closeModal"></div>
-                
-                <div class="relative transform overflow-hidden rounded-lg bg-[#1a1625] px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+
+                <div
+                    class="relative transform overflow-hidden rounded-lg bg-[#1a1625] px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
                     <div>
                         <div class="mb-4">
                             <h3 class="text-lg font-medium">Detail Peminjaman</h3>
@@ -193,10 +220,12 @@
                             <!-- Informasi Pengiriman -->
                             <div>
                                 <h4 class="text-sm font-medium text-gray-400">Informasi Pengiriman</h4>
-                                <p class="mt-1">{{ str_replace('_', ' ', $selectedPeminjaman->metode_pengiriman) }}</p>
+                                <p class="mt-1">{{ str_replace('_', ' ', $selectedPeminjaman->metode_pengiriman) }}
+                                </p>
                                 <p class="text-sm text-gray-400">{{ $selectedPeminjaman->alamat_pengiriman }}</p>
-                                @if($selectedPeminjaman->catatan_pengiriman)
-                                    <p class="text-sm text-gray-400 mt-1">Catatan: {{ $selectedPeminjaman->catatan_pengiriman }}</p>
+                                @if ($selectedPeminjaman->catatan_pengiriman)
+                                    <p class="text-sm text-gray-400 mt-1">Catatan:
+                                        {{ $selectedPeminjaman->catatan_pengiriman }}</p>
                                 @endif
                             </div>
 
@@ -212,7 +241,7 @@
                                         <span class="text-gray-400">Rencana Pinjam:</span>
                                         {{ Carbon\Carbon::parse($selectedPeminjaman->tgl_peminjaman_diinginkan)->format('d M Y') }}
                                     </p>
-                                    @if($selectedPeminjaman->tgl_dikirim)
+                                    @if ($selectedPeminjaman->tgl_dikirim)
                                         <p class="text-sm">
                                             <span class="text-gray-400">Tanggal Kirim:</span>
                                             {{ Carbon\Carbon::parse($selectedPeminjaman->tgl_dikirim)->format('d M Y H:i') }}
@@ -222,7 +251,7 @@
                             </div>
 
                             <!-- Status History -->
-                            @if($selectedPeminjaman->staff)
+                            @if ($selectedPeminjaman->staff)
                                 <div>
                                     <h4 class="text-sm font-medium text-gray-400">Diproses Oleh</h4>
                                     <p class="mt-1">{{ $selectedPeminjaman->staff->name }}</p>
@@ -243,16 +272,20 @@
     @endif
 
     <!-- Modal Reject -->
-    @if($activeModal === 'reject' && $selectedPeminjaman)
-        <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    @if ($activeModal === 'reject' && $selectedPeminjaman)
+        <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog"
+            aria-modal="true">
             <div class="flex min-h-screen items-end justify-center p-4 text-center sm:items-center sm:p-0">
                 <div class="fixed inset-0 bg-black/50 transition-opacity" wire:click="closeModal"></div>
-                
-                <div class="relative transform overflow-hidden rounded-lg bg-[#1a1625] px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+
+                <div
+                    class="relative transform overflow-hidden rounded-lg bg-[#1a1625] px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
                     <div>
                         <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-500/10">
-                            <svg class="h-6 w-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            <svg class="h-6 w-6 text-red-400" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12" />
                             </svg>
                         </div>
                         <div class="mt-3 text-center">
@@ -268,12 +301,9 @@
                     </div>
 
                     <div class="mt-5">
-                        <textarea
-                            wire:model="alasanPenolakan"
+                        <textarea wire:model="alasanPenolakan"
                             class="w-full bg-[#0f0a19] rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 border border-gray-800"
-                            rows="3"
-                            placeholder="Alasan penolakan..."
-                        ></textarea>
+                            rows="3" placeholder="Alasan penolakan..."></textarea>
                         @error('alasanPenolakan')
                             <span class="text-sm text-red-400 mt-1">{{ $message }}</span>
                         @enderror
@@ -295,16 +325,19 @@
     @endif
 
     <!-- Modal Upload -->
-    @if($activeModal === 'upload' && $selectedPeminjaman)
-        <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    @if ($activeModal === 'upload' && $selectedPeminjaman)
+        <div class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog"
+            aria-modal="true">
             <div class="flex min-h-screen items-end justify-center p-4 text-center sm:items-center sm:p-0">
                 <div class="fixed inset-0 bg-black/50 transition-opacity" wire:click="closeModal"></div>
-                
-                <div class="relative transform overflow-hidden rounded-lg bg-[#1a1625] px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+
+                <div
+                    class="relative transform overflow-hidden rounded-lg bg-[#1a1625] px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
                     <div>
                         <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-purple-500/10">
-                            <svg class="h-6 w-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                            <svg class="h-6 w-6 text-purple-400" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                             </svg>
                         </div>
@@ -323,7 +356,8 @@
                     <div class="mt-5">
                         <div class="rounded-lg border-2 border-dashed border-gray-800 p-4">
                             <div class="text-center">
-                                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                 </svg>
@@ -331,7 +365,8 @@
                                     <label for="file-upload"
                                         class="relative cursor-pointer rounded-md bg-[#1a1625] font-semibold text-purple-400 focus-within:outline-none focus-within:ring-2 focus-within:ring-purple-500 focus-within:ring-offset-2 hover:text-purple-300">
                                         <span>Upload file</span>
-                                        <input wire:model="buktiPengiriman" id="file-upload" type="file" class="sr-only" accept="image/*">
+                                        <input wire:model="buktiPengiriman" id="file-upload" type="file"
+                                            class="sr-only" accept="image/*">
                                     </label>
                                     <p class="pl-1">atau drag and drop</p>
                                 </div>
@@ -340,13 +375,12 @@
                             @error('buktiPengiriman')
                                 <span class="text-sm text-red-400 block mt-2">{{ $message }}</span>
                             @enderror
-                            @if($buktiPengiriman)
+                            @if ($buktiPengiriman)
                                 <div class="mt-4">
                                     <div class="text-sm text-gray-400">Preview:</div>
                                     <div class="mt-2 rounded-lg overflow-hidden bg-[#0f0a19] p-2">
-                                        <img src="{{ $buktiPengiriman->temporaryUrl() }}" 
-                                            class="max-h-48 mx-auto object-contain" 
-                                            alt="Preview">
+                                        <img src="{{ $buktiPengiriman->temporaryUrl() }}"
+                                            class="max-h-48 mx-auto object-contain" alt="Preview">
                                     </div>
                                 </div>
                             @endif
@@ -356,7 +390,7 @@
                     <div class="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3">
                         <button wire:click="uploadBuktiPengiriman"
                             class="inline-flex w-full justify-center rounded-lg bg-purple-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-purple-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-500 sm:col-start-2"
-                            @if(!$buktiPengiriman) disabled @endif>
+                            @if (!$buktiPengiriman) disabled @endif>
                             Upload dan Kirim
                         </button>
                         <button wire:click="closeModal"
