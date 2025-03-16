@@ -12,25 +12,23 @@
         <div class="w-full aspect-[2/3] rounded-xl bg-gray-300"></div>
     @endif
 
-    {{-- Remove unnecessary nested divs and simplify structure --}}
-    @if ($showRating || $isBookmarked)
-        <div class="absolute top-2 right-2 flex space-x-2">
-            @if ($isBookmarked)
-                <button wire:click.stop="toggleBookmark"
-                    class="p-1.5 md:p-2 rounded-lg bg-black/50 hover:bg-black/70">
-                    <x-icon name="bookmark"
-                        class="w-4.5 h-4.5 {{ $isBookmarked ? 'text-purple-500 fill-purple-500' : 'text-white' }}" />
-                </button>
-            @endif
+    {{-- Rating and Bookmark display --}}
+    <div class="absolute top-2 right-2 flex space-x-2">
+        @if ($isBookmarked)
+            <button wire:click.stop="toggleBookmark"
+                class="p-1.5 md:p-2 rounded-lg bg-black/50 hover:bg-black/70">
+                <x-icon name="bookmark"
+                    class="w-4.5 h-4.5 {{ $isBookmarked ? 'text-purple-500 fill-purple-500' : 'text-white' }}" />
+            </button>
+        @endif
 
-            @if ($showRating)
-                <div class="inline-flex items-center bg-black/50 px-2 py-1 rounded-lg">
-                    <x-icon name="star" class="w-3.5 h-3.5 text-yellow-400" />
-                    <span class="text-white text-xs ml-1">{{ number_format($book->rating, 1) }}</span>
-                </div>
-            @endif
-        </div>
-    @endif
+        @if ($showRating)
+            <div class="inline-flex items-center bg-black/50 px-2 py-1 rounded-lg">
+                <x-icon name="star" class="w-3.5 h-3.5 text-yellow-400" />
+                <span class="text-white text-xs ml-1">{{ number_format($book->average_rating, 1) }}</span>
+            </div>
+        @endif
+    </div>
 
     <div class="flex-grow flex flex-col justify-between">
         <div class="mb-3 md:mb-4">
@@ -48,14 +46,13 @@
                 <div class="flex items-center justify-end space-x-1">
                     @if (!$showRating)
                         <span class="text-purple-400">+</span>
+                        <p class="font-medium">{{ number_format($book->peminjam) }}</p>
+                    @else
+                        <div class="flex items-center">
+                            <x-icon name="star" class="w-3.5 h-3.5 text-yellow-400" />
+                            <p class="font-medium ml-1">{{ number_format($book->average_rating, 1) }}/5</p>
+                        </div>
                     @endif
-                    <p class="font-medium">
-                        @if ($showRating)
-                            {{ number_format($book->rating, 1) }}/5
-                        @else
-                            {{ number_format($book->peminjam) }}
-                        @endif
-                    </p>
                 </div>
             </div>
         </div>
