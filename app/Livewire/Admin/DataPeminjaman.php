@@ -203,6 +203,44 @@ class DataPeminjaman extends Component
         }
     }
 
+    public function markAsDipinjam($peminjamanId)
+    {
+        try {
+            DB::beginTransaction();
+            
+            $peminjaman = Peminjaman::findOrFail($peminjamanId);
+            
+            if ($peminjaman->status !== 'DIKIRIM') {
+                session()->flash('error', 'Status peminjaman harus DIKIRIM untuk bisa diubah menjadi DIPINJAM');
+                return;
+            }
+
+            $peminjaman->status = 'DIPINJAM';
+            $peminjaman->tgl_peminjaman_aktual = now();
+            $peminjaman->save();
+
+            // Buat notifikasi untuk user
+            Notifikasi::create([
+                'id_user' => $peminjaman->id_user,
+                'id_peminjaman' => $peminjaman->id,
+                'message' => "Buku {$peminjaman->buku->judul} telah dipinjam pada tanggal " . 
+                            now()->format('d M Y') . ". Batas pengembalian: " . 
+                            Carbon::parse($peminjaman->tgl_kembali_rencana)->format('d M Y'),
+                'tipe' => 'PEMINJAMAN_DITERIMA'
+            ]);
+
+            // Trigger event untuk notifikasi
+            event(new PeminjamanStatusChanged($peminjaman));
+
+            DB::commit();
+            session()->flash('success', 'Status peminjaman berhasil diubah menjadi DIPINJAM');
+            
+        } catch (\Exception $e) {
+            DB::rollBack();
+            session()->flash('error', 'Terjadi kesalahan saat mengubah status peminjaman');
+        }
+    }
+
     public function render()
     {
         $query = Peminjaman::with(['user', 'buku', 'staff'])

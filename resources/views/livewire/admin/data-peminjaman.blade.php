@@ -114,47 +114,37 @@
                                         {{ $peminjaman->created_at->format('d M Y') }}
                                     </td>
                                     <td class="px-6 py-4 text-right">
-                                        <div class="flex items-center justify-end space-x-2">
-                                            @if ($peminjaman->status === 'PENDING')
-                                                <button wire:click="approvePeminjaman({{ $peminjaman->id }})"
-                                                    class="bg-green-500/10 text-green-500 hover:bg-green-500/20 p-2 rounded-lg transition-colors">
-                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor"
-                                                        viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2" d="M5 13l4 4L19 7" />
-                                                    </svg>
-                                                </button>
+                                        <div class="flex justify-end space-x-2">
+                                            <button wire:click="showDetail({{ $peminjaman->id }})"
+                                                class="btn btn-sm btn-ghost">
+                                                Detail
+                                            </button>
+
+                                            @if($peminjaman->status === 'PENDING')
                                                 <button wire:click="showReject({{ $peminjaman->id }})"
-                                                    class="bg-red-500/10 text-red-500 hover:bg-red-500/20 p-2 rounded-lg transition-colors">
-                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor"
-                                                        viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                                    </svg>
+                                                    class="btn btn-sm btn-error">
+                                                    Tolak
                                                 </button>
-                                            @elseif($peminjaman->status === 'DIPROSES')
-                                                <button wire:click="showUpload({{ $peminjaman->id }})"
-                                                    class="bg-purple-500/10 text-purple-500 hover:bg-purple-500/20 p-2 rounded-lg transition-colors inline-flex items-center justify-center"
-                                                    title="Kirim Sekarang">
-                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor"
-                                                        viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                            stroke-width="2"
-                                                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                                                    </svg>
+                                                <button wire:click="processPeminjaman({{ $peminjaman->id }})"
+                                                    class="btn btn-sm btn-success">
+                                                    Proses
                                                 </button>
                                             @endif
-                                            <button wire:click="showDetail({{ $peminjaman->id }})"
-                                                class="bg-gray-500/10 text-gray-400 hover:bg-gray-500/20 p-2 rounded-lg transition-colors">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
-                                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                                </svg>
-                                            </button>
+
+                                            @if($peminjaman->status === 'DIPROSES')
+                                                <button wire:click="showUpload({{ $peminjaman->id }})"
+                                                    class="btn btn-sm btn-primary">
+                                                    Upload Bukti
+                                                </button>
+                                            @endif
+
+                                            @if($peminjaman->status === 'DIKIRIM')
+                                                <button wire:click="markAsDipinjam({{ $peminjaman->id }})"
+                                                    class="btn btn-sm bg-green-500 hover:bg-green-600 text-white"
+                                                    onclick="return confirm('Apakah Anda yakin buku sudah diterima oleh peminjam?')">
+                                                    Terkirim
+                                                </button>
+                                            @endif
                                         </div>
                                     </td>
                                 </tr>
