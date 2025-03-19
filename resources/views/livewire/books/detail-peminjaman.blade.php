@@ -207,11 +207,11 @@
             </div>
         </div>
 
-        <!-- Tambahkan bagian action buttons -->
-        <div class="flex justify-end gap-3 mt-6">
-            @if($peminjaman->status === 'DIKIRIM')
+        <!-- Status Actions -->
+        <div class="mt-6">
+            @if($peminjaman->status === 'DIPINJAM')
                 <button 
-                    wire:click="returnPeminjaman({{ $peminjaman->id }})"
+                    wire:click="$set('showReturnConfirmation', true)"
                     class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
                     Kembalikan Buku
                 </button>
@@ -223,6 +223,27 @@
                 </button>
             @endif
         </div>
+
+        <!-- Return Confirmation Modal -->
+        <x-modal wire:model="showReturnConfirmation">
+            <div class="bg-[#1a1625] rounded-xl p-6">
+                <h3 class="text-xl font-bold mb-4">Konfirmasi Pengembalian</h3>
+                <p class="text-gray-300 mb-6">Apakah Anda yakin ingin mengembalikan buku ini?</p>
+                
+                <div class="flex justify-end gap-3">
+                    <button 
+                        wire:click="$set('showReturnConfirmation', false)"
+                        class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+                        Batal
+                    </button>
+                    <button 
+                        wire:click="returnPeminjaman({{ $peminjaman->id }})"
+                        class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+                        Ya, Kembalikan
+                    </button>
+                </div>
+            </div>
+        </x-modal>
 
         <!-- Rating Modal -->
         <x-modal wire:model="showRatingModal">
@@ -279,27 +300,6 @@
                         </button>
                     </div>
                 </form>
-            </div>
-        </x-modal>
-
-        <!-- Return Confirmation Modal -->
-        <x-modal wire:model="showReturnConfirmation">
-            <div class="bg-[#1a1625] rounded-xl p-6">
-                <h3 class="text-xl font-bold mb-4">Konfirmasi Pengembalian</h3>
-                <p class="text-gray-300 mb-6">Apakah Anda yakin ingin mengembalikan buku ini?</p>
-                
-                <div class="flex justify-end gap-3">
-                    <button 
-                        wire:click="$set('showReturnConfirmation', false)"
-                        class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
-                        Batal
-                    </button>
-                    <button 
-                        wire:click="returnPeminjaman({{ $peminjaman->id }})"
-                        class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
-                        Ya, Kembalikan
-                    </button>
-                </div>
             </div>
         </x-modal>
     </div>
