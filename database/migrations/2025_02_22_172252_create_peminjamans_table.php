@@ -35,6 +35,8 @@ return new class extends Migration
             $table->enum('metode_pengiriman', ['KURIR', 'AMBIL_DI_TEMPAT'])->default('KURIR');
             $table->string('bukti_pengembalian')->nullable();
             $table->integer('total_denda')->default(0);
+            $table->boolean('is_denda_paid')->default(false);
+            $table->timestamp('last_denda_calculation')->nullable();
             $table->string('bukti_pembayaran_denda')->nullable();
             $table->text('alasan_penolakan')->nullable();
             $table->string('nomor_resi')->nullable();
