@@ -34,6 +34,7 @@ class Dashboard extends Component
         // Generate statistik bulanan untuk 6 bulan terakhir
         $sixMonthsAgo = now()->subMonths(5)->startOfMonth();
         
+        // Ambil data peminjaman per bulan
         $monthlyLoans = Peminjaman::select(
             DB::raw('MONTH(created_at) as month'),
             DB::raw('YEAR(created_at) as year'),
@@ -41,10 +42,12 @@ class Dashboard extends Component
         )
         ->where('created_at', '>=', $sixMonthsAgo)
         ->groupBy('year', 'month')
-        ->orderBy('year')
-        ->orderBy('month')
-        ->get();
+        ->get()
+        ->keyBy(function ($item) {
+            return $item->year . '-' . str_pad($item->month, 2, '0', STR_PAD_LEFT);
+        });
 
+        // Ambil data pengembalian per bulan
         $monthlyReturns = Peminjaman::select(
             DB::raw('MONTH(updated_at) as month'),
             DB::raw('YEAR(updated_at) as year'),
@@ -53,44 +56,28 @@ class Dashboard extends Component
         ->where('status', 'DIKEMBALIKAN')
         ->where('updated_at', '>=', $sixMonthsAgo)
         ->groupBy('year', 'month')
-        ->orderBy('year')
-        ->orderBy('month')
-        ->get();
+        ->get()
+        ->keyBy(function ($item) {
+            return $item->year . '-' . str_pad($item->month, 2, '0', STR_PAD_LEFT);
+        });
 
-        // Format data untuk chart
-        $months = collect([]);
+        // Buat array untuk 6 bulan terakhir
+        $monthlyStats = [];
         for ($i = 0; $i < 6; $i++) {
             $date = now()->subMonths($i);
-            $months->push([
+            $key = $date->format('Y-m');
+            
+            $monthlyStats[] = [
                 'month' => $date->format('M'),
                 'year' => $date->year,
                 'month_num' => $date->month,
-                'loans' => 0,
-                'returns' => 0
-            ]);
+                'loans' => $monthlyLoans->get($key)?->total_loans ?? 0,
+                'returns' => $monthlyReturns->get($key)?->total_returns ?? 0
+            ];
         }
 
-        // Masukkan data peminjaman
-        foreach ($monthlyLoans as $loan) {
-            $key = $months->search(function ($item) use ($loan) {
-                return $item['month_num'] == $loan->month && $item['year'] == $loan->year;
-            });
-            if ($key !== false) {
-                $months[$key]['loans'] = $loan->total_loans;
-            }
-        }
-
-        // Masukkan data pengembalian
-        foreach ($monthlyReturns as $return) {
-            $key = $months->search(function ($item) use ($return) {
-                return $item['month_num'] == $return->month && $item['year'] == $return->year;
-            });
-            if ($key !== false) {
-                $months[$key]['returns'] = $return->total_returns;
-            }
-        }
-
-        $this->monthlyStats = $months->reverse()->values()->toArray();
+        // Balik urutan array agar dimulai dari bulan terlama
+        $this->monthlyStats = array_reverse($monthlyStats);
     }
 
     public function getRecentActivities()
