@@ -17,28 +17,30 @@ class CreatePeminjaman extends Component
     public $token;
     public $alamat_pengiriman;
     public $catatan_pengiriman;
-    public $tgl_peminjaman_diinginkan;
-    public $durasi_peminjaman = 1;
+    public $tgl_peminjaman;
+    public $tgl_pengembalian;
     
-    public $minDate;
-    public $maxDate;
+    public $minDatePinjam;
+    public $maxDatePinjam;
+    public $minDateKembali;
+    public $maxDateKembali;
 
     protected $rules = [
         'alamat_pengiriman' => 'required|string|min:10',
         'catatan_pengiriman' => 'nullable|string',
-        'tgl_peminjaman_diinginkan' => 'required|date|after_or_equal:today|before_or_equal:maxDate',
-        'durasi_peminjaman' => 'required|integer|min:1|max:7',
+        'tgl_peminjaman' => 'required|date|after_or_equal:minDatePinjam|before_or_equal:maxDatePinjam',
+        'tgl_pengembalian' => 'required|date|after:tgl_peminjaman|before_or_equal:maxDateKembali',
     ];
 
     protected $messages = [
         'alamat_pengiriman.required' => 'Alamat pengiriman wajib diisi',
         'alamat_pengiriman.min' => 'Alamat pengiriman minimal 10 karakter',
-        'tgl_peminjaman_diinginkan.required' => 'Tanggal peminjaman wajib diisi',
-        'tgl_peminjaman_diinginkan.after_or_equal' => 'Tanggal peminjaman minimal hari ini',
-        'tgl_peminjaman_diinginkan.before_or_equal' => 'Tanggal peminjaman maksimal 30 hari dari sekarang',
-        'durasi_peminjaman.required' => 'Durasi peminjaman wajib diisi',
-        'durasi_peminjaman.min' => 'Durasi peminjaman minimal 1 hari',
-        'durasi_peminjaman.max' => 'Durasi peminjaman maksimal 7 hari',
+        'tgl_peminjaman.required' => 'Tanggal peminjaman wajib diisi',
+        'tgl_peminjaman.after_or_equal' => 'Tanggal peminjaman minimal hari ini',
+        'tgl_peminjaman.before_or_equal' => 'Tanggal peminjaman maksimal 3 hari dari sekarang',
+        'tgl_pengembalian.required' => 'Tanggal pengembalian wajib diisi',
+        'tgl_pengembalian.after' => 'Tanggal pengembalian minimal 1 hari setelah tanggal pinjam',
+        'tgl_pengembalian.before_or_equal' => 'Durasi peminjaman maksimal 7 hari',
     ];
 
     public function mount($token)
@@ -47,7 +49,6 @@ class CreatePeminjaman extends Component
             return redirect()->route('login');
         }
 
-        // Decode token to get book ID and verify expiry
         try {
             $decoded = json_decode(base64_decode($token), true);
             
@@ -62,13 +63,41 @@ class CreatePeminjaman extends Component
             $this->book = Buku::findOrFail($decoded['book_id']);
             $this->token = $token;
             
-            // Set min and max dates for peminjaman
-            $this->minDate = now()->format('Y-m-d');
-            $this->maxDate = now()->addDays(30)->format('Y-m-d');
-            $this->tgl_peminjaman_diinginkan = $this->minDate;
+            // Set tanggal minimal dan maksimal peminjaman
+            $this->minDatePinjam = now()->format('Y-m-d');
+            $this->maxDatePinjam = now()->addDays(3)->format('Y-m-d');
+            
+            // Set default tanggal peminjaman ke hari ini
+            $this->tgl_peminjaman = $this->minDatePinjam;
+            
+            // Update tanggal pengembalian ketika mount
+            $this->updateDateKembali();
 
         } catch (\Exception $e) {
             return redirect()->route('buku')->with('error', 'Link peminjaman tidak valid');
+        }
+    }
+
+    public function updatedTglPeminjaman()
+    {
+        $this->updateDateKembali();
+    }
+
+    private function updateDateKembali()
+    {
+        if ($this->tgl_peminjaman) {
+            $this->minDateKembali = Carbon::parse($this->tgl_peminjaman)->addDay()->format('Y-m-d');
+            $this->maxDateKembali = Carbon::parse($this->tgl_peminjaman)->addDays(7)->format('Y-m-d');
+            
+            // Reset tanggal pengembalian jika di luar range yang valid
+            if ($this->tgl_pengembalian) {
+                $tglKembali = Carbon::parse($this->tgl_pengembalian);
+                if ($tglKembali->lt($this->minDateKembali) || $tglKembali->gt($this->maxDateKembali)) {
+                    $this->tgl_pengembalian = $this->minDateKembali;
+                }
+            } else {
+                $this->tgl_pengembalian = $this->minDateKembali;
+            }
         }
     }
 
@@ -76,17 +105,15 @@ class CreatePeminjaman extends Component
     {
         $this->validate();
 
-        // Decrement book stock
         $this->book->decrement('stock');
 
-        // Create peminjaman dengan durasi yang dipilih user
         $peminjaman = Peminjaman::create([
             'id_user' => Auth::id(),
             'id_buku' => $this->book->id,
             'alamat_pengiriman' => $this->alamat_pengiriman,
             'catatan_pengiriman' => $this->catatan_pengiriman,
-            'tgl_peminjaman_diinginkan' => $this->tgl_peminjaman_diinginkan,
-            'tgl_kembali_rencana' => Carbon::parse($this->tgl_peminjaman_diinginkan)->addDays($this->durasi_peminjaman),
+            'tgl_peminjaman_diinginkan' => $this->tgl_peminjaman,
+            'tgl_kembali_rencana' => $this->tgl_pengembalian,
             'status' => 'PENDING',
             'metode_pengiriman' => 'KURIR'
         ]);

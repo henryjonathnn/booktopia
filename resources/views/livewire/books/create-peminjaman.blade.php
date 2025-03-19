@@ -95,7 +95,7 @@
                     ></textarea>
                 </div>
 
-                {{-- Tanggal dan Durasi Peminjaman --}}
+                {{-- Tanggal Peminjaman dan Pengembalian --}}
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {{-- Tanggal Peminjaman --}}
                     <div>
@@ -103,30 +103,30 @@
                             Tanggal Peminjaman <span class="text-red-500">*</span>
                         </label>
                         <input 
-                            type="datetime-local"
-                            wire:model="tgl_peminjaman_diinginkan"
+                            type="date"
+                            wire:model="tgl_peminjaman"
                             class="w-full bg-[#1A1A2E] rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500/50 border border-purple-500/10"
-                            min="{{ $minDate }}"
-                            max="{{ $maxDate }}"
+                            min="{{ $minDatePinjam }}"
+                            max="{{ $maxDatePinjam }}"
                         >
-                        @error('tgl_peminjaman_diinginkan')
+                        @error('tgl_peminjaman')
                             <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
                         @enderror
                     </div>
 
-                    {{-- Durasi Peminjaman --}}
+                    {{-- Tanggal Pengembalian --}}
                     <div>
                         <label class="block text-sm font-medium text-gray-400 mb-2">
-                            Durasi Peminjaman (Hari) <span class="text-red-500">*</span>
+                            Tanggal Pengembalian <span class="text-red-500">*</span>
                         </label>
                         <input 
-                            type="number"
-                            wire:model="durasi_peminjaman"
+                            type="date"
+                            wire:model="tgl_pengembalian"
                             class="w-full bg-[#1A1A2E] rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500/50 border border-purple-500/10"
-                            min="1"
-                            max="7"
+                            min="{{ $minDateKembali }}"
+                            max="{{ $maxDateKembali }}"
                         >
-                        @error('durasi_peminjaman')
+                        @error('tgl_pengembalian')
                             <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
                         @enderror
                     </div>
@@ -137,7 +137,8 @@
                     <h3 class="font-medium text-purple-400 mb-2">Informasi Peminjaman</h3>
                     <ul class="text-sm text-gray-400 space-y-1">
                         <li>• Peminjaman akan diproses atas nama: {{ auth()->user()->name }}</li>
-                        <li>• Durasi peminjaman minimal 1 hari dan maksimal 7 hari</li>
+                        <li>• Tanggal peminjaman bisa hari ini sampai maksimal 3 hari ke depan</li>
+                        <li>• Durasi peminjaman minimal 1 hari dan maksimal 7 hari dari tanggal pinjam</li>
                         <li>• Keterlambatan pengembalian akan dikenakan denda</li>
                         <li>• Pastikan alamat pengiriman sudah benar dan lengkap</li>
                     </ul>
