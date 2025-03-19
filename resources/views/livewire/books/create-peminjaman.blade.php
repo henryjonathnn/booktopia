@@ -125,9 +125,9 @@
                         </label>
                         <input 
                             type="date"
-                            wire:model="tgl_peminjaman"
+                            wire:model.live="tgl_peminjaman"
                             class="w-full bg-[#1A1A2E] rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500/50 border border-purple-500/10"
-                            min="{{ $minDatePinjam }}"
+                            min="{{ date('Y-m-d') }}"
                             max="{{ $maxDatePinjam }}"
                         >
                         @error('tgl_peminjaman')
@@ -146,18 +146,21 @@
                         <input 
                             type="date"
                             wire:model="tgl_pengembalian"
-                            class="w-full bg-[#1A1A2E] rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500/50 border border-purple-500/10"
-                            min="{{ $minDateKembali }}"
-                            max="{{ $maxDateKembali }}"
+                            class="w-full bg-[#1A1A2E] rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500/50 border border-purple-500/10 {{ !$tgl_peminjaman ? 'cursor-not-allowed' : '' }}"
+                            min="{{ $minReturnDate ?? Carbon\Carbon::parse($tgl_peminjaman)->addDay()->format('Y-m-d') }}"
+                            max="{{ $maxReturnDate }}"
                             {{ !$tgl_peminjaman ? 'disabled' : '' }}
                         >
                         @error('tgl_pengembalian')
                             <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
                         @enderror
                         @if($tgl_peminjaman)
-                        <p class="mt-1 text-xs text-gray-400">
-                            Rentang pengembalian: {{ Carbon\Carbon::parse($minDateKembali)->format('d M Y') }} - {{ Carbon\Carbon::parse($maxDateKembali)->format('d M Y') }}
-                        </p>
+                            <p class="mt-1 text-xs text-gray-400">
+                                Rentang pengembalian: 
+                                {{ $minReturnDate ? Carbon\Carbon::parse($minReturnDate)->format('d M Y') : '1 hari' }} - 
+                                {{ $maxReturnDate ? Carbon\Carbon::parse($maxReturnDate)->format('d M Y') : '7 hari' }}
+                                dari tanggal peminjaman
+                            </p>
                         @endif
                     </div>
                 </div>
