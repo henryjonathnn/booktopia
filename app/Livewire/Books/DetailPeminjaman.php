@@ -67,65 +67,21 @@ class DetailPeminjaman extends Component
 
     public function returnPeminjaman()
     {
-        try {
-            DB::beginTransaction();
-            
-            $peminjaman = $this->peminjaman;
-            
-            if ($peminjaman->status !== 'DIPINJAM') {
-                session()->flash('alert', [
-                    'type' => 'error',
-                    'message' => 'Status peminjaman tidak valid untuk dikembalikan!'
-                ]);
-                return;
-            }
-
-            // Cek keterlambatan
-            if (now() > $peminjaman->tgl_kembali_rencana) {
-                $daysLate = now()->diffInDays($peminjaman->tgl_kembali_rencana);
-                $totalDenda = $peminjaman->buku->denda_harian * $daysLate;
-                
-                $peminjaman->update([
-                    'status' => 'TERLAMBAT',
-                    'total_denda' => $totalDenda,
-                    'last_denda_calculation' => now()
-                ]);
-
-                // Kirim notifikasi keterlambatan
-                $peminjaman->user->notify(new \App\Notifications\PeminjamanTerlambat($peminjaman));
-
-                session()->flash('alert', [
-                    'type' => 'error',
-                    'message' => "Buku terlambat dikembalikan. Total denda: Rp " . number_format($totalDenda, 0, ',', '.')
-                ]);
-
-                $this->showPayDendaModal = true;
-            } else {
-                // Proses pengembalian normal
-                $peminjaman->buku->increment('stock');
-                $peminjaman->update([
+        // Untuk peminjaman tanpa denda
+        if ($this->peminjaman->total_denda == 0) {
+            DB::transaction(function() {
+                $this->peminjaman->update([
                     'status' => 'DIKEMBALIKAN',
                     'tgl_kembali_aktual' => now()
                 ]);
 
-                session()->flash('alert', [
-                    'type' => 'success',
-                    'message' => 'Buku berhasil dikembalikan!'
-                ]);
+                // Kembalikan stok buku
+                $this->peminjaman->buku->increment('stok'); // Menambah stok buku +1
+            });
 
-                $this->showRatingModal = true;
-            }
-
-            DB::commit();
-            
-            // Refresh data
-            $this->peminjaman = $peminjaman->fresh();
-
-        } catch (\Exception $e) {
-            DB::rollBack();
             session()->flash('alert', [
-                'type' => 'error',
-                'message' => 'Gagal mengembalikan buku: ' . $e->getMessage()
+                'type' => 'success',
+                'message' => 'Buku berhasil dikembalikan'
             ]);
         }
     }
@@ -137,7 +93,7 @@ class DetailPeminjaman extends Component
 
             $peminjaman = $this->peminjaman;
             
-            // Update status pembayaran denda
+            // Update status peminjaman
             $peminjaman->update([
                 'is_denda_paid' => true,
                 'status' => 'DIKEMBALIKAN',
@@ -145,11 +101,13 @@ class DetailPeminjaman extends Component
             ]);
 
             // Tambah saldo ke dompet admin
-            $dompet = Dompet::first();
+            $dompet = Dompet::whereHas('user', function($query) {
+                $query->where('role', 'admin');
+            })->first();
             $dompet->tambahSaldo($peminjaman->total_denda);
 
             // Kembalikan stok buku
-            $peminjaman->buku->increment('stock');
+            $peminjaman->buku->increment('stok'); // Menambah stok buku +1
 
             DB::commit();
 
