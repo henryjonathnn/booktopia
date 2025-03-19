@@ -305,7 +305,6 @@ class DataPeminjaman extends Component
         }
     }
 
-    // Tambahkan juga method untuk aksi lainnya
     public function sendPeminjaman($peminjamanId)
     {
         try {
@@ -335,39 +334,6 @@ class DataPeminjaman extends Component
             session()->flash('alert', [
                 'type' => 'error',
                 'message' => 'Gagal mengupdate status: ' . $e->getMessage()
-            ]);
-        }
-    }
-
-    public function rejectPeminjaman($peminjamanId)
-    {
-        try {
-            $peminjaman = Peminjaman::findOrFail($peminjamanId);
-            
-            if (!in_array($peminjaman->status, ['PENDING', 'DIPROSES'])) {
-                session()->flash('alert', [
-                    'type' => 'error',
-                    'message' => 'Status peminjaman tidak valid untuk ditolak!'
-                ]);
-                return;
-            }
-
-            $peminjaman->update([
-                'status' => 'DITOLAK',
-                'id_staff' => auth()->id()
-            ]);
-
-            session()->flash('alert', [
-                'type' => 'success',
-                'message' => 'Peminjaman berhasil ditolak!'
-            ]);
-
-            $this->dispatch('refresh');
-
-        } catch (\Exception $e) {
-            session()->flash('alert', [
-                'type' => 'error',
-                'message' => 'Gagal menolak peminjaman: ' . $e->getMessage()
             ]);
         }
     }
