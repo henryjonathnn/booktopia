@@ -158,7 +158,12 @@
 
                                             @if($peminjaman->status === 'DIKIRIM')
                                                 <button 
-                                                    wire:click="confirmMarkAsDipinjam({{ $peminjaman->id }})"
+                                                    x-data
+                                                    @click="$dispatch('open-modal', { 
+                                                        title: 'Konfirmasi Pengiriman',
+                                                        message: 'Apakah Anda yakin buku sudah diterima oleh peminjam?',
+                                                        peminjamanId: {{ $peminjaman->id }}
+                                                    })"
                                                     class="p-2 text-gray-400 hover:text-green-400 transition-colors group relative"
                                                     title="Tandai Terkirim">
                                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -417,6 +422,88 @@
             </div>
         </div>
     @endif
+
+    {{-- Custom Modal Component --}}
+    <div
+        x-data="{ 
+            show: false,
+            title: '',
+            message: '',
+            peminjamanId: null
+        }"
+        @open-modal.window="
+            show = true;
+            title = $event.detail.title;
+            message = $event.detail.message;
+            peminjamanId = $event.detail.peminjamanId;
+        "
+        x-show="show"
+        x-cloak
+        class="fixed inset-0 z-50 overflow-y-auto"
+        style="display: none;"
+    >
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
+            <div 
+                x-show="show"
+                x-transition:enter="ease-out duration-300"
+                x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100"
+                x-transition:leave="ease-in duration-200"
+                x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0"
+                class="fixed inset-0 transition-opacity"
+                @click="show = false"
+            >
+                <div class="absolute inset-0 bg-black/50"></div>
+            </div>
+
+            <div 
+                x-show="show"
+                x-transition:enter="ease-out duration-300"
+                x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                x-transition:leave="ease-in duration-200"
+                x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                class="relative inline-block overflow-hidden text-left align-bottom transition-all transform bg-[#1A1625] rounded-xl shadow-xl sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
+            >
+                <div class="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="flex items-center justify-center flex-shrink-0 w-12 h-12 mx-auto bg-purple-500/10 rounded-full sm:mx-0 sm:h-10 sm:w-10">
+                            <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                            <h3 class="text-lg font-medium leading-6 text-white" x-text="title"></h3>
+                            <div class="mt-2">
+                                <p class="text-sm text-gray-400" x-text="message"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse sm:space-x-reverse sm:space-x-3">
+                    <button
+                        type="button"
+                        class="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-white bg-purple-500 border border-transparent rounded-lg shadow-sm hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 sm:w-auto sm:text-sm"
+                        @click="
+                            show = false;
+                            $wire.markAsDipinjam(peminjamanId);
+                        "
+                    >
+                        Ya, Sudah Diterima
+                    </button>
+                    <button
+                        type="button"
+                        class="inline-flex justify-center w-full px-4 py-2 mt-3 text-base font-medium text-gray-300 bg-[#2a2435] border border-gray-800 rounded-lg shadow-sm hover:bg-[#2a2435]/70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 sm:mt-0 sm:w-auto sm:text-sm"
+                        @click="show = false"
+                    >
+                        Batal
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @push('scripts')
