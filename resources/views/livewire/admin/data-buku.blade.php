@@ -134,7 +134,7 @@
                                 <td class="hidden md:table-cell px-2 py-2 text-center text-sm">
                                     {{ $buku->stock }}
                                 </td>
-                                <td class="px-6 py-4 text-right sm:text-left whitespace-nowrap" onclick="event.stopPropagation();">
+                       -         <td class="px-6 py-4 text-right sm:text-left whitespace-nowrap" onclick="event.stopPropagation();">
                                     <div class="flex items-center gap-2 justify-end sm:justify-start">
                                         <!-- Edit Button -->
                                         <button wire:click="editBuku({{ $buku->id }})"
