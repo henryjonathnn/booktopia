@@ -12,12 +12,17 @@ class Navbar extends Component
     public $isNotifikasiOpen = false;
     public $unreadCount = 0;
     public $notifikasi = [];
+    public $saldoDompet = 0;
 
-    protected $listeners = ['toggleSidebar'];
+    protected $listeners = [
+        'toggleSidebar',
+        'refreshSaldo' => 'loadSaldoDompet'
+    ];
 
     public function mount()
     {
         $this->loadNotifikasi();
+        $this->loadSaldoDompet();
     }
 
     public function loadNotifikasi()
@@ -41,6 +46,13 @@ class Navbar extends Component
             $this->unreadCount = Notifikasi::where('id_user', Auth::id())
                 ->where('is_read', false)
                 ->count();
+        }
+    }
+
+    public function loadSaldoDompet()
+    {
+        if (Auth::check() && Auth::user()->dompet) {
+            $this->saldoDompet = Auth::user()->dompet->saldo;
         }
     }
 
@@ -87,5 +99,10 @@ class Navbar extends Component
     {
         $user = Auth::user();
         return view('livewire.admin.layouts.navbar', compact('user'));
+    }
+
+    public function refreshSaldo()
+    {
+        $this->dispatch('refreshSaldo');
     }
 }

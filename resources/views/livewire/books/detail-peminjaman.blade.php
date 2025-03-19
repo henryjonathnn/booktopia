@@ -322,6 +322,26 @@
                 </div>
             </x-modal>
 
+            <!-- Pay Denda Modal -->
+            <x-modal wire:model="showPayDendaModal">
+                <div class="bg-[#1a1625] rounded-xl p-6">
+                    <h3 class="text-xl font-bold mb-4">Pembayaran Denda</h3>
+                    <p class="text-gray-300 mb-4">Total denda yang harus dibayar:</p>
+                    <p class="text-2xl font-bold text-red-500 mb-6">Rp {{ number_format($peminjaman->total_denda ?? 0, 0, ',', '.') }}</p>
+                    
+                    <div class="flex justify-end gap-3">
+                        <button wire:click="$set('showPayDendaModal', false)"
+                            class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+                            Batal
+                        </button>
+                        <button wire:click="payDenda"
+                            class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+                            Bayar Denda
+                        </button>
+                    </div>
+                </div>
+            </x-modal>
+
             <!-- Tanggal Section -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 <div>

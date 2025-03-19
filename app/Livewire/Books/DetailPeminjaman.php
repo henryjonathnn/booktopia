@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\DB;
 use App\Models\Rating;
+use App\Models\Dompet;
 
 class DetailPeminjaman extends Component
 {
@@ -29,6 +30,7 @@ class DetailPeminjaman extends Component
     public $rating = 0;
     public $komentar = '';
     public $foto;
+    public $showPayDendaModal = false;
 
     public function mount($id)
     {
@@ -78,33 +80,92 @@ class DetailPeminjaman extends Component
                 return;
             }
 
-            // Tambah stok buku
-            $peminjaman->buku->increment('stock');
+            // Cek keterlambatan
+            if (now() > $peminjaman->tgl_kembali_rencana) {
+                $daysLate = now()->diffInDays($peminjaman->tgl_kembali_rencana);
+                $totalDenda = $peminjaman->buku->denda_harian * $daysLate;
+                
+                $peminjaman->update([
+                    'status' => 'TERLAMBAT',
+                    'total_denda' => $totalDenda,
+                    'last_denda_calculation' => now()
+                ]);
 
-            $peminjaman->update([
-                'status' => 'DIKEMBALIKAN',
-                'tgl_kembali_aktual' => now()
-            ]);
+                // Kirim notifikasi keterlambatan
+                $peminjaman->user->notify(new \App\Notifications\PeminjamanTerlambat($peminjaman));
 
-            // Refresh peminjaman data
-            $this->peminjaman = $peminjaman->fresh();
+                session()->flash('alert', [
+                    'type' => 'error',
+                    'message' => "Buku terlambat dikembalikan. Total denda: Rp " . number_format($totalDenda, 0, ',', '.')
+                ]);
+
+                $this->showPayDendaModal = true;
+            } else {
+                // Proses pengembalian normal
+                $peminjaman->buku->increment('stock');
+                $peminjaman->update([
+                    'status' => 'DIKEMBALIKAN',
+                    'tgl_kembali_aktual' => now()
+                ]);
+
+                session()->flash('alert', [
+                    'type' => 'success',
+                    'message' => 'Buku berhasil dikembalikan!'
+                ]);
+
+                $this->showRatingModal = true;
+            }
 
             DB::commit();
-
-            $this->showReturnConfirmation = false;
-            session()->flash('alert', [
-                'type' => 'success',
-                'message' => 'Buku berhasil dikembalikan!'
-            ]);
-
-            // Show rating modal setelah berhasil
-            $this->showRatingModal = true;
+            
+            // Refresh data
+            $this->peminjaman = $peminjaman->fresh();
 
         } catch (\Exception $e) {
             DB::rollBack();
             session()->flash('alert', [
                 'type' => 'error',
                 'message' => 'Gagal mengembalikan buku: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    public function payDenda()
+    {
+        try {
+            DB::beginTransaction();
+
+            $peminjaman = $this->peminjaman;
+            
+            // Update status pembayaran denda
+            $peminjaman->update([
+                'is_denda_paid' => true,
+                'status' => 'DIKEMBALIKAN',
+                'tgl_kembali_aktual' => now()
+            ]);
+
+            // Tambah saldo ke dompet admin
+            $dompet = Dompet::first();
+            $dompet->tambahSaldo($peminjaman->total_denda);
+
+            // Kembalikan stok buku
+            $peminjaman->buku->increment('stock');
+
+            DB::commit();
+
+            $this->showPayDendaModal = false;
+            $this->showRatingModal = true;
+
+            session()->flash('alert', [
+                'type' => 'success',
+                'message' => 'Pembayaran denda berhasil! Silakan berikan rating untuk buku.'
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            session()->flash('alert', [
+                'type' => 'error',
+                'message' => 'Gagal memproses pembayaran: ' . $e->getMessage()
             ]);
         }
     }

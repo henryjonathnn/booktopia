@@ -65,4 +65,9 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'role' => \App\Http\Middleware\CheckRole::class,
     ];
+
+    protected $routeMiddleware = [
+        // ... existing middlewares ...
+        'check.peminjaman' => \App\Http\Middleware\CheckPeminjamanStatus::class,
+    ];
 }

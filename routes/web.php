@@ -52,8 +52,13 @@ Route::middleware(['auth', 'role:ADMIN'])->group(function () {
     Route::get('/admin/data-peminjaman', DataPeminjaman::class)->name('admin.data-peminjaman');
 });
 
-Route::middleware(['auth'])->group(function () {
+// Protected Routes dengan pengecekan status peminjaman
+Route::middleware(['auth', 'check.peminjaman'])->group(function () {
     Route::get('/peminjaman/create/{token}', \App\Livewire\Books\CreatePeminjaman::class)->name('peminjaman.create');
+});
+
+// Protected Routes tanpa pengecekan status peminjaman
+Route::middleware(['auth'])->group(function () {
     Route::get('/peminjaman/{id}', \App\Livewire\Books\DetailPeminjaman::class)->name('peminjaman.detail');
     Route::get('/peminjaman', \App\Livewire\Books\Peminjaman::class)->name('peminjaman');
     Route::get('/profile', \App\Livewire\User\Profile::class)->name('profile');
