@@ -109,7 +109,6 @@
             init() {
                 const ctx = document.getElementById('loansChart').getContext('2d');
                 
-                // Load Chart.js from CDN
                 if (typeof Chart === 'undefined') {
                     const script = document.createElement('script');
                     script.src = 'https://cdn.jsdelivr.net/npm/chart.js';
@@ -126,7 +125,7 @@
                         labels: this.monthlyData.map(item => item.month),
                         datasets: [
                             {
-                                label: 'Loans',
+                                label: 'Peminjaman',
                                 data: this.monthlyData.map(item => item.loans),
                                 backgroundColor: 'rgba(129, 140, 248, 0.5)',
                                 borderColor: 'rgb(129, 140, 248)',
@@ -134,7 +133,7 @@
                                 borderRadius: 6
                             },
                             {
-                                label: 'Returns',
+                                label: 'Pengembalian',
                                 data: this.monthlyData.map(item => item.returns),
                                 backgroundColor: 'rgba(168, 85, 247, 0.5)',
                                 borderColor: 'rgb(168, 85, 247)',
@@ -198,84 +197,42 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-purple-500/10">
-                    <tr class="hover:bg-purple-500/5">
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center">
-                                <div class="w-8 h-8 bg-purple-500/10 rounded-full flex items-center justify-center mr-3">
-                                    <span class="text-sm font-medium text-purple-400">JD</span>
+                    @forelse($recentActivities as $activity)
+                        <tr class="hover:bg-purple-500/5">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 bg-purple-500/10 rounded-full flex items-center justify-center mr-3">
+                                        <span class="text-sm font-medium text-purple-400">{{ $activity['user']['initials'] }}</span>
+                                    </div>
+                                    <div>
+                                        <div class="text-sm font-medium">{{ $activity['user']['name'] }}</div>
+                                        <div class="text-xs text-gray-400">{{ $activity['user']['email'] }}</div>
+                                    </div>
                                 </div>
-                                <div>
-                                    <div class="text-sm font-medium">John Doe</div>
-                                    <div class="text-xs text-gray-400">john@example.com</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm">
-                            <div>The Great Gatsby</div>
-                            <div class="text-xs text-gray-400">F. Scott Fitzgerald</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm">
-                            <span class="text-blue-400">Borrowed</span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
-                            Feb 24, 2025
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-green-500/10 text-green-400">Active</span>
-                        </td>
-                    </tr>
-                    <tr class="hover:bg-purple-500/5">
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center">
-                                <div class="w-8 h-8 bg-indigo-500/10 rounded-full flex items-center justify-center mr-3">
-                                    <span class="text-sm font-medium text-indigo-400">AS</span>
-                                </div>
-                                <div>
-                                    <div class="text-sm font-medium">Alice Smith</div>
-                                    <div class="text-xs text-gray-400">alice@example.com</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm">
-                            <div>1984</div>
-                            <div class="text-xs text-gray-400">George Orwell</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm">
-                            <span class="text-green-400">Returned</span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
-                            Feb 22, 2025
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-gray-500/10 text-gray-400">Completed</span>
-                        </td>
-                    </tr>
-                    <tr class="hover:bg-purple-500/5">
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="flex items-center">
-                                <div class="w-8 h-8 bg-blue-500/10 rounded-full flex items-center justify-center mr-3">
-                                    <span class="text-sm font-medium text-blue-400">RJ</span>
-                                </div>
-                                <div>
-                                    <div class="text-sm font-medium">Robert Johnson</div>
-                                    <div class="text-xs text-gray-400">robert@example.com</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm">
-                            <div>Harry Potter and the Sorcerer's Stone</div>
-                            <div class="text-xs text-gray-400">J.K. Rowling</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm">
-                            <span class="text-blue-400">Borrowed</span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
-                            Feb 20, 2025
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 py-1 text-xs font-medium rounded-full bg-yellow-500/10 text-yellow-400">Overdue</span>
-                        </td>
-                    </tr>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                <div>{{ $activity['book']['title'] }}</div>
+                                <div class="text-xs text-gray-400">{{ $activity['book']['author'] }}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                <span class="text-{{ $activity['status_color'] }}-400">{{ $activity['action'] }}</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
+                                {{ $activity['date'] }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 py-1 text-xs font-medium rounded-full bg-{{ $activity['status_color'] }}-500/10 text-{{ $activity['status_color'] }}-400">
+                                    {{ $activity['status'] }}
+                                </span>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="px-6 py-4 text-center text-gray-400">
+                                Belum ada aktivitas
+                            </td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
