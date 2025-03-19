@@ -15,15 +15,20 @@ return new class extends Migration
         Schema::create('dompets', function (Blueprint $table) {
             $table->id();
             $table->decimal('saldo', 10, 2)->default(0);
+            $table->foreignId('id_user')->constrained('users')->onDelete('cascade');
             $table->timestamps();
         });
 
-        // Insert saldo awal
-        DB::table('dompets')->insert([
-            'saldo' => 0,
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
+        // Insert saldo awal untuk admin
+        $admin = DB::table('users')->where('role', 'ADMIN')->first();
+        if ($admin) {
+            DB::table('dompets')->insert([
+                'saldo' => 0,
+                'id_user' => $admin->id,
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+        }
     }
 
     /**

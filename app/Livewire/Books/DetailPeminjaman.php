@@ -65,12 +65,12 @@ class DetailPeminjaman extends Component
         return null;
     }
 
-    public function returnPeminjaman($id)
+    public function returnPeminjaman()
     {
         try {
             DB::beginTransaction();
             
-            $peminjaman = Peminjaman::findOrFail($id);
+            $peminjaman = $this->peminjaman;
             
             if ($peminjaman->status !== 'DIPINJAM') {
                 session()->flash('alert', [

@@ -9,13 +9,21 @@ class Dompet extends Model
 {
     use HasFactory;
 
+    protected $table = 'dompets';
+    
     protected $fillable = [
+        'id_user',
         'saldo'
     ];
 
     protected $casts = [
         'saldo' => 'decimal:2'
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'id_user');
+    }
 
     // Method untuk menambah saldo
     public function tambahSaldo($jumlah)

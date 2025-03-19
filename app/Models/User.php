@@ -109,4 +109,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Notifikasi::class, 'id_user');
     }
+
+    public function dompet()
+    {
+        return $this->hasOne(Dompet::class, 'id_user');
+    }
 }
