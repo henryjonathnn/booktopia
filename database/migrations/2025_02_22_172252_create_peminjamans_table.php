@@ -33,6 +33,7 @@ return new class extends Migration
                 'DITOLAK'
             ])->default('PENDING');
             $table->enum('metode_pengiriman', ['KURIR', 'AMBIL_DI_TEMPAT'])->default('KURIR');
+            $table->string('bukti_pengembalian')->nullable();
             $table->integer('total_denda')->default(0);
             $table->string('bukti_pembayaran_denda')->nullable();
             $table->text('alasan_penolakan')->nullable();
