@@ -65,6 +65,27 @@
                 </div>
             </div>
 
+            <style>
+                /* Mengubah warna icon date picker menjadi putih */
+                input[type="date"]::-webkit-calendar-picker-indicator {
+                    filter: invert(1);
+                    opacity: 0.8;
+                }
+                
+                /* Mengatur warna teks input date menjadi putih */
+                input[type="date"] {
+                    color: white;
+                }
+                
+                /* Mengatur warna placeholder untuk input date */
+                input[type="date"]::-webkit-datetime-edit-fields-wrapper { color: white; }
+                input[type="date"]::-webkit-datetime-edit { color: white; }
+                input[type="date"]::-webkit-datetime-edit-text { color: white; }
+                input[type="date"]::-webkit-datetime-edit-month-field { color: white; }
+                input[type="date"]::-webkit-datetime-edit-day-field { color: white; }
+                input[type="date"]::-webkit-datetime-edit-year-field { color: white; }
+            </style>
+
             <form wire:submit.prevent="createPeminjaman" class="space-y-6">
                 {{-- Alamat Pengiriman --}}
                 <div>
@@ -112,6 +133,9 @@
                         @error('tgl_peminjaman')
                             <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
                         @enderror
+                        <p class="mt-1 text-xs text-gray-400">
+                            Maksimal pemesanan: {{ Carbon\Carbon::parse($maxDatePinjam)->format('d M Y') }}
+                        </p>
                     </div>
 
                     {{-- Tanggal Pengembalian --}}
@@ -125,10 +149,16 @@
                             class="w-full bg-[#1A1A2E] rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500/50 border border-purple-500/10"
                             min="{{ $minDateKembali }}"
                             max="{{ $maxDateKembali }}"
+                            {{ !$tgl_peminjaman ? 'disabled' : '' }}
                         >
                         @error('tgl_pengembalian')
                             <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
                         @enderror
+                        @if($tgl_peminjaman)
+                        <p class="mt-1 text-xs text-gray-400">
+                            Rentang pengembalian: {{ Carbon\Carbon::parse($minDateKembali)->format('d M Y') }} - {{ Carbon\Carbon::parse($maxDateKembali)->format('d M Y') }}
+                        </p>
+                        @endif
                     </div>
                 </div>
 

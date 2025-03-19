@@ -81,6 +81,14 @@ class CreatePeminjaman extends Component
     public function updatedTglPeminjaman()
     {
         $this->updateDateKembali();
+        
+        // Reset tanggal pengembalian jika di luar range yang valid
+        if ($this->tgl_pengembalian) {
+            $tglKembali = Carbon::parse($this->tgl_pengembalian);
+            if ($tglKembali->lt($this->minDateKembali) || $tglKembali->gt($this->maxDateKembali)) {
+                $this->tgl_pengembalian = null;
+            }
+        }
     }
 
     private function updateDateKembali()
