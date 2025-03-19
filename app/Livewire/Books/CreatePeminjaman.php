@@ -22,6 +22,7 @@ class CreatePeminjaman extends Component
     
     public $maxReturnDate;
     public $minReturnDate;
+    public $maxDatePinjam;
 
     protected $rules = [
         'alamat_pengiriman' => 'required|string|min:10',
