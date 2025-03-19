@@ -217,7 +217,7 @@
                     <!-- Header -->
                     <div class="flex items-center justify-between p-6 border-b border-purple-500/10">
                         <h3 class="text-2xl font-bold text-white">Detail Peminjaman #{{ $selectedPeminjaman->id }}</h3>
-                        <button @click="activeModal = null" class="text-gray-400 hover:text-white transition-colors">
+                        <button wire:click="closeModal" class="text-gray-400 hover:text-white transition-colors">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                             </svg>
@@ -354,7 +354,9 @@
 
                     <!-- Footer -->
                     <div class="flex justify-end px-6 py-4 border-t border-purple-500/10">
-                        <button @click="activeModal = null" class="px-4 py-2 text-sm font-medium text-gray-300 bg-[#2a2435] hover:bg-[#2a2435]/70 rounded-lg transition-colors">
+                        <button 
+                            wire:click="closeModal"
+                            class="px-4 py-2 text-sm font-medium text-gray-300 bg-[#2a2435] hover:bg-[#2a2435]/70 rounded-lg transition-colors">
                             Tutup
                         </button>
                     </div>
