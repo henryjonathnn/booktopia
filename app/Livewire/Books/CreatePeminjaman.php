@@ -20,16 +20,24 @@ class CreatePeminjaman extends Component
     public $tgl_peminjaman;
     public $tgl_pengembalian;
     
-    public $minDatePinjam;
-    public $maxDatePinjam;
-    public $minDateKembali;
-    public $maxDateKembali;
+    public $maxReturnDate;
+    public $minReturnDate;
 
     protected $rules = [
         'alamat_pengiriman' => 'required|string|min:10',
         'catatan_pengiriman' => 'nullable|string',
-        'tgl_peminjaman' => 'required|date|after_or_equal:minDatePinjam|before_or_equal:maxDatePinjam',
-        'tgl_pengembalian' => 'required|date|after:tgl_peminjaman|before_or_equal:maxDateKembali',
+        'tgl_peminjaman' => [
+            'required',
+            'date',
+            'after_or_equal:today',
+            'before_or_equal:maxDatePinjam'
+        ],
+        'tgl_pengembalian' => [
+            'required',
+            'date',
+            'after:tgl_peminjaman',
+            'before_or_equal:maxReturnDate'
+        ],
     ];
 
     protected $messages = [
@@ -39,8 +47,8 @@ class CreatePeminjaman extends Component
         'tgl_peminjaman.after_or_equal' => 'Tanggal peminjaman minimal hari ini',
         'tgl_peminjaman.before_or_equal' => 'Tanggal peminjaman maksimal 3 hari dari sekarang',
         'tgl_pengembalian.required' => 'Tanggal pengembalian wajib diisi',
-        'tgl_pengembalian.after' => 'Tanggal pengembalian minimal 1 hari setelah tanggal pinjam',
-        'tgl_pengembalian.before_or_equal' => 'Durasi peminjaman maksimal 7 hari',
+        'tgl_pengembalian.after' => 'Minimal peminjaman adalah 1 hari',
+        'tgl_pengembalian.before_or_equal' => 'Maksimal peminjaman adalah 7 hari',
     ];
 
     public function mount($token)
@@ -63,12 +71,11 @@ class CreatePeminjaman extends Component
             $this->book = Buku::findOrFail($decoded['book_id']);
             $this->token = $token;
             
-            // Set tanggal minimal dan maksimal peminjaman
-            $this->minDatePinjam = now()->format('Y-m-d');
+            // Set tanggal maksimal peminjaman (3 hari dari sekarang)
             $this->maxDatePinjam = now()->addDays(3)->format('Y-m-d');
             
             // Set default tanggal peminjaman ke hari ini
-            $this->tgl_peminjaman = $this->minDatePinjam;
+            $this->tgl_peminjaman = now()->format('Y-m-d');
             
             // Update tanggal pengembalian ketika mount
             $this->updateDateKembali();
@@ -78,18 +85,23 @@ class CreatePeminjaman extends Component
         }
     }
 
-    public function updatedTglPeminjaman()
+    public function updatedTglPeminjaman($value)
     {
-        if ($this->tgl_peminjaman) {
-            // Update range tanggal pengembalian berdasarkan tanggal peminjaman yang dipilih
-            $this->minDateKembali = Carbon::parse($this->tgl_peminjaman)->addDay()->format('Y-m-d');
-            $this->maxDateKembali = Carbon::parse($this->tgl_peminjaman)->addDays(7)->format('Y-m-d');
+        if ($value) {
+            // Set range tanggal pengembalian berdasarkan tanggal peminjaman yang dipilih
+            $this->maxReturnDate = Carbon::parse($value)->addDays(7)->format('Y-m-d');
+            $this->minReturnDate = Carbon::parse($value)->addDay()->format('Y-m-d');
             
-            // Set default tanggal pengembalian ke minimal date kembali yang baru
-            $this->tgl_pengembalian = $this->minDateKembali;
+            // Reset tanggal pengembalian jika sudah tidak valid
+            if ($this->tgl_pengembalian) {
+                $tglKembali = Carbon::parse($this->tgl_pengembalian);
+                if ($tglKembali->lte($value) || $tglKembali->gt($this->maxReturnDate)) {
+                    $this->tgl_pengembalian = null;
+                }
+            }
         } else {
-            $this->minDateKembali = null;
-            $this->maxDateKembali = null;
+            $this->maxReturnDate = null;
+            $this->minReturnDate = null;
             $this->tgl_pengembalian = null;
         }
     }
@@ -97,12 +109,12 @@ class CreatePeminjaman extends Component
     private function updateDateKembali()
     {
         if ($this->tgl_peminjaman) {
-            $this->minDateKembali = Carbon::parse($this->tgl_peminjaman)->addDay()->format('Y-m-d');
-            $this->maxDateKembali = Carbon::parse($this->tgl_peminjaman)->addDays(7)->format('Y-m-d');
+            $this->maxReturnDate = Carbon::parse($this->tgl_peminjaman)->addDays(7)->format('Y-m-d');
+            $this->minReturnDate = Carbon::parse($this->tgl_peminjaman)->addDay()->format('Y-m-d');
             
             // Hanya set default jika belum ada tanggal pengembalian
             if (!$this->tgl_pengembalian) {
-                $this->tgl_pengembalian = $this->minDateKembali;
+                $this->tgl_pengembalian = $this->minReturnDate;
             }
         }
     }
