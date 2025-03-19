@@ -134,45 +134,26 @@
                                 <td class="hidden md:table-cell px-2 py-2 text-center text-sm">
                                     {{ $buku->stock }}
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap" onclick="event.stopPropagation();">
-                                    <div class="flex justify-end sm:justify-start">
-                                        <div class="flex items-center gap-2">
-                                            <!-- Edit Button -->
-                                            <button wire:click.stop="editBuku({{ $buku->id }})"
-                                                class="p-1.5 text-gray-400 hover:bg-gray-800 rounded-lg transition-colors">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
-                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                    <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z">
-                                                    </path>
-                                                </svg>
-                                            </button>
-
-                                            <!-- Delete Button -->
-                                            <button 
-                                                wire:click.stop="confirmBukuDeletion({{ $buku->id }})"
-                                                class="text-red-400 hover:text-red-500 transition-colors">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none"
-                                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                                    stroke-linejoin="round">
-                                                    <path d="M3 6h18"></path>
-                                                    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
-                                                    <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
-                                                </svg>
-                                            </button>
-
-                                            <!-- More Button -->
-                                            <button class="p-1.5 hover:bg-gray-800 rounded-lg transition-colors">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
-                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                    class="text-gray-400">
-                                                    <circle cx="12" cy="12" r="1"></circle>
-                                                    <circle cx="12" cy="5" r="1"></circle>
-                                                    <circle cx="12" cy="19" r="1"></circle>
-                                                </svg>
-                                            </button>
-                                        </div>
+                                <td class="px-6 py-4 text-right sm:text-left whitespace-nowrap" onclick="event.stopPropagation();">
+                                    <div class="flex items-center gap-2 justify-end sm:justify-start">
+                                        <button 
+                                            wire:click="editBuku({{ $buku->id }})"
+                                            class="text-blue-400 hover:text-blue-500 transition-colors">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                            </svg>
+                                        </button>
+                                        <button 
+                                            wire:click="confirmBukuDeletion({{ $buku->id }})"
+                                            class="text-red-400 hover:text-red-500 transition-colors">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <polyline points="3 6 5 6 21 6"></polyline>
+                                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                            </svg>
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
