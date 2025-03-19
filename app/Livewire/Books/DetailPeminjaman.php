@@ -70,7 +70,7 @@ class DetailPeminjaman extends Component
             
             $peminjaman = Peminjaman::findOrFail($id);
             
-            if ($peminjaman->status !== 'DIKIRIM') {
+            if ($peminjaman->status !== 'DIPINJAM') {
                 session()->flash('alert', [
                     'type' => 'error',
                     'message' => 'Status peminjaman tidak valid untuk dikembalikan!'
@@ -86,14 +86,18 @@ class DetailPeminjaman extends Component
                 'tanggal_pengembalian' => now()
             ]);
 
+            // Refresh peminjaman data
+            $this->peminjaman = $peminjaman->fresh();
+
             DB::commit();
 
+            $this->showReturnConfirmation = false;
             session()->flash('alert', [
                 'type' => 'success',
                 'message' => 'Buku berhasil dikembalikan!'
             ]);
 
-            // Show rating modal
+            // Show rating modal setelah berhasil
             $this->showRatingModal = true;
 
         } catch (\Exception $e) {
@@ -118,7 +122,7 @@ class DetailPeminjaman extends Component
 
             $ratingData = [
                 'id_user' => auth()->id(),
-                'id_buku' => $this->peminjaman->id_buku,
+                'id_buku' => $this->peminjaman->buku->id,
                 'rating' => $this->rating,
                 'komentar' => $this->komentar
             ];
@@ -145,7 +149,7 @@ class DetailPeminjaman extends Component
             DB::rollBack();
             session()->flash('alert', [
                 'type' => 'error',
-                'message' => 'Terjadi kesalahan saat menyimpan rating'
+                'message' => 'Terjadi kesalahan saat menyimpan rating: ' . $e->getMessage()
             ]);
         }
     }
