@@ -6,9 +6,14 @@ use App\Models\Peminjaman;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use Livewire\WithFileUploads;
+use Illuminate\Support\Facades\DB;
+use App\Models\Rating;
 
 class DetailPeminjaman extends Component
 {
+    use WithFileUploads;
+
     public $peminjaman;
     public $statusColors = [
         'PENDING' => 'yellow',
@@ -19,6 +24,11 @@ class DetailPeminjaman extends Component
         'DIKEMBALIKAN' => 'gray',
         'DITOLAK' => 'red'
     ];
+    public $showReturnConfirmation = false;
+    public $showRatingModal = false;
+    public $rating = 0;
+    public $komentar = '';
+    public $foto;
 
     public function mount($id)
     {
@@ -51,6 +61,93 @@ class DetailPeminjaman extends Component
         }
 
         return null;
+    }
+
+    public function returnPeminjaman($id)
+    {
+        try {
+            DB::beginTransaction();
+            
+            $peminjaman = Peminjaman::findOrFail($id);
+            
+            if ($peminjaman->status !== 'DIKIRIM') {
+                session()->flash('alert', [
+                    'type' => 'error',
+                    'message' => 'Status peminjaman tidak valid untuk dikembalikan!'
+                ]);
+                return;
+            }
+
+            // Tambah stok buku
+            $peminjaman->buku->increment('stock');
+
+            $peminjaman->update([
+                'status' => 'DIKEMBALIKAN',
+                'tanggal_pengembalian' => now()
+            ]);
+
+            DB::commit();
+
+            session()->flash('alert', [
+                'type' => 'success',
+                'message' => 'Buku berhasil dikembalikan!'
+            ]);
+
+            // Show rating modal
+            $this->showRatingModal = true;
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            session()->flash('alert', [
+                'type' => 'error',
+                'message' => 'Gagal mengembalikan buku: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    public function submitRating()
+    {
+        $this->validate([
+            'rating' => 'required|numeric|min:1|max:5',
+            'komentar' => 'required|string|min:10',
+            'foto' => 'nullable|image|max:2048'
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $ratingData = [
+                'id_user' => auth()->id(),
+                'id_buku' => $this->peminjaman->id_buku,
+                'rating' => $this->rating,
+                'komentar' => $this->komentar
+            ];
+
+            if ($this->foto) {
+                $path = $this->foto->store('ratings', 'public');
+                $ratingData['url_foto'] = $path;
+            }
+
+            Rating::create($ratingData);
+
+            DB::commit();
+
+            $this->showRatingModal = false;
+            session()->flash('alert', [
+                'type' => 'success',
+                'message' => 'Terima kasih atas penilaian Anda!'
+            ]);
+            
+            // Reset form
+            $this->reset(['rating', 'komentar', 'foto']);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            session()->flash('alert', [
+                'type' => 'error',
+                'message' => 'Terjadi kesalahan saat menyimpan rating'
+            ]);
+        }
     }
 
     public function render()
