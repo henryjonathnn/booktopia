@@ -37,6 +37,16 @@ class DataPeminjaman extends Component
     public $metodes;
     public $uploadingPeminjamanId;
 
+    public $statusColors = [
+        'PENDING' => 'yellow',
+        'DIPROSES' => 'blue',
+        'DIKIRIM' => 'green',
+        'DIPINJAM' => 'purple',
+        'TERLAMBAT' => 'red',
+        'DIKEMBALIKAN' => 'gray',
+        'DITOLAK' => 'red'
+    ];
+
     protected $listeners = ['refreshData' => '$refresh'];
 
     protected function rules()
@@ -78,9 +88,10 @@ class DataPeminjaman extends Component
     // Handler untuk modal detail
     public function showDetail($peminjamanId)
     {
-        $this->resetModalStates();
-        $this->selectedPeminjaman = Peminjaman::with(['user', 'buku', 'staff'])->find($peminjamanId);
-        $this->activeModal = 'detail';
+        $this->selectedPeminjaman = Peminjaman::with(['user', 'buku'])->find($peminjamanId);
+        if ($this->selectedPeminjaman) {
+            $this->activeModal = 'detail';
+        }
     }
 
     // Handler untuk modal reject
@@ -273,7 +284,9 @@ class DataPeminjaman extends Component
             ->latest();
 
         return view('livewire.admin.data-peminjaman', [
-            'peminjamans' => $query->paginate($this->perPage)
+            'peminjamans' => $query->paginate($this->perPage),
+            'statuses' => ['PENDING', 'DIPROSES', 'DIKIRIM', 'DIPINJAM', 'TERLAMBAT', 'DIKEMBALIKAN', 'DITOLAK'],
+            'metodes' => ['AMBIL_DITEMPAT', 'DIANTAR']
         ])->layout('layouts.admin', ['title' => 'Data Peminjaman']);
     }
 
