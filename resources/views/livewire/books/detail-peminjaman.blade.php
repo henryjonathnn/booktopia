@@ -302,5 +302,25 @@
                 </form>
             </div>
         </x-modal>
+
+        <!-- Tanggal Section -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div>
+                <p class="text-gray-400">Tanggal Peminjaman</p>
+                <p class="font-medium">{{ $peminjaman->tanggal_peminjaman ? $peminjaman->tanggal_peminjaman->format('d M Y') : '-' }}</p>
+            </div>
+            <div>
+                <p class="text-gray-400">Tanggal Pengembalian Rencana</p>
+                <p class="font-medium">{{ $peminjaman->tgl_kembali_rencana ? $peminjaman->tgl_kembali_rencana->format('d M Y') : '-' }}</p>
+            </div>
+            <div>
+                <p class="text-gray-400">Tanggal Pengembalian Aktual</p>
+                <p class="font-medium">{{ $peminjaman->tanggal_pengembalian ? $peminjaman->tanggal_pengembalian->format('d M Y') : '-' }}</p>
+            </div>
+            <div>
+                <p class="text-gray-400">Status</p>
+                <p class="font-medium">{{ $peminjaman->status }}</p>
+            </div>
+        </div>
     </div>
 </div> 

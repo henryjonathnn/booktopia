@@ -83,7 +83,7 @@ class DetailPeminjaman extends Component
 
             $peminjaman->update([
                 'status' => 'DIKEMBALIKAN',
-                'tanggal_pengembalian' => now()
+                'tgl_kembali_aktual' => now()
             ]);
 
             // Refresh peminjaman data
