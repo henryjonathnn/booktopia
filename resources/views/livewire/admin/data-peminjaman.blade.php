@@ -157,10 +157,10 @@
                                             @endif
 
                                             @if($peminjaman->status === 'DIKIRIM')
-                                                <button wire:click="markAsDipinjam({{ $peminjaman->id }})"
+                                                <button 
+                                                    wire:click="confirmMarkAsDipinjam({{ $peminjaman->id }})"
                                                     class="p-2 text-gray-400 hover:text-green-400 transition-colors group relative"
-                                                    title="Tandai Terkirim"
-                                                    onclick="return confirm('Apakah Anda yakin buku sudah diterima oleh peminjam?')">
+                                                    title="Tandai Terkirim">
                                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                             d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -418,3 +418,26 @@
         </div>
     @endif
 </div>
+
+@push('scripts')
+<script>
+    window.addEventListener('showConfirmation', event => {
+        Swal.fire({
+            title: 'Konfirmasi Pengiriman',
+            text: 'Apakah Anda yakin buku sudah diterima oleh peminjam?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, Sudah Diterima',
+            cancelButtonText: 'Batal',
+            confirmButtonColor: '#10B981',
+            cancelButtonColor: '#6B7280',
+            background: '#1A1625',
+            color: '#fff'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                @this.markAsDipinjam(event.detail.peminjamanId)
+            }
+        })
+    })
+</script>
+@endpush

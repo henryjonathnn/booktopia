@@ -203,6 +203,11 @@ class DataPeminjaman extends Component
         }
     }
 
+    public function confirmMarkAsDipinjam($peminjamanId)
+    {
+        $this->dispatch('showConfirmation', ['peminjamanId' => $peminjamanId]);
+    }
+
     public function markAsDipinjam($peminjamanId)
     {
         try {
@@ -211,7 +216,11 @@ class DataPeminjaman extends Component
             $peminjaman = Peminjaman::findOrFail($peminjamanId);
             
             if ($peminjaman->status !== 'DIKIRIM') {
-                session()->flash('error', 'Status peminjaman harus DIKIRIM untuk bisa diubah menjadi DIPINJAM');
+                $this->dispatch('swal', [
+                    'icon' => 'error',
+                    'title' => 'Gagal!',
+                    'text' => 'Status peminjaman harus DIKIRIM untuk bisa diubah menjadi DIPINJAM'
+                ]);
                 return;
             }
 
@@ -233,11 +242,20 @@ class DataPeminjaman extends Component
             event(new PeminjamanStatusChanged($peminjaman));
 
             DB::commit();
-            session()->flash('success', 'Status peminjaman berhasil diubah menjadi DIPINJAM');
+            
+            $this->dispatch('swal', [
+                'icon' => 'success',
+                'title' => 'Berhasil!',
+                'text' => 'Status peminjaman berhasil diubah menjadi DIPINJAM'
+            ]);
             
         } catch (\Exception $e) {
             DB::rollBack();
-            session()->flash('error', 'Terjadi kesalahan saat mengubah status peminjaman');
+            $this->dispatch('swal', [
+                'icon' => 'error',
+                'title' => 'Gagal!',
+                'text' => 'Terjadi kesalahan saat mengubah status peminjaman'
+            ]);
         }
     }
 
