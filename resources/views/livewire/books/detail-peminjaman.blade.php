@@ -86,13 +86,36 @@
                 </div>
                 <div>
                     <p class="text-gray-400 mb-1">Metode Pengiriman</p>
-                    <p class="font-medium">{{ $peminjaman->metode_pengiriman }}</p>
+                    <p class="font-medium">{{ str_replace('_', ' ', $peminjaman->metode_pengiriman) }}</p>
                     @if($peminjaman->nomor_resi)
                         <p class="text-gray-400 mt-3 mb-1">Nomor Resi</p>
                         <p class="font-medium">{{ $peminjaman->nomor_resi }}</p>
                     @endif
                 </div>
             </div>
+
+            {{-- Bukti Pengiriman --}}
+            @if($peminjaman->bukti_pengiriman && in_array($peminjaman->status, ['DIKIRIM', 'DIPINJAM', 'TERLAMBAT', 'DIKEMBALIKAN']))
+                <div class="mt-6">
+                    <p class="text-gray-400 mb-2">Bukti Pengiriman</p>
+                    <div class="relative group">
+                        <img 
+                            src="{{ Storage::url($peminjaman->bukti_pengiriman) }}" 
+                            alt="Bukti Pengiriman"
+                            class="w-full max-w-md rounded-lg shadow-lg cursor-pointer hover:opacity-90 transition-opacity"
+                            onclick="window.open('{{ Storage::url($peminjaman->bukti_pengiriman) }}', '_blank')"
+                        />
+                        <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <span class="bg-black/50 text-white px-4 py-2 rounded-lg text-sm">
+                                Klik untuk memperbesar
+                            </span>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-400 mt-2">
+                        Dikirim pada: {{ $peminjaman->tgl_dikirim?->format('d M Y H:i') }}
+                    </p>
+                </div>
+            @endif
         </div>
 
         {{-- Status Timeline --}}
