@@ -80,14 +80,17 @@ class CreatePeminjaman extends Component
 
     public function updatedTglPeminjaman()
     {
-        $this->updateDateKembali();
-        
-        // Reset tanggal pengembalian jika di luar range yang valid
-        if ($this->tgl_pengembalian) {
-            $tglKembali = Carbon::parse($this->tgl_pengembalian);
-            if ($tglKembali->lt($this->minDateKembali) || $tglKembali->gt($this->maxDateKembali)) {
-                $this->tgl_pengembalian = null;
-            }
+        if ($this->tgl_peminjaman) {
+            // Update range tanggal pengembalian berdasarkan tanggal peminjaman yang dipilih
+            $this->minDateKembali = Carbon::parse($this->tgl_peminjaman)->addDay()->format('Y-m-d');
+            $this->maxDateKembali = Carbon::parse($this->tgl_peminjaman)->addDays(7)->format('Y-m-d');
+            
+            // Set default tanggal pengembalian ke minimal date kembali yang baru
+            $this->tgl_pengembalian = $this->minDateKembali;
+        } else {
+            $this->minDateKembali = null;
+            $this->maxDateKembali = null;
+            $this->tgl_pengembalian = null;
         }
     }
 
@@ -97,13 +100,8 @@ class CreatePeminjaman extends Component
             $this->minDateKembali = Carbon::parse($this->tgl_peminjaman)->addDay()->format('Y-m-d');
             $this->maxDateKembali = Carbon::parse($this->tgl_peminjaman)->addDays(7)->format('Y-m-d');
             
-            // Reset tanggal pengembalian jika di luar range yang valid
-            if ($this->tgl_pengembalian) {
-                $tglKembali = Carbon::parse($this->tgl_pengembalian);
-                if ($tglKembali->lt($this->minDateKembali) || $tglKembali->gt($this->maxDateKembali)) {
-                    $this->tgl_pengembalian = $this->minDateKembali;
-                }
-            } else {
+            // Hanya set default jika belum ada tanggal pengembalian
+            if (!$this->tgl_pengembalian) {
                 $this->tgl_pengembalian = $this->minDateKembali;
             }
         }
