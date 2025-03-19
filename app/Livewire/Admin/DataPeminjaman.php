@@ -36,6 +36,7 @@ class DataPeminjaman extends Component
     public $statuses;
     public $metodes;
     public $uploadingPeminjamanId;
+    public $showDetailModal = false;
 
     public $statusColors = [
         'PENDING' => 'yellow',
@@ -47,7 +48,9 @@ class DataPeminjaman extends Component
         'DITOLAK' => 'red'
     ];
 
-    protected $listeners = ['refreshData' => '$refresh'];
+    protected $listeners = [
+        'refresh' => '$refresh'
+    ];
 
     protected function rules()
     {
@@ -90,7 +93,7 @@ class DataPeminjaman extends Component
     {
         $this->selectedPeminjaman = Peminjaman::with(['user', 'buku'])->find($peminjamanId);
         if ($this->selectedPeminjaman) {
-            $this->activeModal = 'detail';
+            $this->showDetailModal = true;
         }
     }
 
@@ -105,7 +108,8 @@ class DataPeminjaman extends Component
     // Handler untuk menutup modal
     public function closeModal()
     {
-        $this->resetModalStates();
+        $this->showDetailModal = false;
+        $this->selectedPeminjaman = null;
     }
 
     // Handler untuk approve peminjaman

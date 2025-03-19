@@ -207,163 +207,165 @@
         </div>
     </div>
 
-    <!-- Modal Detail -->
-    <div x-show="activeModal === 'detail'" class="fixed inset-0 z-50 overflow-y-auto" x-cloak>
-        @if($selectedPeminjaman)
+    {{-- Modal Detail --}}
+    @if($showDetailModal)
+        <div class="fixed inset-0 z-50 overflow-y-auto">
             <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
-                <div class="fixed inset-0 transition-opacity bg-black/50" aria-hidden="true"></div>
+                <div class="fixed inset-0 transition-opacity bg-black/50" wire:click="closeModal"></div>
 
                 <div class="relative inline-block w-full max-w-3xl text-left align-middle transition-all transform bg-[#1A1625] rounded-2xl shadow-xl">
-                    <!-- Header -->
-                    <div class="flex items-center justify-between p-6 border-b border-purple-500/10">
-                        <h3 class="text-2xl font-bold text-white">Detail Peminjaman #{{ $selectedPeminjaman->id }}</h3>
-                        <button wire:click="closeModal" class="text-gray-400 hover:text-white transition-colors">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </div>
-
-                    <!-- Content -->
-                    <div class="p-6 space-y-6">
-                        <!-- Status Badge -->
-                        <div class="flex justify-between items-center">
-                            <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-{{ $statusColors[$selectedPeminjaman->status] }}-500/20 text-{{ $statusColors[$selectedPeminjaman->status] }}-400">
-                                {{ $selectedPeminjaman->status }}
-                            </span>
-                            <span class="text-sm text-gray-400">
-                                Dibuat: {{ $selectedPeminjaman->created_at->format('d M Y H:i') }}
-                            </span>
+                    @if($selectedPeminjaman)
+                        <!-- Header -->
+                        <div class="flex items-center justify-between p-6 border-b border-purple-500/10">
+                            <h3 class="text-2xl font-bold text-white">Detail Peminjaman #{{ $selectedPeminjaman->id }}</h3>
+                            <button wire:click="closeModal" class="text-gray-400 hover:text-white transition-colors">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
                         </div>
 
-                        <!-- Book and User Info -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <!-- Book Info -->
-                            <div class="bg-purple-500/5 rounded-xl p-4">
-                                <h4 class="text-lg font-semibold mb-4 text-purple-400">Informasi Buku</h4>
-                                <div class="flex space-x-4">
-                                    @if($selectedPeminjaman->buku->cover_img)
-                                        <img src="{{ asset('storage/' . $selectedPeminjaman->buku->cover_img) }}" 
-                                            alt="{{ $selectedPeminjaman->buku->judul }}" 
-                                            class="w-24 h-32 object-cover rounded-lg shadow-lg">
-                                    @else
-                                        <div class="w-24 h-32 bg-purple-500/10 rounded-lg flex items-center justify-center">
-                                            <svg class="w-12 h-12 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                        <!-- Content -->
+                        <div class="p-6 space-y-6">
+                            <!-- Status Badge -->
+                            <div class="flex justify-between items-center">
+                                <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-{{ $statusColors[$selectedPeminjaman->status] }}-500/20 text-{{ $statusColors[$selectedPeminjaman->status] }}-400">
+                                    {{ $selectedPeminjaman->status }}
+                                </span>
+                                <span class="text-sm text-gray-400">
+                                    Dibuat: {{ $selectedPeminjaman->created_at->format('d M Y H:i') }}
+                                </span>
+                            </div>
+
+                            <!-- Book and User Info -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- Book Info -->
+                                <div class="bg-purple-500/5 rounded-xl p-4">
+                                    <h4 class="text-lg font-semibold mb-4 text-purple-400">Informasi Buku</h4>
+                                    <div class="flex space-x-4">
+                                        @if($selectedPeminjaman->buku->cover_img)
+                                            <img src="{{ asset('storage/' . $selectedPeminjaman->buku->cover_img) }}" 
+                                                alt="{{ $selectedPeminjaman->buku->judul }}" 
+                                                class="w-24 h-32 object-cover rounded-lg shadow-lg">
+                                        @else
+                                            <div class="w-24 h-32 bg-purple-500/10 rounded-lg flex items-center justify-center">
+                                                <svg class="w-12 h-12 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                                </svg>
+                                            </div>
+                                        @endif
+                                        <div>
+                                            <h5 class="font-semibold">{{ $selectedPeminjaman->buku->judul }}</h5>
+                                            <p class="text-sm text-gray-400">{{ $selectedPeminjaman->buku->penulis }}</p>
+                                            <p class="text-sm text-gray-400 mt-2">ISBN: {{ $selectedPeminjaman->buku->isbn }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- User Info -->
+                                <div class="bg-purple-500/5 rounded-xl p-4">
+                                    <h4 class="text-lg font-semibold mb-4 text-purple-400">Informasi Peminjam</h4>
+                                    <div class="space-y-2">
+                                        <div class="flex items-center space-x-3">
+                                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                             </svg>
+                                            <span>{{ $selectedPeminjaman->user->name }}</span>
+                                        </div>
+                                        <div class="flex items-center space-x-3">
+                                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                            </svg>
+                                            <span>{{ $selectedPeminjaman->user->email }}</span>
+                                        </div>
+                                        <div class="flex items-center space-x-3">
+                                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                                            </svg>
+                                            <span>{{ $selectedPeminjaman->user->phone ?? '-' }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Shipping Info -->
+                            <div class="bg-purple-500/5 rounded-xl p-4">
+                                <h4 class="text-lg font-semibold mb-4 text-purple-400">Informasi Pengiriman</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <p class="text-sm text-gray-400 mb-1">Metode Pengiriman</p>
+                                        <p class="font-medium">{{ str_replace('_', ' ', $selectedPeminjaman->metode_pengiriman) }}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-400 mb-1">Status Pengiriman</p>
+                                        <p class="font-medium">{{ $selectedPeminjaman->status }}</p>
+                                    </div>
+                                    <div class="md:col-span-2">
+                                        <p class="text-sm text-gray-400 mb-1">Alamat Pengiriman</p>
+                                        <p class="font-medium">{{ $selectedPeminjaman->alamat_pengiriman }}</p>
+                                    </div>
+                                    @if($selectedPeminjaman->catatan_pengiriman)
+                                        <div class="md:col-span-2">
+                                            <p class="text-sm text-gray-400 mb-1">Catatan</p>
+                                            <p class="font-medium">{{ $selectedPeminjaman->catatan_pengiriman }}</p>
                                         </div>
                                     @endif
+                                </div>
+                            </div>
+
+                            <!-- Dates Info -->
+                            <div class="bg-purple-500/5 rounded-xl p-4">
+                                <h4 class="text-lg font-semibold mb-4 text-purple-400">Informasi Waktu</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                     <div>
-                                        <h5 class="font-semibold">{{ $selectedPeminjaman->buku->judul }}</h5>
-                                        <p class="text-sm text-gray-400">{{ $selectedPeminjaman->buku->penulis }}</p>
-                                        <p class="text-sm text-gray-400 mt-2">ISBN: {{ $selectedPeminjaman->buku->isbn }}</p>
+                                        <p class="text-sm text-gray-400 mb-1">Tanggal Peminjaman</p>
+                                        <p class="font-medium">{{ $selectedPeminjaman->tgl_peminjaman_diinginkan?->format('d M Y') ?? '-' }}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-400 mb-1">Tanggal Pengembalian</p>
+                                        <p class="font-medium">{{ $selectedPeminjaman->tgl_kembali_rencana?->format('d M Y') ?? '-' }}</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm text-gray-400 mb-1">Durasi</p>
+                                        <p class="font-medium">{{ $selectedPeminjaman->tgl_peminjaman_diinginkan?->diffInDays($selectedPeminjaman->tgl_kembali_rencana) ?? 0 }} hari</p>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- User Info -->
-                            <div class="bg-purple-500/5 rounded-xl p-4">
-                                <h4 class="text-lg font-semibold mb-4 text-purple-400">Informasi Peminjam</h4>
-                                <div class="space-y-2">
-                                    <div class="flex items-center space-x-3">
-                                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                        </svg>
-                                        <span>{{ $selectedPeminjaman->user->name }}</span>
-                                    </div>
-                                    <div class="flex items-center space-x-3">
-                                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                        </svg>
-                                        <span>{{ $selectedPeminjaman->user->email }}</span>
-                                    </div>
-                                    <div class="flex items-center space-x-3">
-                                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                                        </svg>
-                                        <span>{{ $selectedPeminjaman->user->phone ?? '-' }}</span>
+                            @if($selectedPeminjaman->bukti_pengiriman)
+                                <!-- Shipping Proof -->
+                                <div class="bg-purple-500/5 rounded-xl p-4">
+                                    <h4 class="text-lg font-semibold mb-4 text-purple-400">Bukti Pengiriman</h4>
+                                    <div class="relative group">
+                                        <img 
+                                            src="{{ Storage::url($selectedPeminjaman->bukti_pengiriman) }}" 
+                                            alt="Bukti Pengiriman"
+                                            class="w-full max-w-md rounded-lg shadow-lg cursor-pointer hover:opacity-90 transition-opacity"
+                                            onclick="window.open('{{ Storage::url($selectedPeminjaman->bukti_pengiriman) }}', '_blank')"
+                                        />
+                                        <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <span class="bg-black/50 text-white px-4 py-2 rounded-lg text-sm">
+                                                Klik untuk memperbesar
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            @endif
                         </div>
 
-                        <!-- Shipping Info -->
-                        <div class="bg-purple-500/5 rounded-xl p-4">
-                            <h4 class="text-lg font-semibold mb-4 text-purple-400">Informasi Pengiriman</h4>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <p class="text-sm text-gray-400 mb-1">Metode Pengiriman</p>
-                                    <p class="font-medium">{{ str_replace('_', ' ', $selectedPeminjaman->metode_pengiriman) }}</p>
-                                </div>
-                                <div>
-                                    <p class="text-sm text-gray-400 mb-1">Status Pengiriman</p>
-                                    <p class="font-medium">{{ $selectedPeminjaman->status }}</p>
-                                </div>
-                                <div class="md:col-span-2">
-                                    <p class="text-sm text-gray-400 mb-1">Alamat Pengiriman</p>
-                                    <p class="font-medium">{{ $selectedPeminjaman->alamat_pengiriman }}</p>
-                                </div>
-                                @if($selectedPeminjaman->catatan_pengiriman)
-                                    <div class="md:col-span-2">
-                                        <p class="text-sm text-gray-400 mb-1">Catatan</p>
-                                        <p class="font-medium">{{ $selectedPeminjaman->catatan_pengiriman }}</p>
-                                    </div>
-                                @endif
-                            </div>
+                        <!-- Footer -->
+                        <div class="flex justify-end px-6 py-4 border-t border-purple-500/10">
+                            <button 
+                                wire:click="closeModal"
+                                class="px-4 py-2 text-sm font-medium text-gray-300 bg-[#2a2435] hover:bg-[#2a2435]/70 rounded-lg transition-colors">
+                                Tutup
+                            </button>
                         </div>
-
-                        <!-- Dates Info -->
-                        <div class="bg-purple-500/5 rounded-xl p-4">
-                            <h4 class="text-lg font-semibold mb-4 text-purple-400">Informasi Waktu</h4>
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div>
-                                    <p class="text-sm text-gray-400 mb-1">Tanggal Peminjaman</p>
-                                    <p class="font-medium">{{ $selectedPeminjaman->tgl_peminjaman_diinginkan?->format('d M Y') ?? '-' }}</p>
-                                </div>
-                                <div>
-                                    <p class="text-sm text-gray-400 mb-1">Tanggal Pengembalian</p>
-                                    <p class="font-medium">{{ $selectedPeminjaman->tgl_kembali_rencana?->format('d M Y') ?? '-' }}</p>
-                                </div>
-                                <div>
-                                    <p class="text-sm text-gray-400 mb-1">Durasi</p>
-                                    <p class="font-medium">{{ $selectedPeminjaman->tgl_peminjaman_diinginkan?->diffInDays($selectedPeminjaman->tgl_kembali_rencana) ?? 0 }} hari</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        @if($selectedPeminjaman->bukti_pengiriman)
-                            <!-- Shipping Proof -->
-                            <div class="bg-purple-500/5 rounded-xl p-4">
-                                <h4 class="text-lg font-semibold mb-4 text-purple-400">Bukti Pengiriman</h4>
-                                <div class="relative group">
-                                    <img 
-                                        src="{{ Storage::url($selectedPeminjaman->bukti_pengiriman) }}" 
-                                        alt="Bukti Pengiriman"
-                                        class="w-full max-w-md rounded-lg shadow-lg cursor-pointer hover:opacity-90 transition-opacity"
-                                        onclick="window.open('{{ Storage::url($selectedPeminjaman->bukti_pengiriman) }}', '_blank')"
-                                    />
-                                    <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <span class="bg-black/50 text-white px-4 py-2 rounded-lg text-sm">
-                                            Klik untuk memperbesar
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        @endif
-                    </div>
-
-                    <!-- Footer -->
-                    <div class="flex justify-end px-6 py-4 border-t border-purple-500/10">
-                        <button 
-                            wire:click="closeModal"
-                            class="px-4 py-2 text-sm font-medium text-gray-300 bg-[#2a2435] hover:bg-[#2a2435]/70 rounded-lg transition-colors">
-                            Tutup
-                        </button>
-                    </div>
+                    @endif
                 </div>
             </div>
-        @endif
-    </div>
+        </div>
+    @endif
 
     <!-- Modal Reject -->
     @if ($activeModal === 'reject' && $selectedPeminjaman)
