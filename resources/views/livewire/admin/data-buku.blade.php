@@ -24,6 +24,13 @@
                 </div>
             </div>
 
+            {{-- Alert Success --}}
+            @if (session('success'))
+                <div class="mb-6 p-4 bg-green-500/10 border border-green-500/20 rounded-xl text-green-400">
+                    {{ session('success') }}
+                </div>
+            @endif
+
             <!-- Search & Filter Bar -->
             <div class="bg-[#1a1625] p-4 rounded-xl mb-6">
                 <div class="flex flex-col md:flex-row gap-4">

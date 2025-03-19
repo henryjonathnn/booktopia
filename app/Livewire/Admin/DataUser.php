@@ -290,10 +290,7 @@ class DataUser extends Component
         
         $this->resetForm();
         $this->isModalOpen = false;
-        session()->flash('alert', [
-            'type' => 'success',
-            'message' => $message
-        ]);
+        session()->flash('success', $message);
     }
 
     // Confirm user deletion 

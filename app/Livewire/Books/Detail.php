@@ -3,6 +3,7 @@
 namespace App\Livewire\Books;
 
 use App\Models\Buku;
+use App\Models\Peminjaman;
 use App\Models\Rating;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
@@ -22,9 +23,9 @@ class Detail extends Component
         // Parse slug untuk mendapatkan ID
         $id = explode('-', $slug);
         $id = end($id);
-
+    
         $this->book = Buku::with(['ratings', 'sukas'])->find($id);
-
+    
         if (!$this->book || $slug !== self::generateSlug($this->book)) {
             abort(404);
         }
@@ -32,22 +33,42 @@ class Detail extends Component
         // Calculate average rating from all ratings
         $this->calculateAverageRating();
         
+        // Calculate total unique borrowers
+        $this->calculateTotalPeminjam();
+        
         // Ambil buku terkait berdasarkan kategori
         $this->relatedBooks = Buku::where('kategori', $this->book->kategori)
             ->where('id', '!=', $this->book->id)
             ->limit(5)
             ->get();
-
+    
         // Calculate average rating for each related book
         foreach ($this->relatedBooks as $relatedBook) {
             $this->calculateBookRating($relatedBook);
         }
-
+    
         if (Auth::check()) {
             $this->isBookmarked = Auth::user()->bookmarks()
                 ->where('id_buku', $this->book->id)
                 ->exists();
         }
+    }
+    
+    // Add this new method to calculate total unique borrowers
+    private function calculateTotalPeminjam()
+    {
+        // Import the Peminjaman model at the top of your file
+        // use App\Models\Peminjaman;
+        
+        // Count unique users who have borrowed this book
+        // We only count completed/valid borrowings (not rejected ones)
+        $this->book->total_peminjam = Peminjaman::where('id_buku', $this->book->id)
+            ->whereNotIn('status', [
+                Peminjaman::STATUS_PENDING, 
+                Peminjaman::STATUS_DITOLAK
+            ])
+            ->distinct('id_user')
+            ->count('id_user');
     }
 
     public function showPhotoModal($photo)
@@ -129,6 +150,9 @@ class Detail extends Component
 
     public function render()
     {
+        // Re-calculate total peminjam on every render
+        $this->calculateTotalPeminjam();
+        
         // Load ratings with pagination and eager load user relationship
         $bookRatings = Rating::where('id_buku', $this->book->id)
             ->with('user')

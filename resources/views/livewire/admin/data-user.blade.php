@@ -24,6 +24,14 @@
                 </div>
             </div>
 
+            {{-- Alert Success --}}
+            @if (session('success'))
+                <div class="mb-6 p-4 bg-green-500/10 border border-green-500/20 rounded-xl text-green-400">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+
             <!-- Search & Filter Bar -->
             <div class="bg-[#1a1625] p-4 rounded-xl mb-6">
                 <div class="flex flex-col md:flex-row gap-4">
@@ -106,12 +114,13 @@
                                     <div class="flex items-center gap-3">
                                         <div class="w-10 h-10 rounded-full overflow-hidden bg-gray-700 flex-shrink-0">
                                             @if ($user->profile_img)
-                                                <img src="{{ Storage::url($user->profile_img) }}" alt="{{ $user->name }}"
-                                                    class="w-full h-full object-cover">
+                                                <img src="{{ Storage::url($user->profile_img) }}"
+                                                    alt="{{ $user->name }}" class="w-full h-full object-cover">
                                             @else
                                                 <div class="flex items-center justify-center h-full">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-500"
-                                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                                        class="h-6 w-6 text-gray-500" fill="none" viewBox="0 0 24 24"
+                                                        stroke="currentColor">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
                                                             stroke-width="2"
                                                             d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -121,7 +130,8 @@
                                         </div>
                                         <div>
                                             <div class="font-medium text-white">{{ $user->name }}</div>
-                                            <div class="text-sm text-gray-400 hidden sm:block">{{ $user->email }}</div>
+                                            <div class="text-sm text-gray-400 hidden sm:block">{{ $user->email }}
+                                            </div>
                                         </div>
                                     </div>
                                 </td>
@@ -162,9 +172,11 @@
                                                     <path
                                                         d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
                                                     </path>
-                                                    <line x1="10" y1="11" x2="10" y2="17">
+                                                    <line x1="10" y1="11" x2="10"
+                                                        y2="17">
                                                     </line>
-                                                    <line x1="14" y1="11" x2="14" y2="17">
+                                                    <line x1="14" y1="11" x2="14"
+                                                        y2="17">
                                                     </line>
                                                 </svg>
                                             </button>
@@ -233,7 +245,8 @@
                                 <button wire:click="closeDetailModal" class="text-gray-400 hover:text-white">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
                                         viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M6 18L18 6M6 6l12 12" />
                                     </svg>
                                 </button>
                             </div>
@@ -248,9 +261,11 @@
                                                 alt="{{ $selectedUser->name }}" class="w-full h-full object-cover">
                                         @else
                                             <div class="flex items-center justify-center h-full">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-600"
-                                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                <svg xmlns="http://www.w3.org/2000/svg"
+                                                    class="h-16 w-16 text-gray-600" fill="none"
+                                                    viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
                                                         d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                                 </svg>
                                             </div>
@@ -266,7 +281,8 @@
                                     <div class="space-y-4">
                                         <!-- Informasi Umum -->
                                         <div>
-                                            <h3 class="text-sm font-medium text-gray-500 uppercase mb-2">Informasi Umum</h3>
+                                            <h3 class="text-sm font-medium text-gray-500 uppercase mb-2">Informasi Umum
+                                            </h3>
                                             <div class="grid grid-cols-2 gap-2">
                                                 <div>
                                                     <p class="text-xs text-gray-500">Username</p>
@@ -278,11 +294,13 @@
                                                 </div>
                                                 <div>
                                                     <p class="text-xs text-gray-500">Status</p>
-                                                    <p class="text-sm">{{ $selectedUser->is_active ? 'Aktif' : 'Nonaktif' }}</p>
+                                                    <p class="text-sm">
+                                                        {{ $selectedUser->is_active ? 'Aktif' : 'Nonaktif' }}</p>
                                                 </div>
                                                 <div>
                                                     <p class="text-xs text-gray-500">Tanggal Bergabung</p>
-                                                    <p class="text-sm">{{ $selectedUser->created_at->format('d M Y') }}</p>
+                                                    <p class="text-sm">
+                                                        {{ $selectedUser->created_at->format('d M Y') }}</p>
                                                 </div>
                                             </div>
                                         </div>
