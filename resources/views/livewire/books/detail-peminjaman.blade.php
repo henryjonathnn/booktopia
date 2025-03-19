@@ -206,5 +206,101 @@
                 @endif
             </div>
         </div>
+
+        <!-- Tambahkan bagian action buttons -->
+        <div class="flex justify-end gap-3 mt-6">
+            @if($peminjaman->status === 'DIKIRIM')
+                <button 
+                    wire:click="returnPeminjaman({{ $peminjaman->id }})"
+                    class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+                    Kembalikan Buku
+                </button>
+            @elseif($peminjaman->status === 'DIKEMBALIKAN' && !$peminjaman->buku->ratings()->where('id_user', auth()->id())->exists())
+                <button 
+                    wire:click="$set('showRatingModal', true)"
+                    class="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors">
+                    Beri Rating
+                </button>
+            @endif
+        </div>
+
+        <!-- Rating Modal -->
+        <x-modal wire:model="showRatingModal">
+            <div class="bg-[#1a1625] rounded-xl p-6">
+                <h3 class="text-xl font-bold mb-4">Beri Rating</h3>
+                
+                <form wire:submit.prevent="submitRating" class="space-y-4">
+                    <!-- Rating Stars -->
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Rating</label>
+                        <div class="flex gap-2">
+                            @for($i = 1; $i <= 5; $i++)
+                                <button type="button" 
+                                    wire:click="$set('rating', {{ $i }})"
+                                    class="text-2xl {{ $i <= $rating ? 'text-yellow-400' : 'text-gray-400' }}">
+                                    ★
+                                </button>
+                            @endfor
+                        </div>
+                    </div>
+
+                    <!-- Komentar -->
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Komentar</label>
+                        <textarea 
+                            wire:model="komentar" 
+                            rows="4"
+                            class="w-full bg-[#0f0a19] rounded-lg p-3 focus:ring-2 focus:ring-purple-500"
+                            placeholder="Berikan komentar Anda tentang buku ini..."></textarea>
+                    </div>
+
+                    <!-- Foto -->
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Foto (Opsional)</label>
+                        <input 
+                            type="file" 
+                            wire:model="foto" 
+                            accept="image/*"
+                            class="w-full bg-[#0f0a19] rounded-lg p-3">
+                        <p class="text-sm text-gray-400 mt-1">Format: JPG, PNG, GIF (Max. 2MB)</p>
+                    </div>
+
+                    <div class="flex justify-end gap-3">
+                        <button 
+                            type="button"
+                            wire:click="$set('showRatingModal', false)"
+                            class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+                            Batal
+                        </button>
+                        <button 
+                            type="submit"
+                            class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+                            Kirim Rating
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </x-modal>
+
+        <!-- Return Confirmation Modal -->
+        <x-modal wire:model="showReturnConfirmation">
+            <div class="bg-[#1a1625] rounded-xl p-6">
+                <h3 class="text-xl font-bold mb-4">Konfirmasi Pengembalian</h3>
+                <p class="text-gray-300 mb-6">Apakah Anda yakin ingin mengembalikan buku ini?</p>
+                
+                <div class="flex justify-end gap-3">
+                    <button 
+                        wire:click="$set('showReturnConfirmation', false)"
+                        class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+                        Batal
+                    </button>
+                    <button 
+                        wire:click="returnPeminjaman({{ $peminjaman->id }})"
+                        class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+                        Ya, Kembalikan
+                    </button>
+                </div>
+            </div>
+        </x-modal>
     </div>
 </div> 

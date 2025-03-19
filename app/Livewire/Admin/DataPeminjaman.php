@@ -272,6 +272,8 @@ class DataPeminjaman extends Component
     public function processPeminjaman($peminjamanId)
     {
         try {
+            DB::beginTransaction();
+            
             $peminjaman = Peminjaman::findOrFail($peminjamanId);
             
             // Pastikan status saat ini adalah PENDING
@@ -283,21 +285,35 @@ class DataPeminjaman extends Component
                 return;
             }
 
+            // Cek stok buku
+            if ($peminjaman->buku->stock <= 0) {
+                session()->flash('alert', [
+                    'type' => 'error',
+                    'message' => 'Stok buku tidak mencukupi!'
+                ]);
+                return;
+            }
+
+            // Kurangi stok buku
+            $peminjaman->buku->decrement('stock');
+
             // Update status menjadi DIPROSES
             $peminjaman->update([
                 'status' => 'DIPROSES',
-                'id_staff' => auth()->id() // Catat staff yang memproses
+                'id_staff' => auth()->id()
             ]);
 
+            DB::commit();
+            
             session()->flash('alert', [
                 'type' => 'success',
                 'message' => 'Peminjaman berhasil diproses!'
             ]);
 
-            // Refresh komponen
             $this->dispatch('refresh');
 
         } catch (\Exception $e) {
+            DB::rollBack();
             session()->flash('alert', [
                 'type' => 'error',
                 'message' => 'Gagal memproses peminjaman: ' . $e->getMessage()
@@ -334,6 +350,47 @@ class DataPeminjaman extends Component
             session()->flash('alert', [
                 'type' => 'error',
                 'message' => 'Gagal mengupdate status: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    public function returnPeminjaman($peminjamanId)
+    {
+        try {
+            DB::beginTransaction();
+            
+            $peminjaman = Peminjaman::findOrFail($peminjamanId);
+            
+            if ($peminjaman->status !== 'DIKIRIM') {
+                session()->flash('alert', [
+                    'type' => 'error',
+                    'message' => 'Status peminjaman tidak valid untuk dikembalikan!'
+                ]);
+                return;
+            }
+
+            // Tambah stok buku
+            $peminjaman->buku->increment('stock');
+
+            $peminjaman->update([
+                'status' => 'DIKEMBALIKAN',
+                'tanggal_pengembalian' => now()
+            ]);
+
+            DB::commit();
+
+            session()->flash('alert', [
+                'type' => 'success',
+                'message' => 'Buku berhasil dikembalikan!'
+            ]);
+
+            $this->dispatch('refresh');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            session()->flash('alert', [
+                'type' => 'error',
+                'message' => 'Gagal mengembalikan buku: ' . $e->getMessage()
             ]);
         }
     }
