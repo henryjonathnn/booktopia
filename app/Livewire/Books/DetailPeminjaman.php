@@ -115,6 +115,14 @@ class DetailPeminjaman extends Component
             'rating' => 'required|numeric|min:1|max:5',
             'komentar' => 'required|string|min:10',
             'foto' => 'nullable|image|max:2048'
+        ], [
+            'rating.required' => 'Rating harus diisi',
+            'rating.min' => 'Rating minimal 1',
+            'rating.max' => 'Rating maksimal 5',
+            'komentar.required' => 'Komentar harus diisi',
+            'komentar.min' => 'Komentar minimal 10 karakter',
+            'foto.image' => 'File harus berupa gambar',
+            'foto.max' => 'Ukuran foto maksimal 2MB'
         ]);
 
         try {
@@ -137,19 +145,24 @@ class DetailPeminjaman extends Component
             DB::commit();
 
             $this->showRatingModal = false;
-            session()->flash('alert', [
-                'type' => 'success',
-                'message' => 'Terima kasih atas penilaian Anda!'
-            ]);
             
             // Reset form
             $this->reset(['rating', 'komentar', 'foto']);
 
+            // Tampilkan notifikasi sukses
+            $this->dispatch('alert', [
+                'type' => 'success',
+                'message' => 'Terima kasih atas feedback Anda! Rating berhasil disimpan.'
+            ]);
+
+            // Refresh data untuk memperbarui tampilan
+            $this->peminjaman = $this->peminjaman->fresh(['buku.ratings']);
+
         } catch (\Exception $e) {
             DB::rollBack();
-            session()->flash('alert', [
+            $this->dispatch('alert', [
                 'type' => 'error',
-                'message' => 'Terjadi kesalahan saat menyimpan rating: ' . $e->getMessage()
+                'message' => 'Gagal menyimpan rating: ' . $e->getMessage()
             ]);
         }
     }
