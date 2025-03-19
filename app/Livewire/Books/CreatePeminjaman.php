@@ -18,6 +18,7 @@ class CreatePeminjaman extends Component
     public $alamat_pengiriman;
     public $catatan_pengiriman;
     public $tgl_peminjaman_diinginkan;
+    public $durasi_peminjaman = 1;
     
     public $minDate;
     public $maxDate;
@@ -26,6 +27,7 @@ class CreatePeminjaman extends Component
         'alamat_pengiriman' => 'required|string|min:10',
         'catatan_pengiriman' => 'nullable|string',
         'tgl_peminjaman_diinginkan' => 'required|date|after_or_equal:today|before_or_equal:maxDate',
+        'durasi_peminjaman' => 'required|integer|min:1|max:7',
     ];
 
     protected $messages = [
@@ -34,6 +36,9 @@ class CreatePeminjaman extends Component
         'tgl_peminjaman_diinginkan.required' => 'Tanggal peminjaman wajib diisi',
         'tgl_peminjaman_diinginkan.after_or_equal' => 'Tanggal peminjaman minimal hari ini',
         'tgl_peminjaman_diinginkan.before_or_equal' => 'Tanggal peminjaman maksimal 30 hari dari sekarang',
+        'durasi_peminjaman.required' => 'Durasi peminjaman wajib diisi',
+        'durasi_peminjaman.min' => 'Durasi peminjaman minimal 1 hari',
+        'durasi_peminjaman.max' => 'Durasi peminjaman maksimal 7 hari',
     ];
 
     public function mount($token)
@@ -74,14 +79,14 @@ class CreatePeminjaman extends Component
         // Decrement book stock
         $this->book->decrement('stock');
 
-        // Create peminjaman
+        // Create peminjaman dengan durasi yang dipilih user
         $peminjaman = Peminjaman::create([
             'id_user' => Auth::id(),
             'id_buku' => $this->book->id,
             'alamat_pengiriman' => $this->alamat_pengiriman,
             'catatan_pengiriman' => $this->catatan_pengiriman,
             'tgl_peminjaman_diinginkan' => $this->tgl_peminjaman_diinginkan,
-            'tgl_kembali_rencana' => Carbon::parse($this->tgl_peminjaman_diinginkan)->addDays(7),
+            'tgl_kembali_rencana' => Carbon::parse($this->tgl_peminjaman_diinginkan)->addDays($this->durasi_peminjaman),
             'status' => 'PENDING',
             'metode_pengiriman' => 'KURIR'
         ]);
