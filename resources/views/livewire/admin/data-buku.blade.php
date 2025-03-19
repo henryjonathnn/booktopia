@@ -149,21 +149,15 @@
                                             </button>
 
                                             <!-- Delete Button -->
-                                            <button
-                                                wire:click.stop="$set('confirmingBukuDeletion', true); $set('bukuIdToDelete', {{ $buku->id }})"
-                                                class="p-1.5 hover:bg-gray-800 rounded-lg transition-colors">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
-                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                                                    class="text-gray-400">
-                                                    <polyline points="3 6 5 6 21 6"></polyline>
-                                                    <path
-                                                        d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
-                                                    </path>
-                                                    <line x1="10" y1="11" x2="10" y2="17">
-                                                    </line>
-                                                    <line x1="14" y1="11" x2="14" y2="17">
-                                                    </line>
+                                            <button 
+                                                wire:click.stop="confirmBukuDeletion({{ $buku->id }})"
+                                                class="text-red-400 hover:text-red-500 transition-colors">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none"
+                                                    stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                    stroke-linejoin="round">
+                                                    <path d="M3 6h18"></path>
+                                                    <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                                                    <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
                                                 </svg>
                                             </button>
 
@@ -314,11 +308,13 @@
                                 dapat dibatalkan.</p>
 
                             <div class="flex justify-end gap-3">
-                                <button wire:click="$set('confirmingBukuDeletion', false)"
+                                <button 
+                                    wire:click="$set('confirmingBukuDeletion', false)"
                                     class="px-4 py-2 bg-gray-800 text-gray-300 rounded-lg hover:bg-gray-700 transition-colors">
                                     Batal
                                 </button>
-                                <button wire:click="deleteBuku"
+                                <button 
+                                    wire:click="deleteBuku"
                                     class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
                                     Hapus
                                 </button>
