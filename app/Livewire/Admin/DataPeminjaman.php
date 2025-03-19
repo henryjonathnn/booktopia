@@ -224,9 +224,11 @@ class DataPeminjaman extends Component
                 return;
             }
 
-            $peminjaman->status = 'DIPINJAM';
-            $peminjaman->tgl_peminjaman_aktual = now();
-            $peminjaman->save();
+            // Update status dan tanggal
+            $peminjaman->update([
+                'status' => 'DIPINJAM',
+                'tgl_peminjaman_aktual' => now()
+            ]);
 
             // Buat notifikasi untuk user
             Notifikasi::create([
@@ -242,20 +244,13 @@ class DataPeminjaman extends Component
             event(new PeminjamanStatusChanged($peminjaman));
 
             DB::commit();
-            
-            $this->dispatch('swal', [
-                'icon' => 'success',
-                'title' => 'Berhasil!',
-                'text' => 'Status peminjaman berhasil diubah menjadi DIPINJAM'
-            ]);
+
+            // Refresh data
+            $this->dispatch('refresh');
             
         } catch (\Exception $e) {
             DB::rollBack();
-            $this->dispatch('swal', [
-                'icon' => 'error',
-                'title' => 'Gagal!',
-                'text' => 'Terjadi kesalahan saat mengubah status peminjaman'
-            ]);
+            logger()->error('Error in markAsDipinjam: ' . $e->getMessage());
         }
     }
 
