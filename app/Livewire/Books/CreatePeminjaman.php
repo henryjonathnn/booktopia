@@ -124,7 +124,7 @@ class CreatePeminjaman extends Component
     {
         $this->validate();
 
-        $this->book->decrement('stock');
+        // $this->book->decrement('stock');
 
         $peminjaman = Peminjaman::create([
             'id_user' => Auth::id(),

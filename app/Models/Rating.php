@@ -16,4 +16,10 @@ class Rating extends Model
         'komentar',
         'url_foto',
     ];
+
+    // Relasi dengan User
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'id_user');
+    }
 }

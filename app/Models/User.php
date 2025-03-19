@@ -80,7 +80,7 @@ class User extends Authenticatable
     }
 
     // Relationships
-    public function peminjaman()
+    public function peminjamans()
     {
         return $this->hasMany(Peminjaman::class, 'id_user');
     }

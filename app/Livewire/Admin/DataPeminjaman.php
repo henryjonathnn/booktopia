@@ -153,7 +153,7 @@ class DataPeminjaman extends Component
                 return;
             }
 
-            $peminjaman->buku->increment('stock');
+            // $peminjaman->buku->increment('stock');
             $peminjaman->status = 'DITOLAK';
             $peminjaman->alasan_penolakan = $this->alasanPenolakan;
             $peminjaman->id_staff = auth()->id();
@@ -394,6 +394,7 @@ class DataPeminjaman extends Component
             ]);
         }
     }
+
 
     public function render()
     {

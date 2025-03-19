@@ -3,6 +3,7 @@
 namespace App\Livewire\Books;
 
 use App\Models\Buku;
+use App\Models\Rating;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -12,6 +13,9 @@ class Detail extends Component
     public $book;
     public $isBookmarked = false;
     public $relatedBooks = [];
+
+    public $showModal = false;
+    public $modalPhoto = '';
 
     public function mount($slug)
     {
@@ -45,6 +49,20 @@ class Detail extends Component
                 ->exists();
         }
     }
+
+    public function showPhotoModal($photo)
+    {
+        $this->modalPhoto = $photo;
+        $this->showModal = true;
+    }
+    
+    // Method untuk menyembunyikan modal foto
+    public function hidePhotoModal()
+    {
+        $this->showModal = false;
+        $this->modalPhoto = '';
+    }
+
 
     // Helper method to calculate average rating
     private function calculateAverageRating()
@@ -111,6 +129,14 @@ class Detail extends Component
 
     public function render()
     {
-        return view('livewire.books.detail')->layout('layouts.user');
+        // Load ratings with pagination and eager load user relationship
+        $bookRatings = Rating::where('id_buku', $this->book->id)
+            ->with('user')
+            ->orderBy('created_at', 'desc')
+            ->paginate(5);
+            
+        return view('livewire.books.detail', [
+            'bookRatings' => $bookRatings
+        ])->layout('layouts.user');
     }
 }
