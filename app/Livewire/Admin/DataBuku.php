@@ -333,23 +333,67 @@ class DataBuku extends Component
     // Delete the book
     public function deleteBuku($bukuId = null)
     {
-        $idToDelete = $bukuId ?? $this->bukuIdToDelete;
-        $buku = Buku::findOrFail($idToDelete);
-        
-        // Delete cover image if exists
-        if ($buku->cover_img) {
-            Storage::delete('public/' . $buku->cover_img);
+        try {
+            $idToDelete = $bukuId ?? $this->bukuIdToDelete;
+            $buku = Buku::findOrFail($idToDelete);
+            
+            // Delete cover image if exists
+            if ($buku->cover_img) {
+                Storage::delete('public/' . $buku->cover_img);
+            }
+            
+            $buku->delete();
+            
+            $this->confirmingBukuDeletion = false;
+            $this->bukuIdToDelete = null;
+            $this->selectedBooks = array_diff($this->selectedBooks, [$idToDelete]);
+            
+            session()->flash('alert', [
+                'type' => 'success',
+                'message' => 'Buku berhasil dihapus!'
+            ]);
+
+            // Dispatch event untuk refresh komponen
+            $this->dispatch('refresh');
+            
+        } catch (\Exception $e) {
+            session()->flash('alert', [
+                'type' => 'error',
+                'message' => 'Gagal menghapus buku. ' . $e->getMessage()
+            ]);
         }
-        
-        $buku->delete();
-        
-        $this->confirmingBukuDeletion = false;
-        $this->bukuIdToDelete = null;
-        
-        session()->flash('alert', [
-            'type' => 'success',
-            'message' => 'Buku berhasil dihapus!'
-        ]);
+    }
+
+    // Tambahkan method untuk delete selected books
+    public function deleteSelectedBooks()
+    {
+        try {
+            $books = Buku::whereIn('id', $this->selectedBooks)->get();
+            
+            foreach ($books as $book) {
+                if ($book->cover_img) {
+                    Storage::delete('public/' . $book->cover_img);
+                }
+                $book->delete();
+            }
+            
+            $this->selectedBooks = [];
+            $this->selectAll = false;
+            
+            session()->flash('alert', [
+                'type' => 'success',
+                'message' => count($books) . ' buku berhasil dihapus!'
+            ]);
+
+            // Dispatch event untuk refresh komponen
+            $this->dispatch('refresh');
+            
+        } catch (\Exception $e) {
+            session()->flash('alert', [
+                'type' => 'error',
+                'message' => 'Gagal menghapus buku. ' . $e->getMessage()
+            ]);
+        }
     }
 
     // Reset form fields

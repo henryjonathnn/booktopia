@@ -22,8 +22,8 @@ class Dashboard extends Component
         // Hitung total users (non-admin)
         $this->totalUsers = User::where('role', 'USER')->count();
         
-        // Hitung total buku
-        $this->totalBooks = Buku::sum('stock');
+        // Hitung total buku (jumlah judul buku, bukan stok)
+        $this->totalBooks = Buku::count();
         
         // Hitung total peminjaman
         $this->totalLoans = Peminjaman::count();
