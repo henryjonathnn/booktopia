@@ -13,6 +13,7 @@ class Detail extends Component
 {
     public $book;
     public $isBookmarked = false;
+    public $isLiked = false;
     public $relatedBooks = [];
 
     public $showModal = false;
@@ -24,7 +25,7 @@ class Detail extends Component
         $id = explode('-', $slug);
         $id = end($id);
     
-        $this->book = Buku::with(['ratings', 'sukas'])->find($id);
+        $this->book = Buku::with(['ratings', 'sukas'])->withCount('sukas')->find($id);
     
         if (!$this->book || $slug !== self::generateSlug($this->book)) {
             abort(404);
@@ -50,6 +51,13 @@ class Detail extends Component
         if (Auth::check()) {
             $this->isBookmarked = Auth::user()->bookmarks()
                 ->where('id_buku', $this->book->id)
+                ->exists();
+        }
+
+        // Check if current user has liked this book
+        if (auth()->check()) {
+            $this->isLiked = $this->book->sukas()
+                ->where('id_user', auth()->id())
                 ->exists();
         }
     }
@@ -146,6 +154,30 @@ class Detail extends Component
         ]));
 
         return redirect()->route('peminjaman.create', ['token' => $token]);
+    }
+
+    public function toggleLike()
+    {
+        if (!auth()->check()) {
+            return redirect()->route('login');
+        }
+
+        if ($this->isLiked) {
+            // Unlike
+            $this->book->sukas()
+                ->where('id_user', auth()->id())
+                ->delete();
+        } else {
+            // Like
+            $this->book->sukas()->create([
+                'id_user' => auth()->id()
+            ]);
+        }
+
+        $this->isLiked = !$this->isLiked;
+        // Refresh the book data to get updated sukas count
+        $this->book->refresh();
+        $this->book->loadCount('sukas');
     }
 
     public function render()
