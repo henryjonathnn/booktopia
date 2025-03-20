@@ -291,44 +291,59 @@ class DataBuku extends Component
     {
         $this->validate();
         
-        // Creating or updating book
-        $bukuData = [
-            'judul' => $this->judul,
-            'penulis' => $this->penulis,
-            'isbn' => $this->isbn,
-            'kategori' => $this->bukuKategori,
-            'deskripsi' => $this->deskripsi,
-            'stock' => $this->stock,
-            'denda_harian' => $this->denda_harian,
-            'penerbit' => $this->penerbit,
-            'tahun_terbit' => $this->tahun_terbit,
-        ];
-        
-        // Handle cover image upload
-        if ($this->coverImage) {
-            // Delete existing cover image if updating
-            if ($this->bukuId && $this->existingCoverImage) {
-                Storage::delete('public/' . $this->existingCoverImage);
+        try {
+            DB::beginTransaction();
+
+            $bukuData = [
+                'judul' => $this->judul,
+                'penulis' => $this->penulis,
+                'isbn' => $this->isbn,
+                'kategori' => $this->bukuKategori,
+                'deskripsi' => $this->deskripsi,
+                'stock' => $this->stock,
+                'denda_harian' => $this->denda_harian,
+                'penerbit' => $this->penerbit,
+                'tahun_terbit' => $this->tahun_terbit,
+            ];
+            
+            // Handle cover image upload
+            if ($this->coverImage) {
+                // Delete existing cover image if updating
+                if ($this->bukuId && $this->existingCoverImage) {
+                    Storage::delete('public/' . $this->existingCoverImage);
+                }
+                
+                // Store the new image
+                $imagePath = $this->coverImage->store('covers', 'public');
+                $bukuData['cover_img'] = $imagePath;
             }
             
-            // Store the new image
-            $imagePath = $this->coverImage->store('covers', 'public');
-            $bukuData['cover_img'] = $imagePath;
+            if ($this->bukuId) {
+                // Update existing book
+                Buku::findOrFail($this->bukuId)->update($bukuData);
+                $message = 'Buku berhasil diperbarui!';
+            } else {
+                // Create new book
+                Buku::create($bukuData);
+                $message = 'Buku berhasil ditambahkan!';
+            }
+            
+            DB::commit();
+
+            $this->resetForm();
+            $this->isModalOpen = false;
+            $this->dispatch('alert', [
+                'type' => 'success',
+                'message' => $message
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $this->dispatch('alert', [
+                'type' => 'error',
+                'message' => 'Error: ' . $e->getMessage()
+            ]);
         }
-        
-        if ($this->bukuId) {
-            // Update existing book
-            Buku::findOrFail($this->bukuId)->update($bukuData);
-            $message = 'Buku berhasil diperbarui!';
-        } else {
-            // Create new book
-            Buku::create($bukuData);
-            $message = 'Buku berhasil ditambahkan!';
-        }
-        
-        $this->resetForm();
-        $this->isModalOpen = false;
-        session()->flash('success', $message);
     }
 
     // Confirm book deletion 
@@ -356,7 +371,7 @@ class DataBuku extends Component
             $this->bukuIdToDelete = null;
             $this->selectedBooks = array_diff($this->selectedBooks, [$idToDelete]);
             
-            session()->flash('alert', [
+            $this->dispatch('alert', [
                 'type' => 'success',
                 'message' => 'Buku berhasil dihapus!'
             ]);
@@ -365,7 +380,7 @@ class DataBuku extends Component
             $this->dispatch('refresh');
             
         } catch (\Exception $e) {
-            session()->flash('alert', [
+            $this->dispatch('alert', [
                 'type' => 'error',
                 'message' => 'Gagal menghapus buku. ' . $e->getMessage()
             ]);
@@ -388,7 +403,7 @@ class DataBuku extends Component
             $this->selectedBooks = [];
             $this->selectAll = false;
             
-            session()->flash('alert', [
+            $this->dispatch('alert', [
                 'type' => 'success',
                 'message' => count($books) . ' buku berhasil dihapus!'
             ]);
@@ -397,7 +412,7 @@ class DataBuku extends Component
             $this->dispatch('refresh');
             
         } catch (\Exception $e) {
-            session()->flash('alert', [
+            $this->dispatch('alert', [
                 'type' => 'error',
                 'message' => 'Gagal menghapus buku. ' . $e->getMessage()
             ]);
