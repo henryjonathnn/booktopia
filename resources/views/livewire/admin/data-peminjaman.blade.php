@@ -47,8 +47,8 @@
                             @endforeach
                         </select>
 
-                        <!-- Export PDF Button -->
-                        <div x-data="exportPDF">
+                        <div>
+                            {{-- Export Button --}}
                             <button wire:click="showExportOptions"
                                 class="px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center justify-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -56,6 +56,132 @@
                                 </svg>
                                 Export PDF
                             </button>
+                        
+                            {{-- Export Modal --}}
+                            @if($showExportModal)
+                            <div class="fixed inset-0 z-50 overflow-y-auto">
+                                <div class="flex min-h-screen items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                                    <div class="fixed inset-0 bg-black/50 transition-opacity" wire:click="closeExportModal"></div>
+                        
+                                    <div class="relative transform overflow-hidden rounded-lg bg-[#1a1625] px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+                                        <div class="sm:flex sm:items-start">
+                                            <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left w-full">
+                                                <h3 class="text-xl font-semibold leading-6 text-gray-200">Export Data Peminjaman</h3>
+                                                <div class="mt-6 space-y-4">
+                                                    {{-- Status Filter --}}
+                                                    <div>
+                                                        <label class="block text-sm font-medium text-gray-400 mb-2">Status Peminjaman</label>
+                                                        <select wire:model="exportStatus" class="w-full px-3 py-2.5 bg-[#0f0a19] rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm border border-gray-800">
+                                                            <option value="">Semua Status</option>
+                                                            @foreach($statuses as $status)
+                                                                <option value="{{ $status }}">{{ $status }}</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                        
+                                                    {{-- Date Range --}}
+                                                    <div class="grid grid-cols-2 gap-4">
+                                                        <div>
+                                                            <label class="block text-sm font-medium text-gray-400 mb-2">Tanggal Mulai</label>
+                                                            <input type="date" 
+                                                                wire:model="exportDateStart" 
+                                                                min="{{ $minDate }}" 
+                                                                max="{{ $maxDate }}"
+                                                                class="w-full px-3 py-2.5 bg-[#0f0a19] rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm border border-gray-800">
+                                                            @error('exportDateStart') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
+                                                        </div>
+                                                        <div>
+                                                            <label class="block text-sm font-medium text-gray-400 mb-2">Tanggal Akhir</label>
+                                                            <input type="date" 
+                                                                wire:model="exportDateEnd" 
+                                                                min="{{ $minDate }}" 
+                                                                max="{{ $maxDate }}"
+                                                                class="w-full px-3 py-2.5 bg-[#0f0a19] rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm border border-gray-800">
+                                                            @error('exportDateEnd') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="mt-6 flex justify-end space-x-3">
+                                            <button wire:click="closeExportModal"
+                                                class="inline-flex justify-center rounded-lg bg-[#2a2435] px-3 py-2 text-sm font-semibold text-gray-300 shadow-sm ring-1 ring-inset ring-gray-800 hover:bg-[#2a2435]/70">
+                                                Batal
+                                            </button>
+                                            <button wire:click="generatePDF"
+                                                class="inline-flex justify-center rounded-lg bg-purple-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-purple-700">
+                                                Export PDF
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @endif
+                        
+                            {{-- PDF Template (Hidden) --}}
+                            <div id="pdf-content" class="hidden">
+                                @if($exportData)
+                                <div>
+                                    <h1>Laporan Data Peminjaman - {{ $exportData['status'] }}</h1>
+                                    <p>Periode: {{ $exportData['dateStart'] }} - {{ $exportData['dateEnd'] }}</p>
+                                    <p>Dicetak pada: {{ $exportData['timestamp'] }}</p>
+                                    
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>No</th>
+                                                <th>ID Peminjaman</th>
+                                                <th>Tanggal</th>
+                                                <th>Buku</th>
+                                                <th>Peminjam</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($exportData['peminjamans'] as $index => $item)
+                                            <tr>
+                                                <td>{{ $index + 1 }}</td>
+                                                <td>{{ $item['id'] }}</td>
+                                                <td>{{ $item['created_at'] }}</td>
+                                                <td>
+                                                    <div>{{ $item['buku']['judul'] }}</div>
+                                                    <div>Penulis: {{ $item['buku']['penulis'] }}</div>
+                                                    <div>ISBN: {{ $item['buku']['isbn'] }}</div>
+                                                </td>
+                                                <td>
+                                                    <div>{{ $item['user']['name'] }}</div>
+                                                    <div>{{ $item['user']['email'] }}</div>
+                                                    <div>Telp: {{ $item['user']['phone'] }}</div>
+                                                </td>
+                                                <td>{{ $item['status'] }}</td>
+                                            </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                                @endif
+                            </div>
+                        
+                            @push('scripts')
+                            <script>
+                                document.addEventListener('livewire:load', function () {
+                                    Livewire.on('generatePDF', function(data) {
+                                        const opt = {
+                                            margin: [10, 10, 10, 10],
+                                            filename: 'laporan_peminjaman_' + new Date().getTime() + '.pdf',
+                                            image: { type: 'jpeg', quality: 0.98 },
+                                            html2canvas: { scale: 2 },
+                                            jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+                                        };
+                        
+                                        const element = document.getElementById('pdf-content');
+                                        html2pdf().set(opt).from(element).save().then(() => {
+                                            Livewire.emit('pdfGenerated');
+                                        });
+                                    });
+                                });
+                            </script>
+                            @endpush
                         </div>
                     </div>
                 </div>
@@ -602,134 +728,6 @@
                 </div>
             </div>
         </div>
-    </div>
-
-    {{-- Export Modal --}}
-    <div 
-        x-data="{ 
-            showModal: @entangle('showExportModal'),
-            pdfData: null,
-            async generatePDF() {
-                try {
-                    this.pdfData = await $wire.getExportData();
-                    const opt = {
-                        margin: [10, 10, 10, 10],
-                        filename: 'laporan_peminjaman_' + new Date().getTime() + '.pdf',
-                        image: { type: 'jpeg', quality: 0.98 },
-                        html2canvas: { scale: 2 },
-                        jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
-                    };
-                    const element = document.getElementById('pdf-content');
-                    await html2pdf().set(opt).from(element).save();
-                    $wire.closeExportModal();
-                } catch (error) {
-                    console.error('Error generating PDF:', error);
-                }
-            }
-        }" 
-        x-show="showModal"
-        x-cloak
-        class="fixed inset-0 z-50 overflow-y-auto">
-        
-        <div class="flex min-h-screen items-end justify-center p-4 text-center sm:items-center sm:p-0">
-            <div class="fixed inset-0 bg-black/50 transition-opacity" @click="showModal = false"></div>
-
-            <div class="relative transform overflow-hidden rounded-lg bg-[#1a1625] px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
-                <div class="sm:flex sm:items-start">
-                    <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left w-full">
-                        <h3 class="text-xl font-semibold leading-6 text-gray-200">Export Data Peminjaman</h3>
-                        <div class="mt-6 space-y-4">
-                            {{-- Status Filter --}}
-                            <div>
-                                <label class="block text-sm font-medium text-gray-400 mb-2">Status Peminjaman</label>
-                                <select wire:model="exportStatus" class="w-full px-3 py-2.5 bg-[#0f0a19] rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm border border-gray-800">
-                                    <option value="">Semua Status</option>
-                                    @foreach($statuses as $status)
-                                        <option value="{{ $status }}">{{ $status }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            {{-- Date Range --}}
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-400 mb-2">Tanggal Mulai</label>
-                                    <input type="date" 
-                                        wire:model="exportDateStart" 
-                                        min="{{ $minDate }}" 
-                                        max="{{ $maxDate }}"
-                                        class="w-full px-3 py-2.5 bg-[#0f0a19] rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm border border-gray-800">
-                                    @error('exportDateStart') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-400 mb-2">Tanggal Akhir</label>
-                                    <input type="date" 
-                                        wire:model="exportDateEnd" 
-                                        min="{{ $minDate }}" 
-                                        max="{{ $maxDate }}"
-                                        class="w-full px-3 py-2.5 bg-[#0f0a19] rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm border border-gray-800">
-                                    @error('exportDateEnd') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="mt-6 flex justify-end space-x-3">
-                    <button @click="showModal = false"
-                        class="inline-flex justify-center rounded-lg bg-[#2a2435] px-3 py-2 text-sm font-semibold text-gray-300 shadow-sm ring-1 ring-inset ring-gray-800 hover:bg-[#2a2435]/70">
-                        Batal
-                    </button>
-                    <button @click="generatePDF()"
-                        class="inline-flex justify-center rounded-lg bg-purple-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-purple-700">
-                        Export PDF
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {{-- PDF Template (Hidden) --}}
-    <div id="pdf-content" class="hidden">
-        <template x-if="pdfData">
-            <div>
-                <h1 x-text="'Laporan Data Peminjaman - ' + pdfData.status"></h1>
-                <p x-text="'Periode: ' + pdfData.dateStart + ' - ' + pdfData.dateEnd"></p>
-                <p x-text="'Dicetak pada: ' + pdfData.timestamp"></p>
-                
-                <table>
-                    <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>ID Peminjaman</th>
-                            <th>Tanggal</th>
-                            <th>Buku</th>
-                            <th>Peminjam</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <template x-for="(item, index) in pdfData.peminjamans" :key="item.id">
-                            <tr>
-                                <td x-text="index + 1"></td>
-                                <td x-text="item.id"></td>
-                                <td x-text="item.created_at"></td>
-                                <td>
-                                    <div x-text="item.buku.judul"></div>
-                                    <div x-text="'Penulis: ' + item.buku.penulis"></div>
-                                    <div x-text="'ISBN: ' + item.buku.isbn"></div>
-                                </td>
-                                <td>
-                                    <div x-text="item.user.name"></div>
-                                    <div x-text="item.user.email"></div>
-                                    <div x-text="'Telp: ' + item.user.phone"></div>
-                                </td>
-                                <td x-text="item.status"></td>
-                            </tr>
-                        </template>
-                    </tbody>
-                </table>
-            </div>
-        </template>
     </div>
 </div>
 

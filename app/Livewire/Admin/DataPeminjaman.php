@@ -43,6 +43,7 @@ class DataPeminjaman extends Component
     public $exportDateEnd = '';
     public $minDate;
     public $maxDate;
+    public $exportData = null;
 
     public $statusColors = [
         'PENDING' => 'yellow',
@@ -471,6 +472,18 @@ class DataPeminjaman extends Component
             'dateEnd' => $this->exportDateEnd ? Carbon::parse($this->exportDateEnd)->format('d M Y') : 'All',
             'timestamp' => now()->format('d M Y H:i:s'),
         ];
+    }
+
+    public function generatePDF()
+    {
+        $this->exportData = $this->getExportData();
+        $this->emit('generatePDF');
+    }
+
+    public function pdfGenerated()
+    {
+        $this->closeExportModal();
+        $this->exportData = null;
     }
 
     public function render()
