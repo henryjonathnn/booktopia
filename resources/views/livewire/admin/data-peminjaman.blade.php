@@ -176,7 +176,7 @@
                         
                                         const element = document.getElementById('pdf-content');
                                         html2pdf().set(opt).from(element).save().then(() => {
-                                            Livewire.emit('pdfGenerated');
+                                            @this.dispatch('pdfGenerated');
                                         });
                                     });
                                 });

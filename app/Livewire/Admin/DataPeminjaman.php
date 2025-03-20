@@ -477,7 +477,7 @@ class DataPeminjaman extends Component
     public function generatePDF()
     {
         $this->exportData = $this->getExportData();
-        $this->emit('generatePDF');
+        $this->dispatch('generatePDF');
     }
 
     public function pdfGenerated()
