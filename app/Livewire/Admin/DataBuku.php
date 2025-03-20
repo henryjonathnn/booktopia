@@ -444,4 +444,58 @@ class DataBuku extends Component
     {
         $this->validateOnly($field);
     }
+
+    /**
+     * Menyimpan atau mengupdate data buku
+     */
+    public function saveBuku()
+    {
+        $this->validate();
+
+        try {
+            DB::beginTransaction();
+
+            $data = [
+                'isbn' => $this->isbn,
+                'judul' => $this->judul,
+                'penulis' => $this->penulis,
+                'penerbit' => $this->penerbit,
+                'tahun_terbit' => $this->tahun_terbit,
+                'stock' => $this->stock,
+                'kategori' => $this->bukuKategori,
+                'deskripsi' => $this->deskripsi,
+            ];
+
+            // Handle cover image upload
+            if ($this->coverImage) {
+                if ($this->existingCoverImage) {
+                    Storage::disk('public')->delete($this->existingCoverImage);
+                }
+                $data['cover_img'] = $this->coverImage->store('covers', 'public');
+            }
+
+            if ($this->bukuId) {
+                Buku::find($this->bukuId)->update($data);
+                $message = 'Buku berhasil diupdate!';
+            } else {
+                Buku::create($data);
+                $message = 'Buku berhasil ditambahkan!';
+            }
+
+            DB::commit();
+
+            $this->reset();
+            $this->dispatch('alert', [
+                'type' => 'success',
+                'message' => $message
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $this->dispatch('alert', [
+                'type' => 'error',
+                'message' => 'Error: ' . $e->getMessage()
+            ]);
+        }
+    }
 }
