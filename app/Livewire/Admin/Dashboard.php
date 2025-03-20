@@ -96,17 +96,10 @@ class Dashboard extends Component
             ->get()
             ->map(function ($peminjaman) {
                 return [
-                    'user' => [
-                        'name' => $peminjaman->user->name,
-                        'email' => $peminjaman->user->email,
-                        'initials' => strtoupper(substr($peminjaman->user->name, 0, 2))
-                    ],
-                    'book' => [
-                        'title' => $peminjaman->buku->judul,
-                        'author' => $peminjaman->buku->penulis
-                    ],
+                    'user' => $peminjaman->user->name,
+                    'book' => $peminjaman->buku->judul,
                     'action' => $this->getActionText($peminjaman->status),
-                    'date' => $peminjaman->created_at->format('M d, Y'),
+                    'date' => $peminjaman->updated_at->format('d M Y H:i'),
                     'status' => $peminjaman->status,
                     'status_color' => $this->getStatusColor($peminjaman->status)
                 ];
@@ -128,6 +121,23 @@ class Dashboard extends Component
             'DIKEMBALIKAN' => 'gray',
             'DITOLAK' => 'red',
             default => 'gray'
+        };
+    }
+
+    /**
+     * Helper untuk mengkonversi status ke teks aksi yang lebih readable
+     */
+    private function getActionText($status)
+    {
+        return match($status) {
+            'PENDING' => 'mengajukan peminjaman',
+            'DIPROSES' => 'peminjaman diproses',
+            'DIKIRIM' => 'buku dikirim',
+            'DIPINJAM' => 'meminjam buku',
+            'TERLAMBAT' => 'terlambat mengembalikan',
+            'DIKEMBALIKAN' => 'mengembalikan buku',
+            'DITOLAK' => 'peminjaman ditolak',
+            default => 'melakukan aksi'
         };
     }
 
