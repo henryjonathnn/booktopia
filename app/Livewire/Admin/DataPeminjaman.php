@@ -422,61 +422,61 @@ class DataPeminjaman extends Component
 
     public function getExportData()
     {
-        $this->validate([
-            'exportDateStart' => 'required_with:exportDateEnd|date|after_or_equal:' . $this->minDate,
-            'exportDateEnd' => 'required_with:exportDateStart|date|before_or_equal:' . $this->maxDate . '|after_or_equal:exportDateStart',
-        ], [
-            'exportDateStart.after_or_equal' => 'Tanggal mulai tidak boleh kurang dari ' . Carbon::parse($this->minDate)->format('d M Y'),
-            'exportDateEnd.before_or_equal' => 'Tanggal akhir tidak boleh lebih dari ' . Carbon::parse($this->maxDate)->format('d M Y'),
+        // Tambahkan logging
+        logger()->info('Export Data:', [
+            'status' => $this->exportStatus,
+            'dateStart' => $this->exportDateStart,
+            'dateEnd' => $this->exportDateEnd
         ]);
 
-        $query = Peminjaman::with(['user', 'buku', 'staff'])
-            ->when($this->exportStatus, function ($query) {
-                $query->where('status', $this->exportStatus);
-            })
-            ->when($this->exportDateStart && $this->exportDateEnd, function ($query) {
-                $query->whereBetween('created_at', [
-                    Carbon::parse($this->exportDateStart)->startOfDay(),
-                    Carbon::parse($this->exportDateEnd)->endOfDay()
-                ]);
-            })
-            ->latest();
+        $query = Peminjaman::query()
+            ->with(['user', 'buku']);
+
+        if ($this->exportStatus) {
+            $query->where('status', $this->exportStatus);
+        }
+
+        if ($this->exportDateStart && $this->exportDateEnd) {
+            $query->whereBetween('created_at', [
+                $this->exportDateStart . ' 00:00:00',
+                $this->exportDateEnd . ' 23:59:59'
+            ]);
+        }
 
         $peminjamans = $query->get();
 
+        // Tambahkan logging
+        logger()->info('Peminjamans count:', ['count' => $peminjamans->count()]);
+
         return [
-            'peminjamans' => $peminjamans->map(function($peminjaman) {
+            'status' => $this->exportStatus ?: 'Semua Status',
+            'dateStart' => $this->exportDateStart ?: 'Awal',
+            'dateEnd' => $this->exportDateEnd ?: 'Akhir',
+            'timestamp' => now()->format('d M Y H:i:s'),
+            'peminjamans' => $peminjamans->map(function ($item) {
                 return [
-                    'id' => $peminjaman->id,
-                    'created_at' => $peminjaman->created_at,
-                    'tanggal_pengiriman' => $peminjaman->tanggal_pengiriman,
-                    'tanggal_pengembalian' => $peminjaman->tanggal_pengembalian,
-                    'metode_pengiriman' => $peminjaman->metode_pengiriman,
-                    'status' => $peminjaman->status,
+                    'id' => $item->id,
+                    'created_at' => $item->created_at->format('d M Y'),
+                    'status' => $item->status,
                     'buku' => [
-                        'judul' => $peminjaman->buku->judul,
-                        'penulis' => $peminjaman->buku->penulis,
-                        'kategori' => $peminjaman->buku->kategori,
-                        'isbn' => $peminjaman->buku->isbn,
+                        'judul' => $item->buku->judul,
+                        'penulis' => $item->buku->penulis,
+                        'isbn' => $item->buku->isbn,
                     ],
                     'user' => [
-                        'name' => $peminjaman->user->name,
-                        'email' => $peminjaman->user->email,
-                        'phone' => $peminjaman->user->phone,
-                        'alamat' => $peminjaman->user->alamat,
+                        'name' => $item->user->name,
+                        'email' => $item->user->email,
+                        'phone' => $item->user->phone,
                     ],
                 ];
-            })->toArray(),
-            'status' => $this->exportStatus ?: 'Semua Status',
-            'dateStart' => $this->exportDateStart ? Carbon::parse($this->exportDateStart)->format('d M Y') : 'All',
-            'dateEnd' => $this->exportDateEnd ? Carbon::parse($this->exportDateEnd)->format('d M Y') : 'All',
-            'timestamp' => now()->format('d M Y H:i:s'),
+            })->toArray()
         ];
     }
 
     public function generatePDF()
     {
         $this->exportData = $this->getExportData();
+        logger()->info('Export Data Generated:', $this->exportData); // Tambahkan logging
         $this->dispatch('generatePDF');
     }
 

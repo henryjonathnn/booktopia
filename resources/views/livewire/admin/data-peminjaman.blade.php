@@ -119,78 +119,86 @@
                             @endif
                         
                             {{-- PDF Template (Hidden) --}}
-                            <div id="pdf-content" class="hidden">
+                            <div id="pdf-content" style="position: absolute; left: -9999px;">
                                 @if($exportData)
-                                <div class="p-8 bg-white text-black">
-                                    <div class="text-center mb-8">
-                                        <h1 class="text-2xl font-bold mb-2">Laporan Data Peminjaman - {{ $exportData['status'] }}</h1>
-                                        <p class="text-sm mb-1">Periode: {{ $exportData['dateStart'] }} - {{ $exportData['dateEnd'] }}</p>
-                                        <p class="text-sm">Dicetak pada: {{ $exportData['timestamp'] }}</p>
+                                    <div class="p-8 bg-white text-black" style="width: 1123px;">
+                                        <div class="text-center mb-8">
+                                            <h1 class="text-2xl font-bold mb-2">Laporan Data Peminjaman - {{ $exportData['status'] }}</h1>
+                                            <p class="text-sm mb-1">Periode: {{ $exportData['dateStart'] }} - {{ $exportData['dateEnd'] }}</p>
+                                            <p class="text-sm">Dicetak pada: {{ $exportData['timestamp'] }}</p>
+                                        </div>
+                                        
+                                        <table class="w-full border-collapse border border-gray-300">
+                                            <thead>
+                                                <tr class="bg-gray-100">
+                                                    <th class="border border-gray-300 px-4 py-2 text-left">No</th>
+                                                    <th class="border border-gray-300 px-4 py-2 text-left">ID Peminjaman</th>
+                                                    <th class="border border-gray-300 px-4 py-2 text-left">Tanggal</th>
+                                                    <th class="border border-gray-300 px-4 py-2 text-left">Buku</th>
+                                                    <th class="border border-gray-300 px-4 py-2 text-left">Peminjam</th>
+                                                    <th class="border border-gray-300 px-4 py-2 text-left">Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach($exportData['peminjamans'] as $index => $item)
+                                                <tr>
+                                                    <td class="border border-gray-300 px-4 py-2">{{ $index + 1 }}</td>
+                                                    <td class="border border-gray-300 px-4 py-2">{{ $item['id'] }}</td>
+                                                    <td class="border border-gray-300 px-4 py-2">{{ $item['created_at'] }}</td>
+                                                    <td class="border border-gray-300 px-4 py-2">
+                                                        <div class="font-semibold">{{ $item['buku']['judul'] }}</div>
+                                                        <div class="text-sm">Penulis: {{ $item['buku']['penulis'] }}</div>
+                                                        <div class="text-sm">ISBN: {{ $item['buku']['isbn'] }}</div>
+                                                    </td>
+                                                    <td class="border border-gray-300 px-4 py-2">
+                                                        <div class="font-semibold">{{ $item['user']['name'] }}</div>
+                                                        <div class="text-sm">{{ $item['user']['email'] }}</div>
+                                                        <div class="text-sm">Telp: {{ $item['user']['phone'] }}</div>
+                                                    </td>
+                                                    <td class="border border-gray-300 px-4 py-2">
+                                                        <span class="px-2 py-1 rounded text-sm
+                                                            @if($item['status'] === 'Dipinjam') bg-blue-100 text-blue-800
+                                                            @elseif($item['status'] === 'Dikembalikan') bg-green-100 text-green-800
+                                                            @elseif($item['status'] === 'Terlambat') bg-red-100 text-red-800
+                                                            @endif">
+                                                            {{ $item['status'] }}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
                                     </div>
-                                    
-                                    <table class="w-full border-collapse border border-gray-300">
-                                        <thead>
-                                            <tr class="bg-gray-100">
-                                                <th class="border border-gray-300 px-4 py-2 text-left">No</th>
-                                                <th class="border border-gray-300 px-4 py-2 text-left">ID Peminjaman</th>
-                                                <th class="border border-gray-300 px-4 py-2 text-left">Tanggal</th>
-                                                <th class="border border-gray-300 px-4 py-2 text-left">Buku</th>
-                                                <th class="border border-gray-300 px-4 py-2 text-left">Peminjam</th>
-                                                <th class="border border-gray-300 px-4 py-2 text-left">Status</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach($exportData['peminjamans'] as $index => $item)
-                                            <tr>
-                                                <td class="border border-gray-300 px-4 py-2">{{ $index + 1 }}</td>
-                                                <td class="border border-gray-300 px-4 py-2">{{ $item['id'] }}</td>
-                                                <td class="border border-gray-300 px-4 py-2">{{ $item['created_at'] }}</td>
-                                                <td class="border border-gray-300 px-4 py-2">
-                                                    <div class="font-semibold">{{ $item['buku']['judul'] }}</div>
-                                                    <div class="text-sm">Penulis: {{ $item['buku']['penulis'] }}</div>
-                                                    <div class="text-sm">ISBN: {{ $item['buku']['isbn'] }}</div>
-                                                </td>
-                                                <td class="border border-gray-300 px-4 py-2">
-                                                    <div class="font-semibold">{{ $item['user']['name'] }}</div>
-                                                    <div class="text-sm">{{ $item['user']['email'] }}</div>
-                                                    <div class="text-sm">Telp: {{ $item['user']['phone'] }}</div>
-                                                </td>
-                                                <td class="border border-gray-300 px-4 py-2">
-                                                    <span class="px-2 py-1 rounded text-sm
-                                                        @if($item['status'] === 'Dipinjam') bg-blue-100 text-blue-800
-                                                        @elseif($item['status'] === 'Dikembalikan') bg-green-100 text-green-800
-                                                        @elseif($item['status'] === 'Terlambat') bg-red-100 text-red-800
-                                                        @endif">
-                                                        {{ $item['status'] }}
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
+                                @else
+                                    <div>No export data available</div>
                                 @endif
                             </div>
                         
                             @push('scripts')
                             <script>
                                 document.addEventListener('livewire:initialized', function () {
-                                    // Listen untuk event generatePDF
                                     Livewire.on('generatePDF', () => {
                                         try {
-                                            const opt = {
-                                                margin: [10, 10, 10, 10],
-                                                filename: 'laporan_peminjaman_' + new Date().getTime() + '.pdf',
-                                                image: { type: 'jpeg', quality: 0.98 },
-                                                html2canvas: { scale: 2 },
-                                                jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
-                                            };
-
                                             const element = document.getElementById('pdf-content');
+                                            console.log('PDF Element:', element); // Tambahkan debugging
+                                            console.log('PDF Content:', element.innerHTML); // Tambahkan debugging
+
                                             if (!element) {
                                                 console.error('PDF content element not found');
                                                 return;
                                             }
+
+                                            const opt = {
+                                                margin: [10, 10, 10, 10],
+                                                filename: 'laporan_peminjaman_' + new Date().getTime() + '.pdf',
+                                                image: { type: 'jpeg', quality: 0.98 },
+                                                html2canvas: { 
+                                                    scale: 2,
+                                                    logging: true, // Tambahkan debugging
+                                                    useCORS: true
+                                                },
+                                                jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+                                            };
 
                                             // Generate PDF
                                             html2pdf()
@@ -198,7 +206,7 @@
                                                 .set(opt)
                                                 .save()
                                                 .then(() => {
-                                                    // Notify Livewire that PDF generation is complete
+                                                    console.log('PDF generated successfully'); // Tambahkan debugging
                                                     Livewire.dispatch('pdfGenerated');
                                                 })
                                                 .catch((error) => {
