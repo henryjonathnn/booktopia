@@ -8,16 +8,31 @@
             </div>
         </div>
         
-        <!-- Menu Items -->
-        <div class="flex-1 flex flex-col items-center justify-center space-y-8">
-            @foreach ($menuItems as $item)
-                <a href="{{ $item['path'] }}" class="p-3 rounded-xl hover:bg-purple-500/10 text-gray-400 hover:text-purple-400 transition-all duration-300 group relative {{ ($item['path'] === '/' && request()->is('/')) || request()->is(trim($item['path'], '/')) ? 'bg-purple-500/10 text-purple-400' : '' }}">
-                    <x-icon :name="$item['icon']" class="w-4 h-4" />
-                    <span class="absolute left-full ml-4 px-2 py-1 bg-[#1A1A2E] rounded-md text-sm opacity-0 group-hover:opacity-100 whitespace-nowrap">
-                        {{ $item['label'] }}
-                    </span>
-                </a>
-            @endforeach
+        <!-- Menu Items - Adjusted spacing -->
+        <div class="flex-1 flex flex-col items-center pt-8">
+            <!-- Centered top menu items with consistent spacing -->
+            <div class="space-y-6">
+                @foreach (array_slice($menuItems, 0, 2) as $item)
+                    <a href="{{ $item['path'] }}" class="p-3 rounded-xl hover:bg-purple-500/10 text-gray-400 hover:text-purple-400 transition-all duration-300 group relative {{ ($item['path'] === '/' && request()->is('/')) || request()->is(trim($item['path'], '/')) ? 'bg-purple-500/10 text-purple-400' : '' }}">
+                        <x-icon :name="$item['icon']" class="w-5 h-5" />
+                        <span class="absolute left-full ml-4 px-2 py-1 bg-[#1A1A2E] rounded-md text-sm opacity-0 group-hover:opacity-100 whitespace-nowrap">
+                            {{ $item['label'] }}
+                        </span>
+                    </a>
+                @endforeach
+            </div>
+
+            <!-- Bottom menu items -->
+            <div class="mt-auto mb-8 space-y-6">
+                @foreach (array_slice($menuItems, 2) as $item)
+                    <a href="{{ $item['path'] }}" class="p-3 rounded-xl hover:bg-purple-500/10 text-gray-400 hover:text-purple-400 transition-all duration-300 group relative {{ request()->is(trim($item['path'], '/')) ? 'bg-purple-500/10 text-purple-400' : '' }}">
+                        <x-icon :name="$item['icon']" class="w-5 h-5" />
+                        <span class="absolute left-full ml-4 px-2 py-1 bg-[#1A1A2E] rounded-md text-sm opacity-0 group-hover:opacity-100 whitespace-nowrap">
+                            {{ $item['label'] }}
+                        </span>
+                    </a>
+                @endforeach
+            </div>
         </div>
     </aside>
 
