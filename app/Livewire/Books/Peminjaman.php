@@ -13,6 +13,12 @@ class Peminjaman extends Component
 
     public $statusFilter = '';
     public $search = '';
+    public $showReturnConfirmation = false;
+    public $showRatingModal = false;
+    public $showPayDendaModal = false;
+    public $selectedPeminjaman = null;
+    public $rating = 0;
+    public $review = '';
 
     protected $queryString = [
         'statusFilter' => ['except' => ''],
@@ -37,6 +43,41 @@ class Peminjaman extends Component
     public function updatedStatusFilter()
     {
         $this->resetPage();
+    }
+
+    public function confirmReturn($peminjamanId)
+    {
+        $this->selectedPeminjaman = $peminjamanId;
+        $this->showReturnConfirmation = true;
+    }
+
+    public function returnBook()
+    {
+        if ($this->selectedPeminjaman) {
+            $peminjaman = ModelsPeminjaman::find($this->selectedPeminjaman);
+            if ($peminjaman) {
+                $peminjaman->update([
+                    'status' => 'DIKEMBALIKAN',
+                    'tgl_kembali_aktual' => now()
+                ]);
+
+                // Tambah stok buku
+                $peminjaman->buku->increment('stock');
+            }
+        }
+
+        $this->showReturnConfirmation = false;
+        $this->selectedPeminjaman = null;
+        $this->dispatch('alert', [
+            'type' => 'success',
+            'message' => 'Buku berhasil dikembalikan!'
+        ]);
+    }
+
+    public function closeReturnModal()
+    {
+        $this->showReturnConfirmation = false;
+        $this->selectedPeminjaman = null;
     }
 
     public function getStatusList()

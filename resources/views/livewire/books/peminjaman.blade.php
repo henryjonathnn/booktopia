@@ -122,4 +122,42 @@
             @endif
         </div>
     </div>
+</div>
+
+<!-- Modal Konfirmasi Pengembalian -->
+<div wire:key="return-modal">
+    @if($showReturnConfirmation)
+    <div class="fixed inset-0 z-50 overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                <div class="absolute inset-0 bg-gray-900 opacity-75"></div>
+            </div>
+
+            <div class="relative inline-block w-full max-w-lg p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-[#1A1A2E] rounded-2xl">
+                <div class="sm:flex sm:items-start">
+                    <div class="mt-3 text-center sm:mt-0 sm:text-left w-full">
+                        <h3 class="text-lg font-medium leading-6 text-white">
+                            Konfirmasi Pengembalian
+                        </h3>
+                        <div class="mt-2">
+                            <p class="text-gray-400">
+                                Apakah Anda yakin ingin mengembalikan buku ini?
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+                    <button type="button" wire:click="returnBook"
+                        class="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-white bg-green-600 border border-transparent rounded-md shadow-sm hover:bg-green-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
+                        Ya, Kembalikan
+                    </button>
+                    <button type="button" wire:click="closeReturnModal"
+                        class="mt-3 inline-flex justify-center w-full px-4 py-2 text-base font-medium text-gray-400 bg-[#1A1A2E] border border-gray-600 rounded-md shadow-sm hover:text-gray-300 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm">
+                        Batal
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
 </div> 
