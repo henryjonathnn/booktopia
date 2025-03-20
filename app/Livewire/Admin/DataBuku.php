@@ -61,31 +61,22 @@ class DataBuku extends Component
     public $selectedBuku = null;
 
     // Available categories from database
-    public $categories = [];
+    public $categories = [
+        'FIKSI',
+        'NON-FIKSI',
+        'SAINS',
+        'TEKNOLOGI',
+        'SEJARAH',
+        'SASTRA',
+        'KOMIK',
+        'LAINNYA'
+    ];
 
     protected $listeners = ['refreshBooks' => '$refresh'];
-
-    // Available categories from database
-    public function getCategories()
-    {
-        // Ambil nilai enum dari skema database
-        $enumValues = DB::select("SHOW COLUMNS FROM bukus WHERE Field = 'kategori'")[0]->Type;
-        preg_match('/^enum\((.*)\)$/', $enumValues, $matches);
-        
-        $values = [];
-        if (isset($matches[1])) {
-            foreach(explode(',', $matches[1]) as $value) {
-                $values[] = trim($value, "'");
-            }
-        }
-        
-        return $values;
-    }
 
     public function mount()
     {
         $this->resetPage();
-        $this->categories = $this->getCategories();
     }
 
     // Define validation rules
@@ -228,7 +219,8 @@ class DataBuku extends Component
         return view('livewire.admin.data-buku', [
             'books' => $books,
             'formConfig' => $this->getBukuFormConfig(),
-            'currentBuku' => $this->bukuId ? Buku::find($this->bukuId) : null
+            'currentBuku' => $this->bukuId ? Buku::find($this->bukuId) : null,
+            'categories' => $this->categories
         ])->layout('layouts.admin', ['title' => 'Data Buku']);
     }
 
@@ -462,8 +454,9 @@ class DataBuku extends Component
                 'penerbit' => $this->penerbit,
                 'tahun_terbit' => $this->tahun_terbit,
                 'stock' => $this->stock,
-                'kategori' => $this->bukuKategori,
+                'denda_harian' => $this->denda_harian,
                 'deskripsi' => $this->deskripsi,
+                'kategori' => $this->bukuKategori,
             ];
 
             // Handle cover image upload
