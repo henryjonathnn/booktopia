@@ -124,8 +124,12 @@
     </div>
 
     <!-- Modal Konfirmasi Pengembalian -->
-    @if($showReturnConfirmation)
-    <div class="fixed inset-0 z-50 overflow-y-auto" role="dialog">
+    <div x-data="{ show: false }" 
+         x-show="show || $wire.showReturnConfirmation" 
+         @open-return-modal.window="show = true"
+         @close-return-modal.window="show = false"
+         class="fixed inset-0 z-50 overflow-y-auto" 
+         style="display: none;">
         <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
             <div class="fixed inset-0 transition-opacity bg-gray-900 bg-opacity-75"></div>
 
@@ -143,19 +147,20 @@
                     </div>
                 </div>
                 <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
-                    <button type="button" wire:click="returnBook"
-                        class="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-white bg-green-600 border border-transparent rounded-md shadow-sm hover:bg-green-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
+                    <button type="button" 
+                            wire:click="returnBook"
+                            class="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-white bg-green-600 border border-transparent rounded-md shadow-sm hover:bg-green-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
                         Ya, Kembalikan
                     </button>
-                    <button type="button" wire:click="$set('showReturnConfirmation', false)"
-                        class="mt-3 inline-flex justify-center w-full px-4 py-2 text-base font-medium text-gray-400 bg-[#1A1A2E] border border-gray-600 rounded-md shadow-sm hover:text-gray-300 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm">
+                    <button type="button" 
+                            wire:click="closeReturnModal"
+                            class="mt-3 inline-flex justify-center w-full px-4 py-2 text-base font-medium text-gray-400 bg-[#1A1A2E] border border-gray-600 rounded-md shadow-sm hover:text-gray-300 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm">
                         Batal
                     </button>
                 </div>
             </div>
         </div>
     </div>
-    @endif
 
     <!-- Modal Rating -->
     @if($showRatingModal)

@@ -49,25 +49,32 @@ class Peminjaman extends Component
     {
         $this->selectedPeminjaman = $peminjamanId;
         $this->showReturnConfirmation = true;
-    }
-
-    public function returnBook()
-    {
-        // Logika pengembalian buku
-        $peminjaman = ModelsPeminjaman::find($this->selectedPeminjaman);
-        if ($peminjaman) {
-            $peminjaman->status = 'DIKEMBALIKAN';
-            $peminjaman->save();
-        }
-        
-        $this->showReturnConfirmation = false;
-        $this->selectedPeminjaman = null;
+        $this->dispatch('open-return-modal');
     }
 
     public function closeReturnModal()
     {
         $this->showReturnConfirmation = false;
         $this->selectedPeminjaman = null;
+        $this->dispatch('close-return-modal');
+    }
+
+    public function returnBook()
+    {
+        try {
+            $peminjaman = ModelsPeminjaman::find($this->selectedPeminjaman);
+            if ($peminjaman && $peminjaman->status === 'DIPINJAM') {
+                $peminjaman->status = 'DIKEMBALIKAN';
+                $peminjaman->tanggal_pengembalian = now();
+                $peminjaman->save();
+                
+                session()->flash('success', 'Buku berhasil dikembalikan');
+            }
+        } catch (\Exception $e) {
+            session()->flash('error', 'Terjadi kesalahan saat mengembalikan buku');
+        }
+        
+        $this->closeReturnModal();
     }
 
     public function getStatusList()
