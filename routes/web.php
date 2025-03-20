@@ -63,4 +63,5 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/peminjaman', \App\Livewire\Books\Peminjaman::class)->name('peminjaman');
     Route::get('/profile', \App\Livewire\User\Profile::class)->name('profile');
     Route::get('/favorit', App\Livewire\Books\Favorite::class)->name('favorit');
+    Route::get('/bookmark', App\Livewire\Books\Bookmark::class)->name('bookmark');
 });

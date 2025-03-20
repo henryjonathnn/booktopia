@@ -9,7 +9,7 @@ class Sidebar extends Component
     public $menuItems = [
         ['icon' => 'home', 'label' => 'Beranda', 'path' => '/'],
         ['icon' => 'book', 'label' => 'Buku', 'path' => '/buku'],
-        ['icon' => 'clock', 'label' => 'Riwayat', 'path' => '/riwayat'],
+        ['icon' => 'bookmark', 'label' => 'Bookmark', 'path' => '/bookmark'],
         ['icon' => 'heart', 'label' => 'Favorit', 'path' => '/favorit'],
         ['icon' => 'grid', 'label' => 'Koleksi', 'path' => '/koleksi'],
     ];

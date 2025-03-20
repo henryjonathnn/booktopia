@@ -14,14 +14,16 @@ class BookCard extends Component
 
     public function mount($book, $showRating = false, $rightLabel = 'Peminjam')
     {
-        // Load the sukas count relationship
-        $this->book = $book->loadCount('sukas');
+        $this->book = $book->loadCount(['sukas', 'bookmarks']);
         $this->showRating = $showRating;
         $this->rightLabel = $rightLabel;
         
-        // Check if current user has liked this book
         if (auth()->check()) {
             $this->isLiked = $this->book->sukas()
+                ->where('id_user', auth()->id())
+                ->exists();
+            
+            $this->isBookmarked = $this->book->bookmarks()
                 ->where('id_user', auth()->id())
                 ->exists();
         }
@@ -29,8 +31,23 @@ class BookCard extends Component
 
     public function toggleBookmark()
     {
-        // Implement bookmark logic here
+        if (!auth()->check()) {
+            return redirect()->route('login');
+        }
+
+        if ($this->isBookmarked) {
+            $this->book->bookmarks()
+                ->where('id_user', auth()->id())
+                ->delete();
+        } else {
+            $this->book->bookmarks()->create([
+                'id_user' => auth()->id()
+            ]);
+        }
+
         $this->isBookmarked = !$this->isBookmarked;
+        $this->book->refresh();
+        $this->book->loadCount('bookmarks');
     }
 
     public function toggleLike()
