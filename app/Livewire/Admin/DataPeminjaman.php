@@ -13,6 +13,7 @@ use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class DataPeminjaman extends Component
 {
@@ -420,15 +421,20 @@ class DataPeminjaman extends Component
         $this->reset(['exportStatus', 'exportDateStart', 'exportDateEnd']);
     }
 
+    public function generatePDF()
+    {
+        $data = $this->getExportData();
+        
+        $pdf = Pdf::loadView('pdf.peminjaman', $data);
+        $pdf->setPaper('a4', 'landscape');
+        
+        return response()->streamDownload(function() use ($pdf) {
+            echo $pdf->output();
+        }, 'laporan_peminjaman_'.now()->timestamp.'.pdf');
+    }
+
     public function getExportData()
     {
-        // Tambahkan logging
-        logger()->info('Export Data:', [
-            'status' => $this->exportStatus,
-            'dateStart' => $this->exportDateStart,
-            'dateEnd' => $this->exportDateEnd
-        ]);
-
         $query = Peminjaman::query()
             ->with(['user', 'buku']);
 
@@ -445,45 +451,13 @@ class DataPeminjaman extends Component
 
         $peminjamans = $query->get();
 
-        // Tambahkan logging
-        logger()->info('Peminjamans count:', ['count' => $peminjamans->count()]);
-
         return [
             'status' => $this->exportStatus ?: 'Semua Status',
             'dateStart' => $this->exportDateStart ?: 'Awal',
             'dateEnd' => $this->exportDateEnd ?: 'Akhir',
             'timestamp' => now()->format('d M Y H:i:s'),
-            'peminjamans' => $peminjamans->map(function ($item) {
-                return [
-                    'id' => $item->id,
-                    'created_at' => $item->created_at->format('d M Y'),
-                    'status' => $item->status,
-                    'buku' => [
-                        'judul' => $item->buku->judul,
-                        'penulis' => $item->buku->penulis,
-                        'isbn' => $item->buku->isbn,
-                    ],
-                    'user' => [
-                        'name' => $item->user->name,
-                        'email' => $item->user->email,
-                        'phone' => $item->user->phone,
-                    ],
-                ];
-            })->toArray()
+            'peminjamans' => $peminjamans
         ];
-    }
-
-    public function generatePDF()
-    {
-        $this->exportData = $this->getExportData();
-        logger()->info('Export Data Generated:', $this->exportData); // Tambahkan logging
-        $this->dispatch('generatePDF');
-    }
-
-    public function pdfGenerated()
-    {
-        $this->closeExportModal();
-        $this->exportData = null;
     }
 
     public function render()
