@@ -605,7 +605,9 @@
     </div>
 
     {{-- Export Modal --}}
-    <div x-data="{ 
+    <div 
+        x-data="{ 
+            showModal: @entangle('showExportModal'),
             pdfData: null,
             async generatePDF() {
                 try {
@@ -625,11 +627,12 @@
                 }
             }
         }" 
-        x-show="$wire.showExportModal" 
-        class="fixed inset-0 z-50 overflow-y-auto"
-        style="display: none;">
+        x-show="showModal"
+        x-cloak
+        class="fixed inset-0 z-50 overflow-y-auto">
+        
         <div class="flex min-h-screen items-end justify-center p-4 text-center sm:items-center sm:p-0">
-            <div class="fixed inset-0 bg-black/50 transition-opacity" @click="$wire.showExportModal = false"></div>
+            <div class="fixed inset-0 bg-black/50 transition-opacity" @click="showModal = false"></div>
 
             <div class="relative transform overflow-hidden rounded-lg bg-[#1a1625] px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
                 <div class="sm:flex sm:items-start">
@@ -672,7 +675,7 @@
                     </div>
                 </div>
                 <div class="mt-6 flex justify-end space-x-3">
-                    <button @click="$wire.showExportModal = false"
+                    <button @click="showModal = false"
                         class="inline-flex justify-center rounded-lg bg-[#2a2435] px-3 py-2 text-sm font-semibold text-gray-300 shadow-sm ring-1 ring-inset ring-gray-800 hover:bg-[#2a2435]/70">
                         Batal
                     </button>
@@ -687,44 +690,46 @@
 
     {{-- PDF Template (Hidden) --}}
     <div id="pdf-content" class="hidden">
-        <div x-show="pdfData" x-cloak>
-            <h1 x-text="'Laporan Data Peminjaman - ' + pdfData?.status"></h1>
-            <p x-text="'Periode: ' + pdfData?.dateStart + ' - ' + pdfData?.dateEnd"></p>
-            <p x-text="'Dicetak pada: ' + pdfData?.timestamp"></p>
-            
-            <table>
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>ID Peminjaman</th>
-                        <th>Tanggal</th>
-                        <th>Buku</th>
-                        <th>Peminjam</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <template x-for="(item, index) in pdfData?.peminjamans" :key="item.id">
+        <template x-if="pdfData">
+            <div>
+                <h1 x-text="'Laporan Data Peminjaman - ' + pdfData.status"></h1>
+                <p x-text="'Periode: ' + pdfData.dateStart + ' - ' + pdfData.dateEnd"></p>
+                <p x-text="'Dicetak pada: ' + pdfData.timestamp"></p>
+                
+                <table>
+                    <thead>
                         <tr>
-                            <td x-text="index + 1"></td>
-                            <td x-text="item.id"></td>
-                            <td x-text="item.created_at"></td>
-                            <td>
-                                <div x-text="item.buku.judul"></div>
-                                <div x-text="'Penulis: ' + item.buku.penulis"></div>
-                                <div x-text="'ISBN: ' + item.buku.isbn"></div>
-                            </td>
-                            <td>
-                                <div x-text="item.user.name"></div>
-                                <div x-text="item.user.email"></div>
-                                <div x-text="'Telp: ' + item.user.phone"></div>
-                            </td>
-                            <td x-text="item.status"></td>
+                            <th>No</th>
+                            <th>ID Peminjaman</th>
+                            <th>Tanggal</th>
+                            <th>Buku</th>
+                            <th>Peminjam</th>
+                            <th>Status</th>
                         </tr>
-                    </template>
-                </tbody>
-            </table>
-        </div>
+                    </thead>
+                    <tbody>
+                        <template x-for="(item, index) in pdfData.peminjamans" :key="item.id">
+                            <tr>
+                                <td x-text="index + 1"></td>
+                                <td x-text="item.id"></td>
+                                <td x-text="item.created_at"></td>
+                                <td>
+                                    <div x-text="item.buku.judul"></div>
+                                    <div x-text="'Penulis: ' + item.buku.penulis"></div>
+                                    <div x-text="'ISBN: ' + item.buku.isbn"></div>
+                                </td>
+                                <td>
+                                    <div x-text="item.user.name"></div>
+                                    <div x-text="item.user.email"></div>
+                                    <div x-text="'Telp: ' + item.user.phone"></div>
+                                </td>
+                                <td x-text="item.status"></td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+        </template>
     </div>
 </div>
 

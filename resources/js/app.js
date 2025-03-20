@@ -1,5 +1,4 @@
 import './bootstrap';
-import Alpine from 'alpinejs';
 
 // Definisikan fungsi untuk export PDF
 document.addEventListener('alpine:init', () => {
