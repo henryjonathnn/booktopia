@@ -20,7 +20,6 @@ document.addEventListener('alpine:init', () => {
                 
                 // Configure PDF options
                 const opt = {
-                    margin: [10, 10, 10, 10],
                     filename: 'laporan_peminjaman_' + new Date().getTime() + '.pdf',
                     image: { type: 'jpeg', quality: 0.98 },
                     html2canvas: { scale: 2 },
@@ -40,6 +39,7 @@ document.addEventListener('alpine:init', () => {
     }));
 });
 
-// Inisialisasi Alpine
+// Inisialisasi Alpine sekali saja
+import Alpine from 'alpinejs';
 window.Alpine = Alpine;
 Alpine.start();

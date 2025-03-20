@@ -45,7 +45,7 @@ class Peminjaman extends Component
         $this->resetPage();
     }
 
-    public function confirmReturn($peminjamanId)
+    public function showReturnConfirmationModal($peminjamanId)
     {
         $this->selectedPeminjaman = $peminjamanId;
         $this->showReturnConfirmation = true;
@@ -53,25 +53,15 @@ class Peminjaman extends Component
 
     public function returnBook()
     {
-        if ($this->selectedPeminjaman) {
-            $peminjaman = ModelsPeminjaman::find($this->selectedPeminjaman);
-            if ($peminjaman) {
-                $peminjaman->update([
-                    'status' => 'DIKEMBALIKAN',
-                    'tgl_kembali_aktual' => now()
-                ]);
-
-                // Tambah stok buku
-                $peminjaman->buku->increment('stock');
-            }
+        // Logika pengembalian buku
+        $peminjaman = ModelsPeminjaman::find($this->selectedPeminjaman);
+        if ($peminjaman) {
+            $peminjaman->status = 'DIKEMBALIKAN';
+            $peminjaman->save();
         }
-
+        
         $this->showReturnConfirmation = false;
         $this->selectedPeminjaman = null;
-        $this->dispatch('alert', [
-            'type' => 'success',
-            'message' => 'Buku berhasil dikembalikan!'
-        ]);
     }
 
     public function closeReturnModal()
