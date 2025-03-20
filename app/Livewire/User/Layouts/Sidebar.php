@@ -14,6 +14,12 @@ class Sidebar extends Component
     ];
     
     public function render()
+/**
+ * Render the Livewire user sidebar view.
+ *
+ * @return \Illuminate\View\View
+ */
+
     {
         return view('livewire.user.layouts.sidebar');
     }
