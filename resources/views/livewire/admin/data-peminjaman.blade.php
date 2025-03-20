@@ -121,39 +121,49 @@
                             {{-- PDF Template (Hidden) --}}
                             <div id="pdf-content" class="hidden">
                                 @if($exportData)
-                                <div>
-                                    <h1>Laporan Data Peminjaman - {{ $exportData['status'] }}</h1>
-                                    <p>Periode: {{ $exportData['dateStart'] }} - {{ $exportData['dateEnd'] }}</p>
-                                    <p>Dicetak pada: {{ $exportData['timestamp'] }}</p>
+                                <div class="p-8 bg-white text-black">
+                                    <div class="text-center mb-8">
+                                        <h1 class="text-2xl font-bold mb-2">Laporan Data Peminjaman - {{ $exportData['status'] }}</h1>
+                                        <p class="text-sm mb-1">Periode: {{ $exportData['dateStart'] }} - {{ $exportData['dateEnd'] }}</p>
+                                        <p class="text-sm">Dicetak pada: {{ $exportData['timestamp'] }}</p>
+                                    </div>
                                     
-                                    <table>
+                                    <table class="w-full border-collapse border border-gray-300">
                                         <thead>
-                                            <tr>
-                                                <th>No</th>
-                                                <th>ID Peminjaman</th>
-                                                <th>Tanggal</th>
-                                                <th>Buku</th>
-                                                <th>Peminjam</th>
-                                                <th>Status</th>
+                                            <tr class="bg-gray-100">
+                                                <th class="border border-gray-300 px-4 py-2 text-left">No</th>
+                                                <th class="border border-gray-300 px-4 py-2 text-left">ID Peminjaman</th>
+                                                <th class="border border-gray-300 px-4 py-2 text-left">Tanggal</th>
+                                                <th class="border border-gray-300 px-4 py-2 text-left">Buku</th>
+                                                <th class="border border-gray-300 px-4 py-2 text-left">Peminjam</th>
+                                                <th class="border border-gray-300 px-4 py-2 text-left">Status</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             @foreach($exportData['peminjamans'] as $index => $item)
                                             <tr>
-                                                <td>{{ $index + 1 }}</td>
-                                                <td>{{ $item['id'] }}</td>
-                                                <td>{{ $item['created_at'] }}</td>
-                                                <td>
-                                                    <div>{{ $item['buku']['judul'] }}</div>
-                                                    <div>Penulis: {{ $item['buku']['penulis'] }}</div>
-                                                    <div>ISBN: {{ $item['buku']['isbn'] }}</div>
+                                                <td class="border border-gray-300 px-4 py-2">{{ $index + 1 }}</td>
+                                                <td class="border border-gray-300 px-4 py-2">{{ $item['id'] }}</td>
+                                                <td class="border border-gray-300 px-4 py-2">{{ $item['created_at'] }}</td>
+                                                <td class="border border-gray-300 px-4 py-2">
+                                                    <div class="font-semibold">{{ $item['buku']['judul'] }}</div>
+                                                    <div class="text-sm">Penulis: {{ $item['buku']['penulis'] }}</div>
+                                                    <div class="text-sm">ISBN: {{ $item['buku']['isbn'] }}</div>
                                                 </td>
-                                                <td>
-                                                    <div>{{ $item['user']['name'] }}</div>
-                                                    <div>{{ $item['user']['email'] }}</div>
-                                                    <div>Telp: {{ $item['user']['phone'] }}</div>
+                                                <td class="border border-gray-300 px-4 py-2">
+                                                    <div class="font-semibold">{{ $item['user']['name'] }}</div>
+                                                    <div class="text-sm">{{ $item['user']['email'] }}</div>
+                                                    <div class="text-sm">Telp: {{ $item['user']['phone'] }}</div>
                                                 </td>
-                                                <td>{{ $item['status'] }}</td>
+                                                <td class="border border-gray-300 px-4 py-2">
+                                                    <span class="px-2 py-1 rounded text-sm
+                                                        @if($item['status'] === 'Dipinjam') bg-blue-100 text-blue-800
+                                                        @elseif($item['status'] === 'Dikembalikan') bg-green-100 text-green-800
+                                                        @elseif($item['status'] === 'Terlambat') bg-red-100 text-red-800
+                                                        @endif">
+                                                        {{ $item['status'] }}
+                                                    </span>
+                                                </td>
                                             </tr>
                                             @endforeach
                                         </tbody>
