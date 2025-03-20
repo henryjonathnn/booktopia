@@ -11,15 +11,10 @@ class Sidebar extends Component
         ['icon' => 'book', 'label' => 'Buku', 'path' => '/buku'],
         ['icon' => 'bookmark', 'label' => 'Bookmark', 'path' => '/bookmark'],
         ['icon' => 'heart', 'label' => 'Favorit', 'path' => '/favorit'],
+        ['icon' => 'grid', 'label' => 'Koleksi', 'path' => '/koleksi'],
     ];
     
     public function render()
-/**
- * Render the Livewire user sidebar view.
- *
- * @return \Illuminate\View\View
- */
-
     {
         return view('livewire.user.layouts.sidebar');
     }
