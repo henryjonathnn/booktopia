@@ -8,19 +8,24 @@ use Illuminate\Http\Request;
 class CheckRole
 {
     /**
-     * Handle an incoming request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @param  string  $role
-     * @return mixed
+     * Handle role-based access control
+     * Mendukung pengecekan single role atau multiple roles
+     * Format: 'role:ADMIN' atau 'role:ADMIN,STAFF'
      */
-    public function handle(Request $request, Closure $next, $role)
+    public function handle(Request $request, Closure $next, ...$roles)
     {
-        if (!$request->user() || $request->user()->role !== $role) {
-            return redirect()->route('home');
+        if (!auth()->check()) {
+            return redirect('login');
         }
 
-        return $next($request);
+        $userRole = auth()->user()->role;
+        
+        // Cek apakah role user ada dalam daftar roles yang diizinkan
+        if (in_array($userRole, $roles)) {
+            return $next($request);
+        }
+
+        // Redirect jika tidak punya akses
+        return redirect()->route('home')->with('error', 'Unauthorized access');
     }
 }
