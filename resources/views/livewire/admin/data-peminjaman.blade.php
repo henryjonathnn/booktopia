@@ -605,12 +605,33 @@
     </div>
 
     {{-- Export Modal --}}
-    <div x-data="exportPDF" x-show="$wire.showExportModal" class="fixed inset-0 z-50 overflow-y-auto">
+    <div x-data="{ 
+            pdfData: null,
+            async generatePDF() {
+                try {
+                    this.pdfData = await $wire.getExportData();
+                    const opt = {
+                        margin: [10, 10, 10, 10],
+                        filename: 'laporan_peminjaman_' + new Date().getTime() + '.pdf',
+                        image: { type: 'jpeg', quality: 0.98 },
+                        html2canvas: { scale: 2 },
+                        jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+                    };
+                    const element = document.getElementById('pdf-content');
+                    await html2pdf().set(opt).from(element).save();
+                    $wire.closeExportModal();
+                } catch (error) {
+                    console.error('Error generating PDF:', error);
+                }
+            }
+        }" 
+        x-show="$wire.showExportModal" 
+        class="fixed inset-0 z-50 overflow-y-auto"
+        style="display: none;">
         <div class="flex min-h-screen items-end justify-center p-4 text-center sm:items-center sm:p-0">
             <div class="fixed inset-0 bg-black/50 transition-opacity" @click="$wire.showExportModal = false"></div>
 
             <div class="relative transform overflow-hidden rounded-lg bg-[#1a1625] px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
-                {{-- Modal Content --}}
                 <div class="sm:flex sm:items-start">
                     <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left w-full">
                         <h3 class="text-xl font-semibold leading-6 text-gray-200">Export Data Peminjaman</h3>
@@ -650,13 +671,12 @@
                         </div>
                     </div>
                 </div>
-
-                {{-- Modal Actions --}}
                 <div class="mt-6 flex justify-end space-x-3">
-                    <button @click="$wire.showExportModal = false" class="inline-flex justify-center rounded-lg bg-[#2a2435] px-3 py-2 text-sm font-semibold text-gray-300 shadow-sm ring-1 ring-inset ring-gray-800 hover:bg-[#2a2435]/70">
+                    <button @click="$wire.showExportModal = false"
+                        class="inline-flex justify-center rounded-lg bg-[#2a2435] px-3 py-2 text-sm font-semibold text-gray-300 shadow-sm ring-1 ring-inset ring-gray-800 hover:bg-[#2a2435]/70">
                         Batal
                     </button>
-                    <button @click="generatePDF"
+                    <button @click="generatePDF()"
                         class="inline-flex justify-center rounded-lg bg-purple-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-purple-700">
                         Export PDF
                     </button>
@@ -665,80 +685,45 @@
         </div>
     </div>
 
-    {{-- Hidden PDF Template --}}
-    <div id="pdf-template" class="hidden">
-        <div id="pdf-content" style="font-family: Arial, sans-serif; padding: 40px;">
-            {{-- Header --}}
-            <div style="text-align: center; margin-bottom: 40px;">
-                <h1 style="font-size: 24px; color: #1a1625; margin: 0;">LAPORAN DATA PEMINJAMAN BUKU</h1>
-                <h2 style="font-size: 20px; color: #4B5563; margin: 10px 0;">Perpustakaan BooKoo</h2>
-                <div style="width: 100px; height: 4px; background: #7C3AED; margin: 20px auto;"></div>
-            </div>
-
-            {{-- Info Section --}}
-            <div style="margin-bottom: 30px; padding: 20px; background: #F3F4F6; border-radius: 8px;">
-                <table style="width: 100%;">
-                    <tr>
-                        <td style="padding: 5px; width: 150px;">Status</td>
-                        <td style="padding: 5px;">: <span x-text="data.status"></span></td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 5px;">Periode</td>
-                        <td style="padding: 5px;">: <span x-text="data.dateStart + ' - ' + data.dateEnd"></span></td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 5px;">Waktu Export</td>
-                        <td style="padding: 5px;">: <span x-text="data.timestamp"></span></td>
-                    </tr>
-                </table>
-            </div>
-
-            {{-- Data Table --}}
-            <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
+    {{-- PDF Template (Hidden) --}}
+    <div id="pdf-content" class="hidden">
+        <div x-show="pdfData" x-cloak>
+            <h1 x-text="'Laporan Data Peminjaman - ' + pdfData?.status"></h1>
+            <p x-text="'Periode: ' + pdfData?.dateStart + ' - ' + pdfData?.dateEnd"></p>
+            <p x-text="'Dicetak pada: ' + pdfData?.timestamp"></p>
+            
+            <table>
                 <thead>
-                    <tr style="background: #1a1625; color: white;">
-                        <th style="padding: 12px; text-align: left; border: 1px solid #E5E7EB;">No</th>
-                        <th style="padding: 12px; text-align: left; border: 1px solid #E5E7EB;">Informasi Peminjaman</th>
-                        <th style="padding: 12px; text-align: left; border: 1px solid #E5E7EB;">Data Buku</th>
-                        <th style="padding: 12px; text-align: left; border: 1px solid #E5E7EB;">Data Peminjam</th>
-                        <th style="padding: 12px; text-align: left; border: 1px solid #E5E7EB;">Status</th>
+                    <tr>
+                        <th>No</th>
+                        <th>ID Peminjaman</th>
+                        <th>Tanggal</th>
+                        <th>Buku</th>
+                        <th>Peminjam</th>
+                        <th>Status</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <template x-for="(item, index) in data.peminjamans" :key="item.id">
-                        <tr style="border-bottom: 1px solid #E5E7EB;">
-                            <td style="padding: 12px; border: 1px solid #E5E7EB;" x-text="index + 1"></td>
-                            <td style="padding: 12px; border: 1px solid #E5E7EB;">
-                                <div x-text="'ID: ' + item.id"></div>
-                                <div x-text="'Tanggal: ' + formatDate(item.created_at)"></div>
-                                <div x-text="'Metode: ' + item.metode_pengiriman"></div>
-                                <div x-if="item.tanggal_pengiriman" x-text="'Dikirim: ' + formatDate(item.tanggal_pengiriman)"></div>
-                                <div x-if="item.tanggal_pengembalian" x-text="'Dikembalikan: ' + formatDate(item.tanggal_pengembalian)"></div>
-                            </td>
-                            <td style="padding: 12px; border: 1px solid #E5E7EB;">
-                                <div style="font-weight: bold;" x-text="item.buku.judul"></div>
+                    <template x-for="(item, index) in pdfData?.peminjamans" :key="item.id">
+                        <tr>
+                            <td x-text="index + 1"></td>
+                            <td x-text="item.id"></td>
+                            <td x-text="item.created_at"></td>
+                            <td>
+                                <div x-text="item.buku.judul"></div>
                                 <div x-text="'Penulis: ' + item.buku.penulis"></div>
-                                <div x-text="'Kategori: ' + item.buku.kategori"></div>
                                 <div x-text="'ISBN: ' + item.buku.isbn"></div>
                             </td>
-                            <td style="padding: 12px; border: 1px solid #E5E7EB;">
-                                <div style="font-weight: bold;" x-text="item.user.name"></div>
+                            <td>
+                                <div x-text="item.user.name"></div>
                                 <div x-text="item.user.email"></div>
                                 <div x-text="'Telp: ' + item.user.phone"></div>
-                                <div x-text="'Alamat: ' + item.user.alamat"></div>
                             </td>
-                            <td style="padding: 12px; border: 1px solid #E5E7EB;">
-                                <div x-bind:style="getStatusStyle(item.status)" x-text="item.status"></div>
-                            </td>
+                            <td x-text="item.status"></td>
                         </tr>
                     </template>
                 </tbody>
             </table>
-
-            {{-- Footer --}}
-            <div style="text-align: right; font-style: italic; color: #4B5563;">
-                <p>Generated by BooKoo Library System</p>
-            </div>
         </div>
     </div>
 </div>
