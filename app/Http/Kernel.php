@@ -69,6 +69,5 @@ class Kernel extends HttpKernel
     protected $routeMiddleware = [
         // ... existing middlewares ...
         'check.peminjaman' => \App\Http\Middleware\CheckPeminjamanStatus::class,
-        'role' => \App\Http\Middleware\CheckRole::class,
     ];
 }
