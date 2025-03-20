@@ -41,6 +41,8 @@ class DataPeminjaman extends Component
     public $exportStatus = '';
     public $exportDateStart = '';
     public $exportDateEnd = '';
+    public $minDate;
+    public $maxDate;
 
     public $statusColors = [
         'PENDING' => 'yellow',
@@ -80,6 +82,13 @@ class DataPeminjaman extends Component
             'KURIR',
             'AMBIL_DI_TEMPAT'
         ];
+
+        // Get date range from peminjaman data
+        $dateRange = Peminjaman::selectRaw('MIN(created_at) as min_date, MAX(created_at) as max_date')
+            ->first();
+            
+        $this->minDate = $dateRange->min_date ? Carbon::parse($dateRange->min_date)->format('Y-m-d') : null;
+        $this->maxDate = $dateRange->max_date ? Carbon::parse($dateRange->max_date)->format('Y-m-d') : null;
     }
 
     // Reset semua state modal
@@ -413,8 +422,11 @@ class DataPeminjaman extends Component
     public function getExportData()
     {
         $this->validate([
-            'exportDateStart' => 'required_with:exportDateEnd|date',
-            'exportDateEnd' => 'required_with:exportDateStart|date|after_or_equal:exportDateStart',
+            'exportDateStart' => 'required_with:exportDateEnd|date|after_or_equal:' . $this->minDate,
+            'exportDateEnd' => 'required_with:exportDateStart|date|before_or_equal:' . $this->maxDate . '|after_or_equal:exportDateStart',
+        ], [
+            'exportDateStart.after_or_equal' => 'Tanggal mulai tidak boleh kurang dari ' . Carbon::parse($this->minDate)->format('d M Y'),
+            'exportDateEnd.before_or_equal' => 'Tanggal akhir tidak boleh lebih dari ' . Carbon::parse($this->maxDate)->format('d M Y'),
         ]);
 
         $query = Peminjaman::with(['user', 'buku', 'staff'])

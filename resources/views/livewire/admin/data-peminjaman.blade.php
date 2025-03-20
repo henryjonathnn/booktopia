@@ -627,11 +627,21 @@
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-sm font-medium text-gray-400 mb-2">Tanggal Mulai</label>
-                                    <input type="date" wire:model="exportDateStart" class="w-full px-3 py-2.5 bg-[#0f0a19] rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm border border-gray-800">
+                                    <input type="date" 
+                                        wire:model="exportDateStart" 
+                                        min="{{ $minDate }}" 
+                                        max="{{ $maxDate }}"
+                                        class="w-full px-3 py-2.5 bg-[#0f0a19] rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm border border-gray-800">
+                                    @error('exportDateStart') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-400 mb-2">Tanggal Akhir</label>
-                                    <input type="date" wire:model="exportDateEnd" class="w-full px-3 py-2.5 bg-[#0f0a19] rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm border border-gray-800">
+                                    <input type="date" 
+                                        wire:model="exportDateEnd" 
+                                        min="{{ $minDate }}" 
+                                        max="{{ $maxDate }}"
+                                        class="w-full px-3 py-2.5 bg-[#0f0a19] rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm border border-gray-800">
+                                    @error('exportDateEnd') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
                                 </div>
                             </div>
                         </div>
@@ -750,4 +760,58 @@
             })
         })
     </script>
+@endpush
+
+@push('scripts')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script>
+document.addEventListener('alpine:init', () => {
+    Alpine.data('exportPDF', () => ({
+        data: null,
+        async generatePDF() {
+            try {
+                // Get data from Livewire
+                this.data = await @this.getExportData();
+                
+                // Configure PDF options
+                const opt = {
+                    margin: [10, 10, 10, 10],
+                    filename: 'laporan_peminjaman_' + new Date().getTime() + '.pdf',
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2 },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+                };
+
+                // Generate PDF
+                const element = document.getElementById('pdf-content');
+                await html2pdf().set(opt).from(element).save();
+                
+                // Close modal
+                @this.closeExportModal();
+            } catch (error) {
+                console.error('Error generating PDF:', error);
+            }
+        },
+        formatDate(date) {
+            return new Date(date).toLocaleDateString('id-ID', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+        },
+        getStatusStyle(status) {
+            const styles = {
+                'PENDING': 'background: #FEF3C7; color: #92400E; padding: 4px 8px; border-radius: 4px; display: inline-block;',
+                'DIPROSES': 'background: #DBEAFE; color: #1E40AF; padding: 4px 8px; border-radius: 4px; display: inline-block;',
+                'DIKIRIM': 'background: #D1FAE5; color: #065F46; padding: 4px 8px; border-radius: 4px; display: inline-block;',
+                'DIPINJAM': 'background: #EDE9FE; color: #5B21B6; padding: 4px 8px; border-radius: 4px; display: inline-block;',
+                'TERLAMBAT': 'background: #FEE2E2; color: #991B1B; padding: 4px 8px; border-radius: 4px; display: inline-block;',
+                'DIKEMBALIKAN': 'background: #F3F4F6; color: #1F2937; padding: 4px 8px; border-radius: 4px; display: inline-block;',
+                'DITOLAK': 'background: #FEE2E2; color: #991B1B; padding: 4px 8px; border-radius: 4px; display: inline-block;'
+            };
+            return styles[status] || '';
+        }
+    }))
+});
+</script>
 @endpush
