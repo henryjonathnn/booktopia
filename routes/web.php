@@ -34,16 +34,6 @@ Route::middleware('guest')->group(function () {
     Route::get('/register', Register::class)->name('register');
 });
 
-// Protected Routes - authenticated users only
-Route::middleware('auth')->group(function () {
-    // Fitur-fitur lain yang membutuhkan autentikasi
-    Route::get('/dashboard', function() {
-        return view('dashboard');
-    })->name('dashboard');
-    
-    // Tambahkan fitur lain yang membutuhkan autentikasi di sini
-});
-
 // Admin Routes
 Route::middleware(['auth', 'role:ADMIN'])->group(function () {
     Route::get('/admin/dashboard', Dashboard::class)->name('admin.dashboard');
