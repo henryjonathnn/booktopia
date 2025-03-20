@@ -14,6 +14,14 @@
 
     {{-- Rating and Bookmark display --}}
     <div class="absolute top-2 right-2 flex space-x-2">
+        {{-- Love Button --}}
+        <button wire:click.stop="toggleLike"
+            class="p-1.5 md:p-2 rounded-lg bg-black/50 hover:bg-black/70 transition-all duration-300">
+            <x-icon name="heart" 
+                class="w-4.5 h-4.5 {{ $isLiked ? 'text-red-500 fill-red-500' : 'text-white' }}" />
+        </button>
+
+        {{-- Existing bookmark button --}}
         @if ($isBookmarked)
             <button wire:click.stop="toggleBookmark"
                 class="p-1.5 md:p-2 rounded-lg bg-black/50 hover:bg-black/70">
