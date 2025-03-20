@@ -9,6 +9,10 @@ use App\Models\User;
 use App\Models\Peminjaman;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * Controller untuk halaman dashboard admin
+ * Menampilkan statistik dan aktivitas terkini
+ */
 class Dashboard extends Component
 {
     public $totalUsers = 0;
@@ -80,6 +84,10 @@ class Dashboard extends Component
         $this->monthlyStats = array_reverse($monthlyStats);
     }
 
+    /**
+     * Mengambil data aktivitas peminjaman terbaru
+     * Termasuk detail user, buku, dan status
+     */
     public function getRecentActivities()
     {
         return Peminjaman::with(['user', 'buku'])
@@ -105,20 +113,10 @@ class Dashboard extends Component
             });
     }
 
-    private function getActionText($status)
-    {
-        return match($status) {
-            'PENDING' => 'Mengajukan Peminjaman',
-            'DIPROSES' => 'Sedang Diproses',
-            'DIKIRIM' => 'Dalam Pengiriman',
-            'DIPINJAM' => 'Meminjam',
-            'TERLAMBAT' => 'Terlambat',
-            'DIKEMBALIKAN' => 'Mengembalikan',
-            'DITOLAK' => 'Ditolak',
-            default => 'Unknown'
-        };
-    }
-
+    /**
+     * Helper untuk menentukan warna status berdasarkan jenisnya
+     * Digunakan untuk styling visual di view
+     */
     private function getStatusColor($status)
     {
         return match($status) {

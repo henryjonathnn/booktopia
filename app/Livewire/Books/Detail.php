@@ -9,6 +9,15 @@ use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
+/**
+ * Controller untuk menampilkan detail buku
+ * Menangani:
+ * - Informasi lengkap buku
+ * - Rating dan ulasan
+ * - Bookmark dan like
+ * - Buku-buku terkait
+ * - Pembuatan token peminjaman
+ */
 class Detail extends Component
 {
     public $book;
@@ -62,7 +71,10 @@ class Detail extends Component
         }
     }
     
-    // Add this new method to calculate total unique borrowers
+    /**
+     * Menghitung total peminjam unik untuk buku ini
+     * Digunakan untuk menampilkan popularitas buku
+     */
     private function calculateTotalPeminjam()
     {
         // Import the Peminjaman model at the top of your file
@@ -120,7 +132,11 @@ class Detail extends Component
         }
     }
 
-    // Helper method untuk generate slug
+    /**
+     * Helper method untuk generate slug buku
+     * Format: judul-buku-{id}
+     * Digunakan untuk URL yang SEO friendly
+     */
     public static function generateSlug($book)
     {
         return Str::slug($book->judul) . '-' . $book->id;

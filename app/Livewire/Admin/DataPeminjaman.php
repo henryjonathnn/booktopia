@@ -15,6 +15,10 @@ use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
 
+/**
+ * Controller untuk mengelola data peminjaman buku di panel admin
+ * Menangani operasi CRUD dan perubahan status peminjaman
+ */
 class DataPeminjaman extends Component
 {
     use WithPagination, WithFileUploads;
@@ -127,7 +131,12 @@ class DataPeminjaman extends Component
         $this->selectedPeminjaman = null;
     }
 
-    // Handler untuk approve peminjaman
+    /**
+     * Menangani persetujuan peminjaman buku
+     * - Mengubah status menjadi DIPROSES
+     * - Mencatat staff yang menyetujui
+     * - Membuat notifikasi untuk user
+     */
     public function approvePeminjaman($peminjamanId)
     {
         try {
@@ -238,6 +247,13 @@ class DataPeminjaman extends Component
         $this->dispatch('showConfirmation', ['peminjamanId' => $peminjamanId]);
     }
 
+    /**
+     * Menandai buku sebagai sedang dipinjam
+     * - Memvalidasi status sebelumnya harus DIKIRIM
+     * - Mengupdate tanggal peminjaman aktual
+     * - Menghitung tanggal pengembalian
+     * - Membuat notifikasi untuk user
+     */
     public function markAsDipinjam($peminjamanId)
     {
         try {

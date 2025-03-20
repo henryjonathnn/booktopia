@@ -11,6 +11,14 @@ use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 
+/**
+ * Controller untuk membuat peminjaman buku baru
+ * Menangani:
+ * - Validasi ketersediaan buku
+ * - Pemilihan metode pengambilan
+ * - Penentuan tanggal pinjam & kembali
+ * - Pembuatan record peminjaman
+ */
 class CreatePeminjaman extends Component
 {
     public $book;
@@ -107,6 +115,11 @@ class CreatePeminjaman extends Component
         }
     }
 
+    /**
+     * Mengupdate tanggal pengembalian otomatis
+     * berdasarkan tanggal peminjaman yang dipilih
+     * dengan maksimal durasi 7 hari
+     */
     private function updateDateKembali()
     {
         if ($this->tgl_peminjaman) {
@@ -120,6 +133,13 @@ class CreatePeminjaman extends Component
         }
     }
 
+    /**
+     * Memproses pembuatan peminjaman baru
+     * - Validasi input
+     * - Membuat record peminjaman
+     * - Membuat notifikasi
+     * - Redirect ke detail peminjaman
+     */
     public function createPeminjaman()
     {
         $this->validate();

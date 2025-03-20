@@ -4,6 +4,14 @@ namespace App\Livewire;
 
 use Livewire\Component;
 
+/**
+ * Component untuk menampilkan card buku
+ * Digunakan di berbagai halaman seperti:
+ * - Halaman utama
+ * - Hasil pencarian
+ * - Bookmark
+ * - Favorite
+ */
 class BookCard extends Component
 {
     public $book;
@@ -29,6 +37,10 @@ class BookCard extends Component
         }
     }
 
+    /**
+     * Menangani aksi bookmark/unbookmark buku
+     * Update status di database
+     */
     public function toggleBookmark()
     {
         if (!auth()->check()) {
@@ -50,6 +62,10 @@ class BookCard extends Component
         $this->book->loadCount('bookmarks');
     }
 
+    /**
+     * Menangani aksi like/unlike buku
+     * Update counter dan status di database
+     */
     public function toggleLike()
     {
         if (!auth()->check()) {

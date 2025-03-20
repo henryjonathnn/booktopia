@@ -10,6 +10,14 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * Controller untuk manajemen data buku
+ * Menangani:
+ * - CRUD operasi buku
+ * - Upload cover buku
+ * - Validasi ISBN
+ * - Pengelolaan stok
+ */
 class DataBuku extends Component
 {
     use WithPagination, WithFileUploads;
@@ -275,8 +283,11 @@ class DataBuku extends Component
         $this->selectedBuku = null;
     }
 
-    // Save the book (create or update)
-    public function saveBuku()
+    /**
+     * Menyimpan buku baru atau update existing
+     * Termasuk handling upload gambar cover
+     */
+    public function store()
     {
         $this->validate();
         
@@ -410,7 +421,10 @@ class DataBuku extends Component
         $this->existingCoverImage = null;
     }
 
-    // Validate ISBN in real-time
+    /**
+     * Validasi ISBN secara real-time
+     * Memastikan format dan keunikan ISBN
+     */
     public function validateField($field)
     {
         $this->validateOnly($field);
