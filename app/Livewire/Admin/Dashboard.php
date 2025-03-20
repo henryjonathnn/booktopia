@@ -88,15 +88,28 @@ class Dashboard extends Component
      * Mengambil data aktivitas peminjaman terbaru
      * Termasuk detail user, buku, dan status
      */
-    public function getRecentActivities()
+    private function getRecentActivities()
     {
         return Peminjaman::with(['user', 'buku'])
             ->latest()
             ->take(5)
             ->get()
             ->map(function ($peminjaman) {
+                // Get user initials
+                $nameParts = explode(' ', $peminjaman->user->name);
+                $initials = '';
+                if (count($nameParts) >= 2) {
+                    $initials = strtoupper(substr($nameParts[0], 0, 1) . substr($nameParts[1], 0, 1));
+                } else {
+                    $initials = strtoupper(substr($peminjaman->user->name, 0, 2));
+                }
+
                 return [
-                    'user' => $peminjaman->user->name,
+                    'user' => [
+                        'name' => $peminjaman->user->name,
+                        'email' => $peminjaman->user->email,
+                        'initials' => $initials
+                    ],
                     'book' => $peminjaman->buku->judul,
                     'action' => $this->getActionText($peminjaman->status),
                     'date' => $peminjaman->updated_at->format('d M Y H:i'),
