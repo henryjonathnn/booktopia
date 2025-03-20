@@ -10,6 +10,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ProcessOverduePeminjaman implements ShouldQueue
 {
@@ -54,12 +55,12 @@ class ProcessOverduePeminjaman implements ShouldQueue
                 ]);
 
                 // Kirim notifikasi ke user
-                $peminjaman->user->notify(new \App\Notifications\PeminjamanTerlambat($peminjaman));
+                // $peminjaman->user->notify(new \App\Notifications\PeminjamanTerlambat($peminjaman));
 
                 DB::commit();
             } catch (\Exception $e) {
                 DB::rollBack();
-                \Log::error('Error processing overdue: ' . $e->getMessage());
+                Log::error('Error processing overdue: ' . $e->getMessage());
             }
         }
     }

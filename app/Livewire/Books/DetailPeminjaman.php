@@ -92,7 +92,7 @@ class DetailPeminjaman extends Component
                 ]);
 
                 // Kirim notifikasi keterlambatan
-                $peminjaman->user->notify(new \App\Notifications\PeminjamanTerlambat($peminjaman));
+                // $peminjaman->user->notify(new \App\Notifications\PeminjamanTerlambat($peminjaman));
 
                 session()->flash('alert', [
                     'type' => 'error',

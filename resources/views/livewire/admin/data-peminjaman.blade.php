@@ -46,6 +46,17 @@
                                 <option value="{{ $metode }}">{{ str_replace('_', ' ', $metode) }}</option>
                             @endforeach
                         </select>
+
+                        <!-- Export PDF Button -->
+                        <button id="exportPdf"
+                            class="px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            Export PDF
+                        </button>
                     </div>
                 </div>
             </div>
@@ -118,47 +129,52 @@
                                             <button wire:click="showDetail({{ $peminjaman->id }})"
                                                 class="p-2 text-gray-400 hover:text-purple-400 transition-colors"
                                                 title="Detail">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
                                                         d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                                 </svg>
                                             </button>
 
-                                            @if($peminjaman->status === 'PENDING')
+                                            @if ($peminjaman->status === 'PENDING')
                                                 <button wire:click="showReject({{ $peminjaman->id }})"
                                                     class="p-2 text-gray-400 hover:text-red-400 transition-colors"
                                                     title="Tolak">
-                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                            d="M6 18L18 6M6 6l12 12" />
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                                                     </svg>
                                                 </button>
                                                 <button wire:click="processPeminjaman({{ $peminjaman->id }})"
                                                     class="p-2 text-gray-400 hover:text-green-400 transition-colors"
                                                     title="Proses">
-                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                            d="M5 13l4 4L19 7" />
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2" d="M5 13l4 4L19 7" />
                                                     </svg>
                                                 </button>
                                             @endif
 
-                                            @if($peminjaman->status === 'DIPROSES')
+                                            @if ($peminjaman->status === 'DIPROSES')
                                                 <button wire:click="showUpload({{ $peminjaman->id }})"
                                                     class="p-2 text-gray-400 hover:text-blue-400 transition-colors"
                                                     title="Upload Bukti">
-                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
                                                             d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                                                     </svg>
                                                 </button>
                                             @endif
 
-                                            @if($peminjaman->status === 'DIKIRIM')
-                                                <button 
-                                                    x-data
+                                            @if ($peminjaman->status === 'DIKIRIM')
+                                                <button x-data
                                                     @click="$dispatch('open-modal', { 
                                                         title: 'Konfirmasi Pengiriman',
                                                         message: 'Apakah Anda yakin buku sudah diterima oleh peminjam?',
@@ -166,11 +182,14 @@
                                                     })"
                                                     class="p-2 text-gray-400 hover:text-green-400 transition-colors group relative"
                                                     title="Tandai Terkirim">
-                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
                                                             d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                     </svg>
-                                                    <span class="absolute bottom-full right-0 mb-2 hidden group-hover:block bg-gray-800 text-white text-xs py-1 px-2 rounded">
+                                                    <span
+                                                        class="absolute bottom-full right-0 mb-2 hidden group-hover:block bg-gray-800 text-white text-xs py-1 px-2 rounded">
                                                         Tandai Terkirim
                                                     </span>
                                                 </button>
@@ -208,19 +227,22 @@
     </div>
 
     {{-- Modal Detail --}}
-    @if($showDetailModal)
+    @if ($showDetailModal)
         <div class="fixed inset-0 z-50 overflow-y-auto">
             <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
                 <div class="fixed inset-0 transition-opacity bg-black/50" wire:click="closeModal"></div>
 
-                <div class="relative inline-block w-full max-w-3xl text-left align-middle transition-all transform bg-[#1A1625] rounded-2xl shadow-xl">
-                    @if($selectedPeminjaman)
+                <div
+                    class="relative inline-block w-full max-w-3xl text-left align-middle transition-all transform bg-[#1A1625] rounded-2xl shadow-xl">
+                    @if ($selectedPeminjaman)
                         <!-- Header -->
                         <div class="flex items-center justify-between p-6 border-b border-purple-500/10">
-                            <h3 class="text-2xl font-bold text-white">Detail Peminjaman #{{ $selectedPeminjaman->id }}</h3>
+                            <h3 class="text-2xl font-bold text-white">Detail Peminjaman #{{ $selectedPeminjaman->id }}
+                            </h3>
                             <button wire:click="closeModal" class="text-gray-400 hover:text-white transition-colors">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M6 18L18 6M6 6l12 12" />
                                 </svg>
                             </button>
                         </div>
@@ -229,7 +251,8 @@
                         <div class="p-6 space-y-6">
                             <!-- Status Badge -->
                             <div class="flex justify-between items-center">
-                                <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-{{ $statusColors[$selectedPeminjaman->status] }}-500/20 text-{{ $statusColors[$selectedPeminjaman->status] }}-400">
+                                <span
+                                    class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-{{ $statusColors[$selectedPeminjaman->status] }}-500/20 text-{{ $statusColors[$selectedPeminjaman->status] }}-400">
                                     {{ $selectedPeminjaman->status }}
                                 </span>
                                 <span class="text-sm text-gray-400">
@@ -243,21 +266,27 @@
                                 <div class="bg-purple-500/5 rounded-xl p-4">
                                     <h4 class="text-lg font-semibold mb-4 text-purple-400">Informasi Buku</h4>
                                     <div class="flex space-x-4">
-                                        @if($selectedPeminjaman->buku->cover_img)
-                                            <img src="{{ asset('storage/' . $selectedPeminjaman->buku->cover_img) }}" 
-                                                alt="{{ $selectedPeminjaman->buku->judul }}" 
+                                        @if ($selectedPeminjaman->buku->cover_img)
+                                            <img src="{{ asset('storage/' . $selectedPeminjaman->buku->cover_img) }}"
+                                                alt="{{ $selectedPeminjaman->buku->judul }}"
                                                 class="w-24 h-32 object-cover rounded-lg shadow-lg">
                                         @else
-                                            <div class="w-24 h-32 bg-purple-500/10 rounded-lg flex items-center justify-center">
-                                                <svg class="w-12 h-12 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                            <div
+                                                class="w-24 h-32 bg-purple-500/10 rounded-lg flex items-center justify-center">
+                                                <svg class="w-12 h-12 text-purple-400" fill="none"
+                                                    stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                                                 </svg>
                                             </div>
                                         @endif
                                         <div>
                                             <h5 class="font-semibold">{{ $selectedPeminjaman->buku->judul }}</h5>
-                                            <p class="text-sm text-gray-400">{{ $selectedPeminjaman->buku->penulis }}</p>
-                                            <p class="text-sm text-gray-400 mt-2">ISBN: {{ $selectedPeminjaman->buku->isbn }}</p>
+                                            <p class="text-sm text-gray-400">{{ $selectedPeminjaman->buku->penulis }}
+                                            </p>
+                                            <p class="text-sm text-gray-400 mt-2">ISBN:
+                                                {{ $selectedPeminjaman->buku->isbn }}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -267,20 +296,26 @@
                                     <h4 class="text-lg font-semibold mb-4 text-purple-400">Informasi Peminjam</h4>
                                     <div class="space-y-2">
                                         <div class="flex items-center space-x-3">
-                                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                             </svg>
                                             <span>{{ $selectedPeminjaman->user->name }}</span>
                                         </div>
                                         <div class="flex items-center space-x-3">
-                                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                                             </svg>
                                             <span>{{ $selectedPeminjaman->user->email }}</span>
                                         </div>
                                         <div class="flex items-center space-x-3">
-                                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                                             </svg>
                                             <span>{{ $selectedPeminjaman->user->phone ?? '-' }}</span>
                                         </div>
@@ -294,7 +329,8 @@
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
                                         <p class="text-sm text-gray-400 mb-1">Metode Pengiriman</p>
-                                        <p class="font-medium">{{ str_replace('_', ' ', $selectedPeminjaman->metode_pengiriman) }}</p>
+                                        <p class="font-medium">
+                                            {{ str_replace('_', ' ', $selectedPeminjaman->metode_pengiriman) }}</p>
                                     </div>
                                     <div>
                                         <p class="text-sm text-gray-400 mb-1">Status Pengiriman</p>
@@ -304,7 +340,7 @@
                                         <p class="text-sm text-gray-400 mb-1">Alamat Pengiriman</p>
                                         <p class="font-medium">{{ $selectedPeminjaman->alamat_pengiriman }}</p>
                                     </div>
-                                    @if($selectedPeminjaman->catatan_pengiriman)
+                                    @if ($selectedPeminjaman->catatan_pengiriman)
                                         <div class="md:col-span-2">
                                             <p class="text-sm text-gray-400 mb-1">Catatan</p>
                                             <p class="font-medium">{{ $selectedPeminjaman->catatan_pengiriman }}</p>
@@ -319,31 +355,35 @@
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                     <div>
                                         <p class="text-sm text-gray-400 mb-1">Tanggal Peminjaman</p>
-                                        <p class="font-medium">{{ $selectedPeminjaman->tgl_peminjaman_diinginkan?->format('d M Y') ?? '-' }}</p>
+                                        <p class="font-medium">
+                                            {{ $selectedPeminjaman->tgl_peminjaman_diinginkan?->format('d M Y') ?? '-' }}
+                                        </p>
                                     </div>
                                     <div>
                                         <p class="text-sm text-gray-400 mb-1">Tanggal Pengembalian</p>
-                                        <p class="font-medium">{{ $selectedPeminjaman->tgl_kembali_rencana?->format('d M Y') ?? '-' }}</p>
+                                        <p class="font-medium">
+                                            {{ $selectedPeminjaman->tgl_kembali_rencana?->format('d M Y') ?? '-' }}</p>
                                     </div>
                                     <div>
                                         <p class="text-sm text-gray-400 mb-1">Durasi</p>
-                                        <p class="font-medium">{{ $selectedPeminjaman->tgl_peminjaman_diinginkan?->diffInDays($selectedPeminjaman->tgl_kembali_rencana) ?? 0 }} hari</p>
+                                        <p class="font-medium">
+                                            {{ $selectedPeminjaman->tgl_peminjaman_diinginkan?->diffInDays($selectedPeminjaman->tgl_kembali_rencana) ?? 0 }}
+                                            hari</p>
                                     </div>
                                 </div>
                             </div>
 
-                            @if($selectedPeminjaman->bukti_pengiriman)
+                            @if ($selectedPeminjaman->bukti_pengiriman)
                                 <!-- Shipping Proof -->
                                 <div class="bg-purple-500/5 rounded-xl p-4">
                                     <h4 class="text-lg font-semibold mb-4 text-purple-400">Bukti Pengiriman</h4>
                                     <div class="relative group">
-                                        <img 
-                                            src="{{ Storage::url($selectedPeminjaman->bukti_pengiriman) }}" 
+                                        <img src="{{ Storage::url($selectedPeminjaman->bukti_pengiriman) }}"
                                             alt="Bukti Pengiriman"
                                             class="w-full max-w-md rounded-lg shadow-lg cursor-pointer hover:opacity-90 transition-opacity"
-                                            onclick="window.open('{{ Storage::url($selectedPeminjaman->bukti_pengiriman) }}', '_blank')"
-                                        />
-                                        <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                            onclick="window.open('{{ Storage::url($selectedPeminjaman->bukti_pengiriman) }}', '_blank')" />
+                                        <div
+                                            class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                                             <span class="bg-black/50 text-white px-4 py-2 rounded-lg text-sm">
                                                 Klik untuk memperbesar
                                             </span>
@@ -355,8 +395,7 @@
 
                         <!-- Footer -->
                         <div class="flex justify-end px-6 py-4 border-t border-purple-500/10">
-                            <button 
-                                wire:click="closeModal"
+                            <button wire:click="closeModal"
                                 class="px-4 py-2 text-sm font-medium text-gray-300 bg-[#2a2435] hover:bg-[#2a2435]/70 rounded-lg transition-colors">
                                 Tutup
                             </button>
@@ -500,54 +539,42 @@
     @endif
 
     {{-- Custom Modal Component --}}
-    <div
-        x-data="{ 
-            show: false,
-            title: '',
-            message: '',
-            peminjamanId: null
-        }"
+    <div x-data="{
+        show: false,
+        title: '',
+        message: '',
+        peminjamanId: null
+    }"
         @open-modal.window="
             show = true;
             title = $event.detail.title;
             message = $event.detail.message;
             peminjamanId = $event.detail.peminjamanId;
         "
-        x-show="show"
-        x-cloak
-        class="fixed inset-0 z-50 overflow-y-auto"
-        style="display: none;"
-    >
+        x-show="show" x-cloak class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
         <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
-            <div 
-                x-show="show"
-                x-transition:enter="ease-out duration-300"
-                x-transition:enter-start="opacity-0"
-                x-transition:enter-end="opacity-100"
-                x-transition:leave="ease-in duration-200"
-                x-transition:leave-start="opacity-100"
-                x-transition:leave-end="opacity-0"
-                class="fixed inset-0 transition-opacity"
-                @click="show = false"
-            >
+            <div x-show="show" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200"
+                x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+                class="fixed inset-0 transition-opacity" @click="show = false">
                 <div class="absolute inset-0 bg-black/50"></div>
             </div>
 
-            <div 
-                x-show="show"
-                x-transition:enter="ease-out duration-300"
+            <div x-show="show" x-transition:enter="ease-out duration-300"
                 x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                 x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
                 x-transition:leave="ease-in duration-200"
                 x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
                 x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                class="relative inline-block overflow-hidden text-left align-bottom transition-all transform bg-[#1A1625] rounded-xl shadow-xl sm:my-8 sm:align-middle sm:max-w-lg sm:w-full"
-            >
+                class="relative inline-block overflow-hidden text-left align-bottom transition-all transform bg-[#1A1625] rounded-xl shadow-xl sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
                 <div class="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                     <div class="sm:flex sm:items-start">
-                        <div class="flex items-center justify-center flex-shrink-0 w-12 h-12 mx-auto bg-purple-500/10 rounded-full sm:mx-0 sm:h-10 sm:w-10">
-                            <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        <div
+                            class="flex items-center justify-center flex-shrink-0 w-12 h-12 mx-auto bg-purple-500/10 rounded-full sm:mx-0 sm:h-10 sm:w-10">
+                            <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </div>
                         <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
@@ -559,21 +586,17 @@
                     </div>
                 </div>
                 <div class="px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse sm:space-x-reverse sm:space-x-3">
-                    <button
-                        type="button"
+                    <button type="button"
                         class="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-white bg-purple-500 border border-transparent rounded-lg shadow-sm hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 sm:w-auto sm:text-sm"
                         @click="
                             show = false;
                             $wire.markAsDipinjam(peminjamanId);
-                        "
-                    >
+                        ">
                         Ya, Sudah Diterima
                     </button>
-                    <button
-                        type="button"
+                    <button type="button"
                         class="inline-flex justify-center w-full px-4 py-2 mt-3 text-base font-medium text-gray-300 bg-[#2a2435] border border-gray-800 rounded-lg shadow-sm hover:bg-[#2a2435]/70 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 sm:mt-0 sm:w-auto sm:text-sm"
-                        @click="show = false"
-                    >
+                        @click="show = false">
                         Batal
                     </button>
                 </div>
@@ -583,24 +606,24 @@
 </div>
 
 @push('scripts')
-<script>
-    window.addEventListener('showConfirmation', event => {
-        Swal.fire({
-            title: 'Konfirmasi Pengiriman',
-            text: 'Apakah Anda yakin buku sudah diterima oleh peminjam?',
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonText: 'Ya, Sudah Diterima',
-            cancelButtonText: 'Batal',
-            confirmButtonColor: '#10B981',
-            cancelButtonColor: '#6B7280',
-            background: '#1A1625',
-            color: '#fff'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                @this.markAsDipinjam(event.detail.peminjamanId)
-            }
+    <script>
+        window.addEventListener('showConfirmation', event => {
+            Swal.fire({
+                title: 'Konfirmasi Pengiriman',
+                text: 'Apakah Anda yakin buku sudah diterima oleh peminjam?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Sudah Diterima',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#10B981',
+                cancelButtonColor: '#6B7280',
+                background: '#1A1625',
+                color: '#fff'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    @this.markAsDipinjam(event.detail.peminjamanId)
+                }
+            })
         })
-    })
-</script>
+    </script>
 @endpush
