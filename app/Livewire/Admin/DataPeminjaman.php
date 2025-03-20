@@ -37,10 +37,10 @@ class DataPeminjaman extends Component
     public $metodes;
     public $uploadingPeminjamanId;
     public $showDetailModal = false;
+    public $showExportModal = false;
     public $exportStatus = '';
     public $exportDateStart = '';
     public $exportDateEnd = '';
-    public $showExportModal = false;
 
     public $statusColors = [
         'PENDING' => 'yellow',
@@ -399,6 +399,17 @@ class DataPeminjaman extends Component
         }
     }
 
+    public function showExportOptions()
+    {
+        $this->showExportModal = true;
+    }
+
+    public function closeExportModal()
+    {
+        $this->showExportModal = false;
+        $this->reset(['exportStatus', 'exportDateStart', 'exportDateEnd']);
+    }
+
     public function getExportData()
     {
         $this->validate([
@@ -421,7 +432,28 @@ class DataPeminjaman extends Component
         $peminjamans = $query->get();
 
         return [
-            'peminjamans' => $peminjamans,
+            'peminjamans' => $peminjamans->map(function($peminjaman) {
+                return [
+                    'id' => $peminjaman->id,
+                    'created_at' => $peminjaman->created_at,
+                    'tanggal_pengiriman' => $peminjaman->tanggal_pengiriman,
+                    'tanggal_pengembalian' => $peminjaman->tanggal_pengembalian,
+                    'metode_pengiriman' => $peminjaman->metode_pengiriman,
+                    'status' => $peminjaman->status,
+                    'buku' => [
+                        'judul' => $peminjaman->buku->judul,
+                        'penulis' => $peminjaman->buku->penulis,
+                        'kategori' => $peminjaman->buku->kategori,
+                        'isbn' => $peminjaman->buku->isbn,
+                    ],
+                    'user' => [
+                        'name' => $peminjaman->user->name,
+                        'email' => $peminjaman->user->email,
+                        'phone' => $peminjaman->user->phone,
+                        'alamat' => $peminjaman->user->alamat,
+                    ],
+                ];
+            })->toArray(),
             'status' => $this->exportStatus ?: 'Semua Status',
             'dateStart' => $this->exportDateStart ? Carbon::parse($this->exportDateStart)->format('d M Y') : 'All',
             'dateEnd' => $this->exportDateEnd ? Carbon::parse($this->exportDateEnd)->format('d M Y') : 'All',
