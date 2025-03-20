@@ -26,13 +26,13 @@ class Dashboard extends Component
         // Hitung total users (non-admin)
         $this->totalUsers = User::where('role', 'USER')->count();
         
-        // Hitung total buku (jumlah judul buku, bukan stok)
+        // Hitung total buku
         $this->totalBooks = Buku::count();
         
         // Hitung total peminjaman
         $this->totalLoans = Peminjaman::count();
         
-        // Hitung peminjaman aktif (status DIPINJAM)
+        // Hitung peminjaman aktif
         $this->activeLoans = Peminjaman::whereIn('status', ['DIPINJAM', 'TERLAMBAT'])->count();
 
         // Generate statistik bulanan untuk 6 bulan terakhir
@@ -95,7 +95,7 @@ class Dashboard extends Component
             ->take(5)
             ->get()
             ->map(function ($peminjaman) {
-                // Get user initials
+                // Generate user initials
                 $nameParts = explode(' ', $peminjaman->user->name);
                 $initials = '';
                 if (count($nameParts) >= 2) {
@@ -110,7 +110,10 @@ class Dashboard extends Component
                         'email' => $peminjaman->user->email,
                         'initials' => $initials
                     ],
-                    'book' => $peminjaman->buku->judul,
+                    'book' => [
+                        'title' => $peminjaman->buku->judul,
+                        'author' => $peminjaman->buku->penulis
+                    ],
                     'action' => $this->getActionText($peminjaman->status),
                     'date' => $peminjaman->updated_at->format('d M Y H:i'),
                     'status' => $peminjaman->status,
@@ -120,8 +123,7 @@ class Dashboard extends Component
     }
 
     /**
-     * Helper untuk menentukan warna status berdasarkan jenisnya
-     * Digunakan untuk styling visual di view
+     * Helper untuk menentukan warna status
      */
     private function getStatusColor($status)
     {
@@ -138,7 +140,7 @@ class Dashboard extends Component
     }
 
     /**
-     * Helper untuk mengkonversi status ke teks aksi yang lebih readable
+     * Helper untuk mengkonversi status ke teks aksi
      */
     private function getActionText($status)
     {
