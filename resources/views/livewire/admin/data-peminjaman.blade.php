@@ -164,20 +164,39 @@
                         
                             @push('scripts')
                             <script>
-                                document.addEventListener('livewire:load', function () {
-                                    Livewire.on('generatePDF', function(data) {
-                                        const opt = {
-                                            margin: [10, 10, 10, 10],
-                                            filename: 'laporan_peminjaman_' + new Date().getTime() + '.pdf',
-                                            image: { type: 'jpeg', quality: 0.98 },
-                                            html2canvas: { scale: 2 },
-                                            jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
-                                        };
-                        
-                                        const element = document.getElementById('pdf-content');
-                                        html2pdf().set(opt).from(element).save().then(() => {
-                                            @this.dispatch('pdfGenerated');
-                                        });
+                                document.addEventListener('livewire:initialized', function () {
+                                    // Listen untuk event generatePDF
+                                    Livewire.on('generatePDF', () => {
+                                        try {
+                                            const opt = {
+                                                margin: [10, 10, 10, 10],
+                                                filename: 'laporan_peminjaman_' + new Date().getTime() + '.pdf',
+                                                image: { type: 'jpeg', quality: 0.98 },
+                                                html2canvas: { scale: 2 },
+                                                jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+                                            };
+
+                                            const element = document.getElementById('pdf-content');
+                                            if (!element) {
+                                                console.error('PDF content element not found');
+                                                return;
+                                            }
+
+                                            // Generate PDF
+                                            html2pdf()
+                                                .from(element)
+                                                .set(opt)
+                                                .save()
+                                                .then(() => {
+                                                    // Notify Livewire that PDF generation is complete
+                                                    Livewire.dispatch('pdfGenerated');
+                                                })
+                                                .catch((error) => {
+                                                    console.error('Error generating PDF:', error);
+                                                });
+                                        } catch (error) {
+                                            console.error('Error in PDF generation:', error);
+                                        }
                                     });
                                 });
                             </script>
