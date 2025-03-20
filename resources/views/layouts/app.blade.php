@@ -11,6 +11,9 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         @livewireStyles
     @endonce
+    
+    {{-- Add html2pdf CDN --}}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 
 <body class="min-h-full flex flex-col">
@@ -19,6 +22,7 @@
     </div>
     
     @livewireScripts
+    @stack('scripts')
 </body>
 
 </html>
