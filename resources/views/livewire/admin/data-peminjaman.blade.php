@@ -48,12 +48,9 @@
                         </select>
 
                         <!-- Export PDF Button -->
-                        <button id="exportPdf"
-                            class="px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center justify-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        <button wire:click="showExportOptions" class="px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
                             Export PDF
                         </button>
@@ -600,6 +597,133 @@
                         Batal
                     </button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Export Modal --}}
+    <div x-data="exportPDF()" x-show="$wire.showExportModal" class="fixed inset-0 z-50 overflow-y-auto">
+        <div class="flex min-h-screen items-end justify-center p-4 text-center sm:items-center sm:p-0">
+            <div class="fixed inset-0 bg-black/50 transition-opacity" @click="$wire.showExportModal = false"></div>
+
+            <div class="relative transform overflow-hidden rounded-lg bg-[#1a1625] px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+                {{-- Modal Content --}}
+                <div class="sm:flex sm:items-start">
+                    <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left w-full">
+                        <h3 class="text-xl font-semibold leading-6 text-gray-200">Export Data Peminjaman</h3>
+                        <div class="mt-6 space-y-4">
+                            {{-- Status Filter --}}
+                            <div>
+                                <label class="block text-sm font-medium text-gray-400 mb-2">Status Peminjaman</label>
+                                <select wire:model="exportStatus" class="w-full px-3 py-2.5 bg-[#0f0a19] rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm border border-gray-800">
+                                    <option value="">Semua Status</option>
+                                    @foreach($statuses as $status)
+                                        <option value="{{ $status }}">{{ $status }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            {{-- Date Range --}}
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-400 mb-2">Tanggal Mulai</label>
+                                    <input type="date" wire:model="exportDateStart" class="w-full px-3 py-2.5 bg-[#0f0a19] rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm border border-gray-800">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-400 mb-2">Tanggal Akhir</label>
+                                    <input type="date" wire:model="exportDateEnd" class="w-full px-3 py-2.5 bg-[#0f0a19] rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm border border-gray-800">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Modal Actions --}}
+                <div class="mt-6 flex justify-end space-x-3">
+                    <button @click="$wire.showExportModal = false" class="inline-flex justify-center rounded-lg bg-[#2a2435] px-3 py-2 text-sm font-semibold text-gray-300 shadow-sm ring-1 ring-inset ring-gray-800 hover:bg-[#2a2435]/70">
+                        Batal
+                    </button>
+                    <button @click="generatePDF()" class="inline-flex justify-center rounded-lg bg-purple-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-purple-700">
+                        Export PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Hidden PDF Template --}}
+    <div id="pdf-template" class="hidden">
+        <div id="pdf-content" style="font-family: Arial, sans-serif; padding: 40px;">
+            {{-- Header --}}
+            <div style="text-align: center; margin-bottom: 40px;">
+                <h1 style="font-size: 24px; color: #1a1625; margin: 0;">LAPORAN DATA PEMINJAMAN BUKU</h1>
+                <h2 style="font-size: 20px; color: #4B5563; margin: 10px 0;">Perpustakaan BooKoo</h2>
+                <div style="width: 100px; height: 4px; background: #7C3AED; margin: 20px auto;"></div>
+            </div>
+
+            {{-- Info Section --}}
+            <div style="margin-bottom: 30px; padding: 20px; background: #F3F4F6; border-radius: 8px;">
+                <table style="width: 100%;">
+                    <tr>
+                        <td style="padding: 5px; width: 150px;">Status</td>
+                        <td style="padding: 5px;">: <span x-text="data.status"></span></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 5px;">Periode</td>
+                        <td style="padding: 5px;">: <span x-text="data.dateStart + ' - ' + data.dateEnd"></span></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 5px;">Waktu Export</td>
+                        <td style="padding: 5px;">: <span x-text="data.timestamp"></span></td>
+                    </tr>
+                </table>
+            </div>
+
+            {{-- Data Table --}}
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
+                <thead>
+                    <tr style="background: #1a1625; color: white;">
+                        <th style="padding: 12px; text-align: left; border: 1px solid #E5E7EB;">No</th>
+                        <th style="padding: 12px; text-align: left; border: 1px solid #E5E7EB;">Informasi Peminjaman</th>
+                        <th style="padding: 12px; text-align: left; border: 1px solid #E5E7EB;">Data Buku</th>
+                        <th style="padding: 12px; text-align: left; border: 1px solid #E5E7EB;">Data Peminjam</th>
+                        <th style="padding: 12px; text-align: left; border: 1px solid #E5E7EB;">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <template x-for="(item, index) in data.peminjamans" :key="item.id">
+                        <tr style="border-bottom: 1px solid #E5E7EB;">
+                            <td style="padding: 12px; border: 1px solid #E5E7EB;" x-text="index + 1"></td>
+                            <td style="padding: 12px; border: 1px solid #E5E7EB;">
+                                <div x-text="'ID: ' + item.id"></div>
+                                <div x-text="'Tanggal: ' + formatDate(item.created_at)"></div>
+                                <div x-text="'Metode: ' + item.metode_pengiriman"></div>
+                                <div x-if="item.tanggal_pengiriman" x-text="'Dikirim: ' + formatDate(item.tanggal_pengiriman)"></div>
+                                <div x-if="item.tanggal_pengembalian" x-text="'Dikembalikan: ' + formatDate(item.tanggal_pengembalian)"></div>
+                            </td>
+                            <td style="padding: 12px; border: 1px solid #E5E7EB;">
+                                <div style="font-weight: bold;" x-text="item.buku.judul"></div>
+                                <div x-text="'Penulis: ' + item.buku.penulis"></div>
+                                <div x-text="'Kategori: ' + item.buku.kategori"></div>
+                                <div x-text="'ISBN: ' + item.buku.isbn"></div>
+                            </td>
+                            <td style="padding: 12px; border: 1px solid #E5E7EB;">
+                                <div style="font-weight: bold;" x-text="item.user.name"></div>
+                                <div x-text="item.user.email"></div>
+                                <div x-text="'Telp: ' + item.user.phone"></div>
+                                <div x-text="'Alamat: ' + item.user.alamat"></div>
+                            </td>
+                            <td style="padding: 12px; border: 1px solid #E5E7EB;">
+                                <div x-bind:style="getStatusStyle(item.status)" x-text="item.status"></div>
+                            </td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+
+            {{-- Footer --}}
+            <div style="text-align: right; font-style: italic; color: #4B5563;">
+                <p>Generated by BooKoo Library System</p>
             </div>
         </div>
     </div>

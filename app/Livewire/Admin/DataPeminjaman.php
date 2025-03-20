@@ -37,6 +37,10 @@ class DataPeminjaman extends Component
     public $metodes;
     public $uploadingPeminjamanId;
     public $showDetailModal = false;
+    public $exportStatus = '';
+    public $exportDateStart = '';
+    public $exportDateEnd = '';
+    public $showExportModal = false;
 
     public $statusColors = [
         'PENDING' => 'yellow',
@@ -395,6 +399,35 @@ class DataPeminjaman extends Component
         }
     }
 
+    public function getExportData()
+    {
+        $this->validate([
+            'exportDateStart' => 'required_with:exportDateEnd|date',
+            'exportDateEnd' => 'required_with:exportDateStart|date|after_or_equal:exportDateStart',
+        ]);
+
+        $query = Peminjaman::with(['user', 'buku', 'staff'])
+            ->when($this->exportStatus, function ($query) {
+                $query->where('status', $this->exportStatus);
+            })
+            ->when($this->exportDateStart && $this->exportDateEnd, function ($query) {
+                $query->whereBetween('created_at', [
+                    Carbon::parse($this->exportDateStart)->startOfDay(),
+                    Carbon::parse($this->exportDateEnd)->endOfDay()
+                ]);
+            })
+            ->latest();
+
+        $peminjamans = $query->get();
+
+        return [
+            'peminjamans' => $peminjamans,
+            'status' => $this->exportStatus ?: 'Semua Status',
+            'dateStart' => $this->exportDateStart ? Carbon::parse($this->exportDateStart)->format('d M Y') : 'All',
+            'dateEnd' => $this->exportDateEnd ? Carbon::parse($this->exportDateEnd)->format('d M Y') : 'All',
+            'timestamp' => now()->format('d M Y H:i:s'),
+        ];
+    }
 
     public function render()
     {
