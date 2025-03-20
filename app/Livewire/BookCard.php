@@ -14,7 +14,8 @@ class BookCard extends Component
 
     public function mount($book, $showRating = false, $rightLabel = 'Peminjam')
     {
-        $this->book = $book;
+        // Load the sukas count relationship
+        $this->book = $book->loadCount('sukas');
         $this->showRating = $showRating;
         $this->rightLabel = $rightLabel;
         
@@ -51,7 +52,9 @@ class BookCard extends Component
         }
 
         $this->isLiked = !$this->isLiked;
+        // Refresh the book data to get updated sukas count
         $this->book->refresh();
+        $this->book->loadCount('sukas');
     }
 
     public function showBookDetail()

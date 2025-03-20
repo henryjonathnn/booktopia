@@ -1,5 +1,5 @@
-<div class="relative group">
-    {{-- Love Button Container - Positioned with more space from edge --}}
+<div class="relative group h-full">
+    {{-- Love Button Container --}}
     <div class="absolute top-4 right-4 z-10">
         <button wire:click.prevent="toggleLike"
             class="p-2 rounded-lg bg-black/50 hover:bg-black/70 transition-all duration-300">
@@ -10,19 +10,23 @@
 
     {{-- Book Card Link --}}
     <a href="{{ route('buku.detail', ['slug' => \App\Livewire\Books\Detail::generateSlug($book)]) }}"
-        class="glass-effect rounded-2xl p-3 md:p-4 card-glow border border-purple-500/10 transition-all duration-300 hover:-translate-y-2 flex flex-col cursor-pointer block"
+        class="glass-effect h-full rounded-2xl p-3 md:p-4 card-glow border border-purple-500/10 transition-all duration-300 hover:-translate-y-2 flex flex-col cursor-pointer block"
         x-data="{ isHovered: false }" 
         @mouseover="isHovered = true" 
         @mouseout="isHovered = false"
         :class="{ '-translate-y-2': isHovered }">
         
-        {{-- Cover Image --}}
-        @if ($book->cover_img)
-            <img src="{{ asset('storage/' . $book->cover_img) }}" alt="{{ $book->judul }}"
-                class="w-full aspect-[2/3] rounded-xl object-cover" loading="lazy" decoding="async" />
-        @else
-            <div class="w-full aspect-[2/3] rounded-xl bg-gray-300"></div>
-        @endif
+        {{-- Cover Image Container dengan aspect ratio yang konsisten --}}
+        <div class="w-full aspect-[2/3] mb-3 md:mb-4">
+            @if ($book->cover_img)
+                <img src="{{ asset('storage/' . $book->cover_img) }}" alt="{{ $book->judul }}"
+                    class="w-full h-full rounded-xl object-cover" loading="lazy" decoding="async" />
+            @else
+                <div class="w-full h-full rounded-xl bg-gray-300 flex items-center justify-center">
+                    <x-icon name="book-open" class="w-12 h-12 text-gray-400" />
+                </div>
+            @endif
+        </div>
 
         <div class="flex-grow flex flex-col justify-between">
             <div class="mb-3 md:mb-4">
@@ -40,7 +44,7 @@
                     <div class="flex items-center justify-end space-x-1">
                         @if (!$showRating)
                             <span class="text-purple-400">+</span>
-                            <p class="font-medium">{{ number_format($book->peminjam) }}</p>
+                            <p class="font-medium">{{ $book->sukas_count ?? 0 }}</p>
                         @else
                             <div class="flex items-center">
                                 <x-icon name="star" class="w-3.5 h-3.5 text-yellow-400" />
