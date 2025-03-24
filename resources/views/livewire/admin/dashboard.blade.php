@@ -1,13 +1,11 @@
 <div>
-    <h1 class="text-2xl font-semibold mb-6">Dashboard Overview</h1>
-    
     <!-- Stats Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 mt-20">
         <!-- Total Users Card -->
         <div class="bg-[#1a1625] rounded-xl shadow-md border border-purple-500/10 p-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-gray-400 text-sm font-medium">Total Users</p>
+                    <p class="text-gray-400 text-sm font-medium">Total User</p>
                     <h3 class="text-3xl font-bold mt-1">{{ $totalUsers }}</h3>
                 </div>
                 <div class="p-3 bg-purple-500/10 rounded-lg">
@@ -23,7 +21,7 @@
                     </svg>
                     8.4%
                 </span>
-                <span class="text-gray-400 ml-2">Since last month</span>
+                <span class="text-gray-400 ml-2">Sejak bulan lalu</span>
             </div>
         </div>
 
@@ -31,7 +29,7 @@
         <div class="bg-[#1a1625] rounded-xl shadow-md border border-purple-500/10 p-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-gray-400 text-sm font-medium">Total Books</p>
+                    <p class="text-gray-400 text-sm font-medium">Total Buku</p>
                     <h3 class="text-3xl font-bold mt-1">{{ $totalBooks }}</h3>
                 </div>
                 <div class="p-3 bg-indigo-500/10 rounded-lg">
@@ -47,7 +45,7 @@
                     </svg>
                     12.1%
                 </span>
-                <span class="text-gray-400 ml-2">Since last month</span>
+                <span class="text-gray-400 ml-2">Sejak bulan lalu</span>
             </div>
         </div>
 
@@ -55,7 +53,7 @@
         <div class="bg-[#1a1625] rounded-xl shadow-md border border-purple-500/10 p-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-gray-400 text-sm font-medium">Total Loans</p>
+                    <p class="text-gray-400 text-sm font-medium">Peminjaman</p>
                     <h3 class="text-3xl font-bold mt-1">{{ $totalLoans }}</h3>
                 </div>
                 <div class="p-3 bg-blue-500/10 rounded-lg">
@@ -71,7 +69,7 @@
                     </svg>
                     5.2%
                 </span>
-                <span class="text-gray-400 ml-2">Since last month</span>
+                <span class="text-gray-400 ml-2">Sejak bulan lalu</span>
             </div>
         </div>
 
@@ -79,7 +77,7 @@
         <div class="bg-[#1a1625] rounded-xl shadow-md border border-purple-500/10 p-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-gray-400 text-sm font-medium">Active Loans</p>
+                    <p class="text-gray-400 text-sm font-medium">Dipinjam</p>
                     <h3 class="text-3xl font-bold mt-1">{{ $activeLoans }}</h3>
                 </div>
                 <div class="p-3 bg-green-500/10 rounded-lg">
@@ -96,7 +94,7 @@
                     </svg>
                     2.1%
                 </span>
-                <span class="text-gray-400 ml-2">Since last month</span>
+                <span class="text-gray-400 ml-2">Sejak bulan lalu</span>
             </div>
         </div>
     </div>
